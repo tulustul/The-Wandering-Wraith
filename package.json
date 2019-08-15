@@ -1,0 +1,25 @@
+{
+  "name": "js13k2019",
+  "version": "1.0.0",
+  "description": "A 13kB shooter challenge",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --mode=development --host 0.0.0.0",
+    "build": "webpack --mode=production --env=prod",
+    "publish": "npm run build && ./publish.js"
+  },
+  "author": "Mateusz Tomczyk",
+  "license": "MIT",
+  "devDependencies": {
+    "copy-webpack-plugin": "^4.6.0",
+    "gh-pages": "^1.2.0",
+    "imagemin": "^6.1.0",
+    "imagemin-pngquant": "^6.0.1",
+    "ts-loader": "^4.5.0",
+    "typescript": "^3.5.3",
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.6",
+    "webpack-dev-server": "^3.8.0",
+    "webpack-shell-plugin": "^0.5.0"
+  }
+}
