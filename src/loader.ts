@@ -8,15 +8,13 @@ import { generateBezierSegments } from "./bezier";
 // c - cubic bezier, (x1 y1 x2 y2 x y)+
 // v - vertical line, y+
 // z - close path
-const commands = "mlcvhz";
+const commands = "MlcVHz";
 
 export function loadLevel(engine: EntityEngine, level: string) {
-  const svg = document.getElementById(level)! as any;
-  const height = svg["viewBox"].baseVal.height;
-  const paths = svg.querySelectorAll("path");
+  const paths = document.getElementById(level)!.querySelectorAll("path");
   for (const path of paths) {
     const d = path.getAttribute("d")!;
-    for (const [start, end] of new PathParser(d, height).parse()) {
+    for (const [start, end] of new PathParser(d).parse()) {
       console.log(start, end);
       new TerrainSegmentComponent(engine, { start, end });
     }
@@ -27,9 +25,7 @@ class PathParser {
   private pos: Vector2;
   private index = 0;
 
-  constructor(private d: string, height: number) {
-    this.pos = new Vector2(0, height);
-  }
+  constructor(private d: string) {}
 
   *parse(): IterableIterator<[Vector2, Vector2]> {
     let command!: string;
@@ -45,20 +41,20 @@ class PathParser {
         continue;
       }
       switch (command) {
-        case "m":
-          this.pos.add(this.parseVector());
+        case "M":
+          this.pos = this.parseVector();
           command = "l";
           break;
         case "l":
           yield [this.pos.copy(), this.pos.add(this.parseVector()).copy()];
           break;
-        case "v":
+        case "V":
           const y = this.parseNumber();
           const start = this.pos.copy();
-          this.pos.y += y;
+          this.pos.y = y;
           yield [start, this.pos.copy()];
           break;
-        case "h":
+        case "H":
           const x = this.parseNumber();
           const start2 = this.pos.copy();
           this.pos.x += x;

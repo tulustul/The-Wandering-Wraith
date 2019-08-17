@@ -100,7 +100,7 @@ export class Game {
     //   end: new Vector2(1500, 400),
     // });
 
-    loadLevel(this.engine, "level1");
+    loadLevel(this.engine, "a");
     // const controlPoints = [
     //   // new Vector2(0, 100),
     //   // new Vector2(110, 33),
