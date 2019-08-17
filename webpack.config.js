@@ -3,6 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlWebpackInlineSVGPlugin = require("html-webpack-inline-svg-plugin");
 const ExtraWatchWebpackPlugin = require("extra-watch-webpack-plugin");
+const ZipPlugin = require("zip-webpack-plugin");
 
 module.exports = env => {
   const isProd = env === "prod";
@@ -21,21 +22,15 @@ module.exports = env => {
     }),
     new HtmlWebpackInlineSVGPlugin({
       runPreEmit: true,
-      convertPathData: false,
-      convertTransform: false,
-      cleanupNumericValues: false,
-      convertShapeToPath: false,
-      transformsWithOnePath: false,
-      removeDimensions: false,
-      removeAttrs: false,
-      cleanupAttrs: false,
-      convertColors: false,
-      removeUnusedNS: false,
     }),
     new ExtraWatchWebpackPlugin({
       files: ["levels/*.svg"],
     }),
   ];
+
+  if (isProd) {
+    plugins.push(new ZipPlugin({ filename: "bundle.zip" }));
+  }
 
   return {
     entry: "./src/index.ts",

@@ -3,10 +3,11 @@ import { Vector2 } from "./vector";
 import { TerrainSegmentComponent } from "./systems/terrain";
 import { generateBezierSegments } from "./bezier";
 
-// m - move to, (x y)+
+// M - move to, (x y)
 // l - line to, (x y)+
 // c - cubic bezier, (x1 y1 x2 y2 x y)+
-// v - vertical line, y+
+// V - vertical line, y
+// H - vertical line, y
 // z - close path
 const commands = "MlcVHz";
 
