@@ -2,12 +2,6 @@ import { Vector2 } from "../../vector";
 import { GRID_SIZE } from "./constants";
 import { getIndexOfCell } from "./helpers";
 
-function circleToPointColision(circle: CircleShape, point: Vector2) {
-  const distX = point.x - circle.pos.x;
-  const distY = point.y - circle.pos.y;
-  return Math.sqrt(distX * distX + distY * distY) <= circle.radius;
-}
-
 function lineToPointColision(
   lineStart: Vector2,
   lineEnd: Vector2,
@@ -71,12 +65,6 @@ export class CircleShape extends Shape {
   }
 
   checkColisionWithLine(line: LineShape) {
-    const startInside1 = circleToPointColision(this, line.start);
-    const startInside2 = circleToPointColision(this, line.end);
-    if (startInside1 || startInside2) {
-      // return true;
-      return null;
-    }
     const length = line.start.distanceTo(line.end);
     const dot =
       ((this.pos.x - line.start.x) * (line.end.x - line.start.x) +
@@ -93,13 +81,18 @@ export class CircleShape extends Shape {
       return null;
     }
 
-    const penetration = this.radius - this.pos.distanceTo(closestPoint);
-    if (penetration <= 0) {
-      return null;
-    }
+    return this.getPenetration(closestPoint);
+    // this.getPenetration(line.start) ||
+    // this.getPenetration(line.end)
+  }
 
-    const angle = this.pos.directionTo(closestPoint);
-    return new Vector2(0, 1).mul(-penetration).rotate(angle);
+  getPenetration(p: Vector2) {
+    const penetration = this.radius - this.pos.distanceTo(p);
+    if (penetration > 0) {
+      const angle = this.pos.directionTo(p);
+      return new Vector2(0, 1).mul(-penetration).rotate(angle);
+    }
+    return null;
   }
 }
 

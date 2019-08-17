@@ -149,7 +149,9 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
   private resolveColisions(colisions: IterableIterator<Colision>) {
     for (const colision of colisions) {
       colision.hitter.pos.add(colision.force);
-      colision.hitter.vel.add(colision.force.mul(colision.hitter.bounciness));
+      colision.hitter.vel.add(colision.force);
+      // colision.hitter.vel.rotate(colision.force.angle());
+      // .mul(colision.hitter.bounciness);
     }
   }
 
