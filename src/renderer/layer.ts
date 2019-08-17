@@ -54,6 +54,7 @@ export class Layer {
       this.canvas.width = this.renderer.game.canvas.width;
       this.canvas.height = this.renderer.game.canvas.height;
     }
+    this.clearCanvas();
   }
 
   clearCanvas() {

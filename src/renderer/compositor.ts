@@ -13,20 +13,49 @@ interface CompositorEntry {
   target?: string;
   blendMode?: BlendMode;
   offset?: boolean;
+  offsetScale?: number;
 }
 
 // missing fields just repeat from the last entry
 const COMPOSITOR_ENTRIES: CompositorEntry[] = [
   {
-    target: "movingProps",
+    target: "base",
+    source: "background",
+    blendMode: "source-over",
+    offset: true,
+    offsetScale: 0.3,
+  },
+  {
+    target: "base",
+    source: "hills1",
+    blendMode: "source-over",
+    offset: true,
+    offsetScale: 0.1,
+  },
+  {
+    target: "base",
+    source: "hills2",
+    blendMode: "source-over",
+    offset: true,
+    offsetScale: 0.15,
+  },
+  {
+    target: "base",
+    source: "hills3",
+    blendMode: "source-over",
+    offset: true,
+    offsetScale: 0.2,
+  },
+  {
+    target: "base",
     source: "terrain",
-    blendMode: "lighten",
-    offset: false,
+    blendMode: "source-over",
+    offset: true,
   },
   {
     target: "base",
     source: "movingProps",
-    blendMode: "lighten",
+    blendMode: "source-over",
     offset: false,
   },
 ];
@@ -65,19 +94,25 @@ export class Compositor {
 
       target.context.globalCompositeOperation = entry.blendMode as BlendMode;
 
+      const offsetScale = nextEntry.offsetScale || 1;
+
       if (entry.offset) {
-        this.drawLayerWithCameraOffset(target, source);
+        this.drawLayerWithCameraOffset(target, source, offsetScale);
       } else {
         target.context.drawImage(source.canvas, 0, 0);
       }
     }
   }
 
-  drawLayerWithCameraOffset(target: Layer, source: Layer) {
+  drawLayerWithCameraOffset(
+    target: Layer,
+    source: Layer,
+    offsetScale: number,
+  ) {
     target.context.drawImage(
       source.canvas,
-      -this.camera.pos.x,
-      -this.camera.pos.y,
+      -this.camera.pos.x * offsetScale,
+      -this.camera.pos.y * offsetScale,
       this.canvas.width,
       this.canvas.height,
       0,

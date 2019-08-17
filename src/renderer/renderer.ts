@@ -26,7 +26,7 @@ export class Renderer {
 
     this.baseLayer = new Layer("base", this, {
       followPlayer: false,
-      fill: "black",
+      clear: false,
       canvas: this.game.canvas,
     });
 

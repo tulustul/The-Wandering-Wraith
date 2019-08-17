@@ -9,14 +9,18 @@ import { generateBezierSegments } from "./bezier";
 // V - vertical line, y
 // H - vertical line, y
 // z - close path
-const commands = "MlcVHz";
+const commands = "MLlcVHz";
 
 export function loadLevel(engine: EntityEngine, level: string) {
-  const paths = document.getElementById(level)!.querySelectorAll("path");
+  const svg = document.getElementById(level) as any;
+
+  engine.worldWidth = svg.viewBox.baseVal.width;
+  engine.worldHeight = svg.viewBox.baseVal.height;
+
+  const paths = svg.querySelectorAll("path");
   for (const path of paths) {
     const d = path.getAttribute("d")!;
     for (const [start, end] of new PathParser(d).parse()) {
-      console.log(start, end);
       new TerrainSegmentComponent(engine, { start, end });
     }
   }
@@ -48,6 +52,11 @@ class PathParser {
           break;
         case "l":
           yield [this.pos.copy(), this.pos.add(this.parseVector()).copy()];
+          break;
+        case "L":
+          const start3 = this.pos.copy();
+          this.pos = this.parseVector();
+          yield [start3, this.pos.copy()];
           break;
         case "V":
           const y = this.parseNumber();

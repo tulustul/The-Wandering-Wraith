@@ -4,6 +4,23 @@ import { Renderer } from "./renderer";
 import { AgentSystem } from "../systems/agent";
 import { TerrainSystem } from "../systems/terrain";
 import { CircleShape } from "../systems/physics/shapes";
+import { generateTree } from "../trees";
+
+function svgToImg() {
+  const svg = document.querySelector("svg")!;
+  const xml = new XMLSerializer().serializeToString(svg);
+
+  const svg64 = btoa(xml);
+  const b64Start = "data:image/svg+xml;base64,";
+  const image64 = b64Start + svg64;
+
+  const img = new Image();
+  img.src = image64;
+
+  return img;
+}
+
+const terrainImg = svgToImg();
 
 export class SystemsRenderer {
   terrainLayer = new Layer("terrain", this.renderer, {
@@ -16,7 +33,29 @@ export class SystemsRenderer {
     clear: true,
   });
 
-  activeLayer: Layer;
+  skyLayer = new Layer("background", this.renderer, {
+    renderWholeWorld: true,
+    followPlayer: false,
+    clear: false,
+  });
+
+  hills1 = new Layer("hills1", this.renderer, {
+    renderWholeWorld: true,
+    followPlayer: false,
+    clear: false,
+  });
+
+  hills2 = new Layer("hills2", this.renderer, {
+    renderWholeWorld: true,
+    followPlayer: false,
+    clear: false,
+  });
+
+  hills3 = new Layer("hills3", this.renderer, {
+    renderWholeWorld: true,
+    followPlayer: false,
+    clear: false,
+  });
 
   constructor(private renderer: Renderer) {}
 
@@ -32,15 +71,16 @@ export class SystemsRenderer {
     this.context.strokeStyle = "#ffffff";
     this.context.globalCompositeOperation = "source-over";
 
-    for (const terrainSegment of this.engine.getSystem<TerrainSystem>(
-      TerrainSystem,
-    ).entities) {
-      this.context.beginPath();
-      this.context.moveTo(terrainSegment.start.x, terrainSegment.start.y);
-      this.context.lineTo(terrainSegment.end.x, terrainSegment.end.y);
-      this.context.stroke();
-      this.context.closePath();
-    }
+    this.context.drawImage(terrainImg, 0, 0);
+    // for (const terrainSegment of this.engine.getSystem<TerrainSystem>(
+    //   TerrainSystem,
+    // ).entities) {
+    //   this.context.beginPath();
+    //   this.context.moveTo(terrainSegment.start.x, terrainSegment.start.y);
+    //   this.context.lineTo(terrainSegment.end.x, terrainSegment.end.y);
+    //   this.context.stroke();
+    //   this.context.closePath();
+    // }
   }
 
   renderAgents() {
@@ -70,10 +110,71 @@ export class SystemsRenderer {
     }
   }
 
-  render() {
+  renderSky() {
+    const canvas = this.renderer.activeLayer.canvas;
+    var grd = this.context.createLinearGradient(0, 0, 0, canvas.height);
+    grd.addColorStop(0, "#a8dfff");
+    grd.addColorStop(0.7, "#111");
+
+    this.context.fillStyle = grd;
+    this.context.fillRect(0, 0, canvas.width, canvas.height);
+
+    const treeImg = generateTree(8, 0.5, 65);
+    this.context.drawImage(treeImg, 530, 200);
+  }
+
+  renderHills(
+    colorHigh: string,
+    colorLow: string,
+    x1: number,
+    x2: number,
+    x3: number,
+    y1: number,
+    y2: number,
+    y3: number,
+  ) {
+    const canvas = this.renderer.activeLayer.canvas;
+
+    var grd = this.context.createLinearGradient(0, 0, 0, canvas.height);
+    grd.addColorStop(0, colorHigh);
+    grd.addColorStop(1, colorLow);
+
+    this.context.fillStyle = grd;
+    this.context.beginPath();
+    this.context.moveTo(0, 0);
+    for (let x = 0; x <= canvas.width; x++) {
+      this.context.lineTo(
+        x,
+        Math.sin(x / x1) * y1 +
+          Math.sin(x / x2) * y2 +
+          Math.sin(x / x3) * y3 +
+          canvas.height / 4,
+      );
+    }
+    this.context.lineTo(canvas.width, canvas.height);
+    this.context.lineTo(0, canvas.height);
+    this.context.closePath();
+    this.context.fill();
+  }
+
+  prerender() {
+    this.skyLayer.activate();
+    this.renderSky();
+
     this.terrainLayer.activate();
     this.renderTerrain();
 
+    this.hills1.activate();
+    this.renderHills("#ccecff", "#2d3438", 163, 139, 111, 200, 150, 79);
+
+    this.hills2.activate();
+    this.renderHills("#a6ddff", "#1e282e", 197, 211, 380, 140, 35, 80);
+
+    this.hills3.activate();
+    this.renderHills("#104263", "#061824", 260, 311, 290, 111, 98, 64);
+  }
+
+  render() {
     this.movingPropsLayer.activate();
     this.renderAgents();
   }
