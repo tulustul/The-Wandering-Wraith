@@ -9,11 +9,13 @@ import { treeDefinitions, TreeDefinition } from "../trees";
 interface FoliageOptions {
   pos: Vector2;
   definition: TreeDefinition;
+  isForeground: boolean;
 }
 
 export class FoliageComponent extends Entity {
   pos!: Vector2;
   definition!: TreeDefinition;
+  isForeground: boolean;
   constructor(options: FoliageOptions) {
     super();
     Object.assign(this, options);
@@ -39,10 +41,17 @@ export class FoliageSystem extends EntitySystem<FoliageComponent> {
         );
         if (pos) {
           const img = treeDefinition.frames[0];
+          const isForeground = Math.random() > 0.5;
           this.add(
             new FoliageComponent({
-              pos: pos.add(new Vector2(img.width / -2, -img.height + 20)),
+              pos: pos.add(
+                new Vector2(
+                  img.width / -2,
+                  -img.height + (isForeground ? 20 : 0),
+                ),
+              ),
               definition: treeDefinition,
+              isForeground,
             }),
           );
         }

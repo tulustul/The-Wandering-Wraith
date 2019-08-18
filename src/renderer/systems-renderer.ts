@@ -59,7 +59,12 @@ export class SystemsRenderer {
     clear: false,
   });
 
-  foliageLayer = new Layer("trees", this.renderer, {
+  foliageBackgroundLayer = new Layer("foliageBackground", this.renderer, {
+    followPlayer: true,
+    clear: true,
+  });
+
+  foliageForegroundLayer = new Layer("foliageForeground", this.renderer, {
     followPlayer: true,
     clear: true,
   });
@@ -82,17 +87,17 @@ export class SystemsRenderer {
 
     // debug below:
     // Toggle terrain colision helpers
-    this.context.strokeStyle = "#ff0";
-    this.context.lineWidth = 2;
-    for (const terrainSegment of this.engine.getSystem<TerrainSystem>(
-      TerrainSystem,
-    ).entities) {
-      this.context.beginPath();
-      this.context.moveTo(terrainSegment.start.x, terrainSegment.start.y);
-      this.context.lineTo(terrainSegment.end.x, terrainSegment.end.y);
-      this.context.stroke();
-      this.context.closePath();
-    }
+    // this.context.strokeStyle = "#ff0";
+    // this.context.lineWidth = 2;
+    // for (const terrainSegment of this.engine.getSystem<TerrainSystem>(
+    //   TerrainSystem,
+    // ).entities) {
+    //   this.context.beginPath();
+    //   this.context.moveTo(terrainSegment.start.x, terrainSegment.start.y);
+    //   this.context.lineTo(terrainSegment.end.x, terrainSegment.end.y);
+    //   this.context.stroke();
+    //   this.context.closePath();
+    // }
   }
 
   renderAgents() {
@@ -170,9 +175,12 @@ export class SystemsRenderer {
     this.context.fill();
   }
 
-  renderFoliage() {
+  renderFoliage(isForeGround: boolean) {
     for (const foliage of this.engine.getSystem<FoliageSystem>(FoliageSystem)
       .entities) {
+      if (foliage.isForeground !== isForeGround) {
+        continue;
+      }
       const framesCount = foliage.definition.frames.length;
       let frame = Math.abs(
         (Math.round(this.engine.time / 50 + foliage.pos.x) %
@@ -240,7 +248,10 @@ export class SystemsRenderer {
     this.renderBalls();
     this.renderDebug();
 
-    this.foliageLayer.activate();
-    this.renderFoliage();
+    this.foliageBackgroundLayer.activate();
+    this.renderFoliage(false);
+
+    this.foliageForegroundLayer.activate();
+    this.renderFoliage(true);
   }
 }

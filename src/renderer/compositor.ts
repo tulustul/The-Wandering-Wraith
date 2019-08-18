@@ -48,19 +48,25 @@ const COMPOSITOR_ENTRIES: CompositorEntry[] = [
   },
   {
     target: "base",
+    source: "foliageBackground",
+    blendMode: "source-over",
+    offset: false,
+  },
+  {
+    target: "base",
     source: "terrain",
     blendMode: "source-over",
     offset: true,
   },
   {
     target: "base",
-    source: "trees",
+    source: "movingProps",
     blendMode: "source-over",
     offset: false,
   },
   {
     target: "base",
-    source: "movingProps",
+    source: "foliageForeground",
     blendMode: "source-over",
     offset: false,
   },
