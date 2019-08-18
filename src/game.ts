@@ -10,6 +10,7 @@ import { TerrainSystem, TerrainSegmentComponent } from "./systems/terrain";
 import { PhysicsSystem } from "./systems/physics/physics";
 
 import { loadLevel } from "./loader";
+import { FoliageSystem } from "./systems/foliage";
 
 interface Notification {
   text: string;
@@ -58,6 +59,7 @@ export class Game {
     this.engine.register(new PlayerSystem());
     this.engine.register(new PhysicsSystem());
     this.engine.register(new TerrainSystem());
+    this.engine.register(new FoliageSystem());
     this.engine.init();
 
     this.initStage();
@@ -76,5 +78,6 @@ export class Game {
     this.camera.connectWithAgent(player.agent);
 
     loadLevel(this.engine, "a");
+    this.engine.getSystem<FoliageSystem>(FoliageSystem).spawnFoliage();
   }
 }

@@ -4,7 +4,8 @@ import {
   DynamicPhysicalEntity,
   Colision,
 } from "./physics.interface";
-import { LineShape } from "./shapes";
+import { LineShape, CircleShape } from "./shapes";
+import { Vector2 } from "../../vector";
 
 type ColisionGrid = Map<number, PhysicalEntity[]>;
 
@@ -72,6 +73,37 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
     this.listeners.get(hitterClass)!.push(callback);
   }
 
+  castRay(from: Vector2, to: Vector2, hitMask: number, presision: number) {
+    /**
+     * That's a highly ineffective algorithm but simple. We make a range of
+     * circle shapes between `from` and `to` and check which is the first to
+     * collide with something.
+     */
+    const step = new Vector2(0, 1).rotate(from.directionTo(to)).mul(presision);
+    const stepsCount = Math.ceil(from.distanceTo(to) / step.getLength());
+    const currentPos = from.copy();
+    const hitter: DynamicPhysicalEntity = {
+      pos: currentPos,
+      shape: new CircleShape(currentPos, presision / 2),
+      hitMask,
+      receiveMask: 0,
+      bounciness: 0,
+      friction: 0,
+      vel: new Vector2(0, 0),
+      weight: 0,
+    };
+
+    for (let i = 0; i < stepsCount; i++) {
+      const colision = this.checkHitterColisions(hitter).next().value;
+      if (colision) {
+        colision.hitter.pos.add(colision.force);
+        return colision.hitter.pos.copy();
+      }
+      hitter.pos.add(step);
+    }
+    return null;
+  }
+
   private updatePosAndVel() {
     for (const entity of this.dynamicEntities) {
       entity.pos.add(entity.vel);
@@ -83,23 +115,38 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
     }
   }
 
-  private *broadPhase(): IterableIterator<
-    [DynamicPhysicalEntity, PhysicalEntity]
-  > {
+  private *checkColisions(): IterableIterator<Colision> {
+    this.dynamicGrid.clear();
+    for (const entity of this.dynamicEntities) {
+      this.putToGrid(this.dynamicGrid, entity);
+    }
+
     for (const hitter of this.dynamicEntities) {
-      for (const cell of hitter.shape.getCells()) {
-        if (this.staticGrid.has(cell)) {
-          for (const receiver of this.staticGrid.get(cell)!) {
-            if (receiver.receiveMask & hitter.hitMask) {
-              yield [hitter, receiver];
+      yield* this.checkHitterColisions(hitter);
+    }
+  }
+
+  private *checkHitterColisions(
+    hitter: DynamicPhysicalEntity,
+  ): IterableIterator<Colision> {
+    for (const cell of hitter.shape.getCells()) {
+      if (this.staticGrid.has(cell)) {
+        for (const receiver of this.staticGrid.get(cell)!) {
+          if (receiver.receiveMask & hitter.hitMask) {
+            const colision = this.checkNarrowColision(hitter, receiver);
+            if (colision) {
+              yield colision;
             }
           }
         }
-        if (this.dynamicGrid.has(cell)) {
-          for (const receiver of this.dynamicGrid.get(cell)!) {
-            if (receiver !== hitter) {
-              if (receiver.receiveMask & hitter.hitMask) {
-                yield [hitter, receiver];
+      }
+      if (this.dynamicGrid.has(cell)) {
+        for (const receiver of this.dynamicGrid.get(cell)!) {
+          if (receiver !== hitter) {
+            if (receiver.receiveMask & hitter.hitMask) {
+              const colision = this.checkNarrowColision(hitter, receiver);
+              if (colision) {
+                yield colision;
               }
             }
           }
@@ -108,28 +155,7 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
     }
   }
 
-  private *checkColisions(): IterableIterator<Colision> {
-    this.dynamicGrid.clear();
-    for (const entity of this.dynamicEntities) {
-      this.putToGrid(this.dynamicGrid, entity);
-    }
-
-    const pairsToCheck = this.broadPhase();
-    yield* this.narrowPhase(pairsToCheck);
-  }
-
-  private *narrowPhase(
-    pairsToCheck: IterableIterator<[DynamicPhysicalEntity, PhysicalEntity]>,
-  ) {
-    for (const [hitter, receiver] of pairsToCheck) {
-      const colision = this.checkColision(hitter, receiver);
-      if (colision) {
-        yield colision;
-      }
-    }
-  }
-
-  private checkColision(
+  private checkNarrowColision(
     hitter: DynamicPhysicalEntity,
     receiver: PhysicalEntity,
   ): Colision | null {

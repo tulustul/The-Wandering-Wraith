@@ -14,7 +14,7 @@ export class Camera {
 
   update() {
     this.pos.x = -this.agent.physicalEntity.pos.x + this.canvas.width / 2;
-    this.pos.y = -this.agent.physicalEntity.pos.y + this.canvas.height / 2;
+    this.pos.y = -this.agent.physicalEntity.pos.y + this.canvas.height / 1.5;
     this.pos.quantify();
   }
 }

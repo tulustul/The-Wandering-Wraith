@@ -2,9 +2,8 @@ import { Layer } from "./layer";
 import { Renderer } from "./renderer";
 
 import { AgentSystem } from "../systems/agent";
-import { TerrainSystem } from "../systems/terrain";
 import { CircleShape } from "../systems/physics/shapes";
-import { generateTree } from "../trees";
+import { FoliageSystem } from "../systems/foliage";
 
 function svgToImg() {
   const svg = document.querySelector("svg")!;
@@ -57,6 +56,11 @@ export class SystemsRenderer {
     clear: false,
   });
 
+  foliageLayer = new Layer("trees", this.renderer, {
+    followPlayer: true,
+    clear: true,
+  });
+
   constructor(private renderer: Renderer) {}
 
   get context() {
@@ -72,6 +76,11 @@ export class SystemsRenderer {
     this.context.globalCompositeOperation = "source-over";
 
     this.context.drawImage(terrainImg, 0, 0);
+
+    // debug below:
+    // Toggle terrain colision helpers
+    // this.context.strokeStyle = "#ff0";
+    // this.context.lineWidth = 2;
     // for (const terrainSegment of this.engine.getSystem<TerrainSystem>(
     //   TerrainSystem,
     // ).entities) {
@@ -119,8 +128,8 @@ export class SystemsRenderer {
     this.context.fillStyle = grd;
     this.context.fillRect(0, 0, canvas.width, canvas.height);
 
-    const treeImg = generateTree(8, 0.5, 65);
-    this.context.drawImage(treeImg, 530, 200);
+    // const treeImg = generateTree(8, 0.5, 65, 3);
+    // this.context.drawImage(treeImg, 530, 200);
   }
 
   renderHills(
@@ -157,6 +166,26 @@ export class SystemsRenderer {
     this.context.fill();
   }
 
+  renderFoliage() {
+    for (const foliage of this.engine.getSystem<FoliageSystem>(FoliageSystem)
+      .entities) {
+      const framesCount = foliage.definition.frames.length;
+      let frame = Math.abs(
+        (Math.round(this.engine.time / 50 + foliage.pos.x) %
+          (framesCount * 2)) -
+          framesCount,
+      );
+      if (frame === framesCount) {
+        frame = framesCount - 1;
+      }
+      this.context.drawImage(
+        foliage.definition.frames[frame],
+        foliage.pos.x,
+        foliage.pos.y,
+      );
+    }
+  }
+
   prerender() {
     this.skyLayer.activate();
     this.renderSky();
@@ -177,5 +206,8 @@ export class SystemsRenderer {
   render() {
     this.movingPropsLayer.activate();
     this.renderAgents();
+
+    this.foliageLayer.activate();
+    this.renderFoliage();
   }
 }
