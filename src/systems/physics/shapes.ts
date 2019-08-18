@@ -27,7 +27,7 @@ function lineToPointColision(
 
 export abstract class Shape {
   abstract getCells(): IterableIterator<number>;
-  checkColisionWithLine(line: LineShape): Vector2 | null {
+  checkColisionWithLine(line: LineShape): [Vector2, Vector2] | null {
     return null;
   }
 }
@@ -64,7 +64,7 @@ export class CircleShape extends Shape {
     }
   }
 
-  checkColisionWithLine(line: LineShape) {
+  checkColisionWithLine(line: LineShape): [Vector2, Vector2] | null {
     const length = line.start.distanceTo(line.end);
     const dot =
       ((this.pos.x - line.start.x) * (line.end.x - line.start.x) +
@@ -81,9 +81,11 @@ export class CircleShape extends Shape {
       return null;
     }
 
-    return this.getPenetration(closestPoint);
-    // this.getPenetration(line.start) ||
-    // this.getPenetration(line.end)
+    const penetration = this.getPenetration(closestPoint);
+    if (!penetration) {
+      return null;
+    }
+    return [penetration, closestPoint];
   }
 
   getPenetration(p: Vector2) {

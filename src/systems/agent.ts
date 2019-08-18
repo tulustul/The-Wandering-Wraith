@@ -1,7 +1,10 @@
 import { EntitySystem, EntityEngine, Entity } from "./ecs";
 import { Vector2 } from "../vector";
 import { BARRIER_MASK } from "../colisions-masks";
-import { DynamicPhysicalEntity } from "./physics/physics.interface";
+import {
+  DynamicPhysicalEntityDefinition,
+  DynamicPhysicalEntity,
+} from "./physics/physics.interface";
 import { PhysicsSystem } from "./physics/physics";
 import { CircleShape } from "./physics/shapes";
 
@@ -11,11 +14,11 @@ export interface AgentOptions {
 }
 
 export class AgentComponent extends Entity {
-  maxSpeed = 8;
+  maxSpeed = 4;
 
   weight = 1;
 
-  ACCELERATION = 1.5;
+  ACCELERATION = 0.6;
 
   physicalEntity: DynamicPhysicalEntity;
 
@@ -44,7 +47,7 @@ export class AgentComponent extends Entity {
       hitMask: BARRIER_MASK,
       bounciness: 0.5,
       pos: pos,
-      friction: 1.03,
+      friction: 0.4,
       vel: new Vector2(0, 0),
       weight: 1,
     });
@@ -60,6 +63,15 @@ export class AgentComponent extends Entity {
   moveToDirection(direction: number) {
     const acc = new Vector2(0, this.ACCELERATION).rotate(direction);
     this.updateVelocity(acc);
+  }
+
+  jump() {
+    for (const point of this.physicalEntity.contactPoints) {
+      if (point.y - this.physicalEntity.pos.y > 5) {
+        this.physicalEntity.vel.y += -5;
+        break;
+      }
+    }
   }
 
   private updateVelocity(acc: Vector2) {

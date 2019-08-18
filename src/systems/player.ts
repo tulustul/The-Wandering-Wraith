@@ -54,8 +54,11 @@ export class PlayerSystem extends EntitySystem<PlayerComponent> {
 
   updateControls(player: PlayerComponent) {
     const control = this.engine.game.control;
-    if (control.keys.get("KeyW")) {
+    if (control.keys.get("Space")) {
       player.agent.moveToDirection(Math.PI);
+    }
+    if (control.keys.get("KeyW")) {
+      player.agent.jump();
     }
     if (control.keys.get("KeyA")) {
       player.agent.moveToDirection(Math.PI * 0.5);
@@ -70,7 +73,7 @@ export class PlayerSystem extends EntitySystem<PlayerComponent> {
 
   makeStep(player: PlayerComponent) {
     if (this.engine.time - this.lastStepTime > this.STEPS_RATE) {
-      if (player.agent.physicalEntity.vel.getLength() > 0.5) {
+      if (player.agent.physicalEntity.vel.length() > 0.5) {
         this.lastStepTime = this.engine.time;
         this.currentStep = (this.currentStep + 1) % 2;
         // this.engine.sound.play('collectA');

@@ -4,7 +4,7 @@ import { Compositor } from "./compositor";
 
 import { Game } from "../game";
 
-const VIEWPORT_HEIGHT = 800;
+const VIEWPORT_HEIGHT = 240;
 
 export class Renderer {
   context: CanvasRenderingContext2D;
@@ -49,6 +49,9 @@ export class Renderer {
       for (const layer of Object.values(this.compositor.layers)) {
         layer.updateSize(false);
       }
+    }
+    if (this.systemsRenderer) {
+      this.systemsRenderer.prerender();
     }
   }
 }

@@ -1,14 +1,15 @@
 import { Vector2 } from "../../vector";
 import { Shape } from "./shapes";
 
-export interface PhysicalEntity {
+export interface PhysicalEntityDefinition {
   pos: Vector2;
   shape: Shape;
   receiveMask: number;
   parent?: any;
 }
 
-export interface DynamicPhysicalEntity extends PhysicalEntity {
+export interface DynamicPhysicalEntityDefinition
+  extends PhysicalEntityDefinition {
   vel: Vector2;
   friction: number;
   weight: number;
@@ -18,6 +19,12 @@ export interface DynamicPhysicalEntity extends PhysicalEntity {
 
 export interface Colision {
   hitter: DynamicPhysicalEntity;
-  receiver: PhysicalEntity;
-  force: Vector2;
+  receiver: PhysicalEntityDefinition;
+  point: Vector2;
+  penetration: Vector2;
+}
+
+export interface DynamicPhysicalEntity
+  extends DynamicPhysicalEntityDefinition {
+  contactPoints: Vector2[];
 }

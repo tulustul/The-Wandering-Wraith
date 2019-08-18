@@ -1,4 +1,4 @@
-import { Game } from './game';
+import { Game } from "./game";
 
 let cumulativeTime = 0;
 const timeStep = 1000 / 60;
@@ -6,17 +6,17 @@ const timeStep = 1000 / 60;
 let game: Game;
 
 function init() {
-  const canvas = document.getElementsByTagName('canvas')[0];
+  const canvas = document.getElementsByTagName("canvas")[0];
 
   game = new Game(canvas);
 
   requestAnimationFrame(tick);
 
-  window.addEventListener('visibilitychange', () => {
+  window.addEventListener("visibilitychange", () => {
     game.paused = true;
   });
 
-  window.addEventListener('resize', () => game.renderer.updateSize());
+  window.addEventListener("resize", () => game.renderer.updateSize());
 }
 
 function tick(timestamp: number) {

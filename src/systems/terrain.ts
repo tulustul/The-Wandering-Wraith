@@ -2,7 +2,7 @@ import { EntitySystem, EntityEngine, Entity } from "./ecs";
 
 import { Vector2 } from "../vector";
 import { BARRIER_MASK } from "../colisions-masks";
-import { PhysicalEntity } from "./physics/physics.interface";
+import { PhysicalEntityDefinition } from "./physics/physics.interface";
 import { PhysicsSystem } from "./physics/physics";
 import { LineShape } from "./physics/shapes";
 
@@ -12,7 +12,7 @@ interface TerrainOptions {
 }
 
 export class TerrainSegmentComponent extends Entity {
-  physicalEnity!: PhysicalEntity;
+  physicalEnity!: PhysicalEntityDefinition;
 
   start!: Vector2;
   end!: Vector2;

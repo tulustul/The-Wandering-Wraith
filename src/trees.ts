@@ -90,9 +90,9 @@ function drawTree(
 const spritesRenderer = new SpriteRenderer();
 
 export const treeDefinitions: TreeDefinition[] = [
-  { frames: Array.from(animateTree(4, 0.3, 45, 11)), density: 80 },
+  { frames: Array.from(animateTree(4, 0.5, 28, 11)), density: 80 },
   { frames: Array.from(animateTree(5, 0.2, 30, 13)), density: 90 },
-  { frames: Array.from(animateTree(7, 0.3, 45, 3)), density: 400 },
+  { frames: Array.from(animateTree(7, 0.5, 45, 3)), density: 400 },
   { frames: Array.from(animateTree(7, 0.4, 45, 6)), density: 450 },
   { frames: Array.from(animateTree(8, 0.4, 55, 2)), density: 500 },
   { frames: Array.from(animateTree(9, 0.35, 65, 1)), density: 700 },

@@ -126,5 +126,6 @@ export class Compositor {
       this.canvas.width,
       this.canvas.height,
     );
+    target.context.restore();
   }
 }

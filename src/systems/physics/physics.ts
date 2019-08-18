@@ -1,22 +1,23 @@
 import { EntitySystem } from "../ecs";
 import {
-  PhysicalEntity,
-  DynamicPhysicalEntity,
+  PhysicalEntityDefinition,
+  DynamicPhysicalEntityDefinition,
   Colision,
+  DynamicPhysicalEntity,
 } from "./physics.interface";
 import { LineShape, CircleShape } from "./shapes";
 import { Vector2 } from "../../vector";
 
-type ColisionGrid = Map<number, PhysicalEntity[]>;
+type ColisionGrid = Map<number, PhysicalEntityDefinition[]>;
 
 type ColisionCallback = (colision: Colision) => void;
 
-export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
+export class PhysicsSystem extends EntitySystem<PhysicalEntityDefinition> {
   staticGrid: ColisionGrid = new Map();
 
   dynamicGrid: ColisionGrid = new Map();
 
-  staticEntities: PhysicalEntity[] = [];
+  staticEntities: PhysicalEntityDefinition[] = [];
 
   dynamicEntities: DynamicPhysicalEntity[] = [];
 
@@ -26,19 +27,23 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
     super();
   }
 
-  addStatic(entity: PhysicalEntity) {
+  addStatic(entity: PhysicalEntityDefinition) {
     this.staticEntities.push(entity);
     this.putToGrid(this.staticGrid, entity);
     return entity;
   }
 
-  addDynamic(entity: DynamicPhysicalEntity) {
-    this.dynamicEntities.push(entity);
+  addDynamic(entity: DynamicPhysicalEntityDefinition) {
+    const newEntity: DynamicPhysicalEntity = {
+      ...entity,
+      contactPoints: [],
+    };
+    this.dynamicEntities.push(newEntity);
     this.putToGrid(this.dynamicGrid, entity);
-    return entity;
+    return newEntity;
   }
 
-  remove(entity: PhysicalEntity) {
+  remove(entity: PhysicalEntityDefinition) {
     let index = this.dynamicEntities.indexOf(entity as DynamicPhysicalEntity);
     if (index !== -1) {
       this.dynamicEntities.splice(index, 1);
@@ -80,7 +85,7 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
      * collide with something.
      */
     const step = new Vector2(0, 1).rotate(from.directionTo(to)).mul(presision);
-    const stepsCount = Math.ceil(from.distanceTo(to) / step.getLength());
+    const stepsCount = Math.ceil(from.distanceTo(to) / step.length());
     const currentPos = from.copy();
     const hitter: DynamicPhysicalEntity = {
       pos: currentPos,
@@ -91,12 +96,13 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
       friction: 0,
       vel: new Vector2(0, 0),
       weight: 0,
+      contactPoints: [],
     };
 
     for (let i = 0; i < stepsCount; i++) {
       const colision = this.checkHitterColisions(hitter).next().value;
       if (colision) {
-        colision.hitter.pos.add(colision.force);
+        colision.hitter.pos.add(colision.penetration);
         return colision.hitter.pos.copy();
       }
       hitter.pos.add(step);
@@ -106,12 +112,39 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
 
   private updatePosAndVel() {
     for (const entity of this.dynamicEntities) {
+      let willSeparate = true;
+      for (const point of entity.contactPoints) {
+        const velAngle = entity.vel.angleTo(point.copy().sub(entity.pos));
+        willSeparate = willSeparate && velAngle > Math.PI / 2;
+      }
+
+      if (!willSeparate) {
+        const posAngle = entity.contactPoints[0]
+          .copy()
+          .sub(entity.pos)
+          .rotate(Math.PI / 2)
+          .angle();
+
+        const friction =
+          Math.min(entity.friction, entity.vel.length()) * Math.sin(posAngle);
+
+        const frictionForce = entity.vel
+          .copy()
+          .normalize()
+          .mul(-friction);
+        entity.vel.add(frictionForce);
+      }
+
       entity.pos.add(entity.vel);
-
-      entity.vel.x /= entity.friction;
-      entity.vel.y /= entity.friction;
-
       entity.vel.y += 0.3;
+
+      /* 
+      Limit the speed to the diameter of circle. 
+      This way we avoid tunelling through terrain in high speeds.
+      **/
+      const radius = (entity.shape as CircleShape).radius;
+      const speed = Math.min(entity.vel.length(), radius);
+      entity.vel = entity.vel.normalize().mul(speed);
     }
   }
 
@@ -129,6 +162,7 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
   private *checkHitterColisions(
     hitter: DynamicPhysicalEntity,
   ): IterableIterator<Colision> {
+    hitter.contactPoints = [];
     for (const cell of hitter.shape.getCells()) {
       if (this.staticGrid.has(cell)) {
         for (const receiver of this.staticGrid.get(cell)!) {
@@ -157,15 +191,16 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
 
   private checkNarrowColision(
     hitter: DynamicPhysicalEntity,
-    receiver: PhysicalEntity,
+    receiver: PhysicalEntityDefinition,
   ): Colision | null {
     if (receiver.shape instanceof LineShape) {
-      const penetration = hitter.shape.checkColisionWithLine(receiver.shape);
-      if (penetration) {
+      const result = hitter.shape.checkColisionWithLine(receiver.shape);
+      if (result) {
         return {
           receiver,
           hitter,
-          force: penetration,
+          penetration: result[0],
+          point: result[1],
         };
       }
     }
@@ -174,20 +209,25 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntity> {
 
   private resolveColisions(colisions: IterableIterator<Colision>) {
     for (const colision of colisions) {
-      colision.hitter.pos.add(colision.force);
-      colision.hitter.vel.add(colision.force);
+      colision.hitter.pos.add(colision.penetration);
+      colision.hitter.vel.add(colision.penetration);
+      colision.hitter.contactPoints.push(colision.point);
       // colision.hitter.vel.rotate(colision.force.angle());
       // .mul(colision.hitter.bounciness);
     }
   }
 
-  private putToGrid(grid: ColisionGrid, entity: PhysicalEntity) {
+  private putToGrid(grid: ColisionGrid, entity: PhysicalEntityDefinition) {
     for (const cell of entity.shape.getCells()) {
       this.addToGrid(grid, cell, entity);
     }
   }
 
-  private addToGrid(grid: ColisionGrid, cell: number, entity: PhysicalEntity) {
+  private addToGrid(
+    grid: ColisionGrid,
+    cell: number,
+    entity: PhysicalEntityDefinition,
+  ) {
     if (!grid.has(cell)) {
       grid.set(cell, [entity]);
     } else {

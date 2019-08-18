@@ -1,5 +1,4 @@
 export class Vector2 {
-
   constructor(public x = 0, public y = 0) {}
 
   copy() {
@@ -27,12 +26,18 @@ export class Vector2 {
     return this;
   }
 
+  sub(vec: Vector2) {
+    this.x -= vec.x;
+    this.y -= vec.y;
+    return this;
+  }
+
   quantify() {
     this.x = Math.round(this.x);
     this.y = Math.round(this.y);
   }
 
-  normalize() {
+  normalize() {
     const length = Math.sqrt(this.x * this.x + this.y * this.y);
     this.x /= length;
     this.y /= length;
@@ -45,19 +50,27 @@ export class Vector2 {
     return this;
   }
 
-  getLength() {
+  dot(vec: Vector2) {
+    return this.x * vec.x + this.y * vec.y;
+  }
+
+  length() {
     return Math.sqrt(this.x * this.x + this.y * this.y);
+  }
+
+  angle() {
+    return Math.PI - Math.atan2(-this.x, -this.y);
   }
 
   distanceTo(v: Vector2) {
     return Math.sqrt(Math.pow(this.x - v.x, 2) + Math.pow(this.y - v.y, 2));
   }
 
-  directionTo(v: Vector2)  {
+  directionTo(v: Vector2) {
     return Math.PI - Math.atan2(this.x - v.x, this.y - v.y);
   }
 
-  angle()  {
-    return Math.PI - Math.atan2(-this.x, -this.y);
+  angleTo(vec: Vector2) {
+    return Math.acos(this.dot(vec) / (this.length() * vec.length()));
   }
 }
