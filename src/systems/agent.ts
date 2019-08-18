@@ -16,13 +16,11 @@ export interface AgentOptions {
 export class AgentComponent extends Entity {
   maxSpeed = 4;
 
-  weight = 1;
-
   ACCELERATION = 0.6;
 
   physicalEntity: DynamicPhysicalEntity;
 
-  rot = 0;
+  direction: "l" | "r" = "r";
 
   onHit: () => void;
 
@@ -45,11 +43,11 @@ export class AgentComponent extends Entity {
       parent: this,
       receiveMask: options.colisionMask,
       hitMask: BARRIER_MASK,
-      bounciness: 0.5,
+      bounciness: 0,
       pos: pos,
       friction: 0.4,
       vel: new Vector2(0, 0),
-      weight: 1,
+      weight: 100,
     });
   }
 
@@ -61,8 +59,21 @@ export class AgentComponent extends Entity {
   }
 
   moveToDirection(direction: number) {
+    // const impulse = new Vector2(
+    //   0,
+    //   this.ACCELERATION * this.physicalEntity.weight,
+    // ).rotate(direction);
+    // this.engine
+    //   .getSystem<PhysicsSystem>(PhysicsSystem)
+    //   .applyImpulse(this.physicalEntity, impulse);
+
     const acc = new Vector2(0, this.ACCELERATION).rotate(direction);
     this.updateVelocity(acc);
+    if (direction < Math.PI) {
+      this.direction = "r";
+    } else {
+      this.direction = "l";
+    }
   }
 
   jump() {
@@ -75,7 +86,7 @@ export class AgentComponent extends Entity {
   }
 
   private updateVelocity(acc: Vector2) {
-    const speed = this.maxSpeed / this.weight;
+    const speed = this.maxSpeed;
     this.physicalEntity.vel.x = Math.min(
       speed,
       Math.max(-speed, this.physicalEntity.vel.x + acc.x),

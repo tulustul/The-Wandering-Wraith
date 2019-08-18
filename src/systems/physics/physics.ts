@@ -95,12 +95,12 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntityDefinition> {
       bounciness: 0,
       friction: 0,
       vel: new Vector2(0, 0),
-      weight: 0,
+      weight: 1,
       contactPoints: [],
     };
 
     for (let i = 0; i < stepsCount; i++) {
-      const colision = this.checkHitterColisions(hitter).next().value;
+      const colision = this.checkHitterColisions(hitter, 0).next().value;
       if (colision) {
         colision.hitter.pos.add(colision.penetration);
         return colision.hitter.pos.copy();
@@ -108,6 +108,10 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntityDefinition> {
       hitter.pos.add(step);
     }
     return null;
+  }
+
+  applyImpulse(entity: DynamicPhysicalEntity, impulse: Vector2) {
+    entity.vel.add(impulse.copy().mul(1 / entity.weight));
   }
 
   private updatePosAndVel() {
@@ -149,18 +153,19 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntityDefinition> {
   }
 
   private *checkColisions(): IterableIterator<Colision> {
-    this.dynamicGrid.clear();
-    for (const entity of this.dynamicEntities) {
-      this.putToGrid(this.dynamicGrid, entity);
-    }
+    // this.dynamicGrid.clear();
+    // for (const entity of this.dynamicEntities) {
+    //   this.putToGrid(this.dynamicGrid, entity);
+    // }
 
-    for (const hitter of this.dynamicEntities) {
-      yield* this.checkHitterColisions(hitter);
+    for (const [index, hitter] of this.dynamicEntities.entries()) {
+      yield* this.checkHitterColisions(hitter, index + 1);
     }
   }
 
   private *checkHitterColisions(
     hitter: DynamicPhysicalEntity,
+    startIndex: number,
   ): IterableIterator<Colision> {
     hitter.contactPoints = [];
     for (const cell of hitter.shape.getCells()) {
@@ -174,15 +179,15 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntityDefinition> {
           }
         }
       }
-      if (this.dynamicGrid.has(cell)) {
-        for (const receiver of this.dynamicGrid.get(cell)!) {
-          if (receiver !== hitter) {
-            if (receiver.receiveMask & hitter.hitMask) {
-              const colision = this.checkNarrowColision(hitter, receiver);
-              if (colision) {
-                yield colision;
-              }
-            }
+    }
+
+    for (let i = startIndex; i < this.dynamicEntities.length; i++) {
+      const receiver = this.dynamicEntities[i];
+      if (receiver !== hitter) {
+        if (receiver.receiveMask & hitter.hitMask) {
+          const colision = this.checkNarrowColision(hitter, receiver);
+          if (colision) {
+            yield colision;
           }
         }
       }
@@ -193,16 +198,21 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntityDefinition> {
     hitter: DynamicPhysicalEntity,
     receiver: PhysicalEntityDefinition,
   ): Colision | null {
+    let result: [Vector2, Vector2] | null;
     if (receiver.shape instanceof LineShape) {
-      const result = hitter.shape.checkColisionWithLine(receiver.shape);
-      if (result) {
-        return {
-          receiver,
-          hitter,
-          penetration: result[0],
-          point: result[1],
-        };
-      }
+      result = hitter.shape.checkColisionWithLine(receiver.shape);
+    } else {
+      result = hitter.shape.checkColisionWithCircle(
+        receiver.shape as CircleShape,
+      );
+    }
+    if (result) {
+      return {
+        receiver,
+        hitter,
+        penetration: result[0],
+        point: result[1],
+      };
     }
     return null;
   }
@@ -210,10 +220,29 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntityDefinition> {
   private resolveColisions(colisions: IterableIterator<Colision>) {
     for (const colision of colisions) {
       colision.hitter.pos.add(colision.penetration);
-      colision.hitter.vel.add(colision.penetration);
       colision.hitter.contactPoints.push(colision.point);
-      // colision.hitter.vel.rotate(colision.force.angle());
-      // .mul(colision.hitter.bounciness);
+      if (colision.receiver.shape instanceof CircleShape) {
+        const receiver = colision.receiver as DynamicPhysicalEntity;
+        receiver.contactPoints.push(colision.point);
+        const relativeVel = receiver.vel.copy().add(colision.hitter.vel);
+        const normal = colision.penetration.copy().normalize();
+        const j =
+          relativeVel.length() *
+          (1 / receiver.weight + 1 / colision.hitter.weight);
+        receiver.vel.add(normal.copy().mul(-j / receiver.weight));
+        colision.hitter.vel.add(normal.copy().mul(j / colision.hitter.weight));
+      } else {
+        colision.hitter.vel.add(colision.penetration);
+        // const speed = colision.hitter.vel.length();
+        // colision.hitter.vel.add(
+        //   colision.penetration
+        //     .copy()
+        //     .normalize()
+        //     .mul(speed * colision.hitter.bounciness),
+        // );
+      }
+
+      // colision.hitter.vel.mul(colision.hitter.bounciness);
     }
   }
 

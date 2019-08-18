@@ -6,6 +6,7 @@ import { CircleShape } from "../systems/physics/shapes";
 import { FoliageSystem } from "../systems/foliage";
 import { PhysicsSystem } from "../systems/physics/physics";
 import { TerrainSystem } from "../systems/terrain";
+import { BallSystem } from "../systems/ball";
 
 function svgToImg() {
   const svg = document.querySelector("svg")!;
@@ -112,31 +113,17 @@ export class SystemsRenderer {
       this.context.closePath();
     }
     this.context.restore();
+  }
 
-    // DEBUG
-    this.context.fillStyle = "#f00";
-    this.context.strokeStyle = "#f00";
-    for (const entity of this.engine.getSystem<PhysicsSystem>(PhysicsSystem)
-      .dynamicEntities) {
-      this.context.save();
+  renderBalls() {
+    this.context.fillStyle = "#222";
+    for (const ball of this.engine.getSystem<BallSystem>(BallSystem)
+      .entities) {
       this.context.beginPath();
-      this.context.moveTo(entity.pos.x, entity.pos.y);
-      this.context.lineTo(
-        entity.pos.x + entity.vel.x * 2,
-        entity.pos.y + entity.vel.y * 2,
-      );
+      this.context.arc(ball.pos.x, ball.pos.y, ball.radius, 0, 2 * Math.PI);
+      this.context.fill();
       this.context.closePath();
-
-      this.context.stroke();
-      for (const point of entity.contactPoints) {
-        this.context.beginPath();
-        this.context.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-        this.context.fill();
-        this.context.closePath();
-      }
-      this.context.restore();
     }
-    this.context.closePath();
   }
 
   renderSky() {
@@ -147,9 +134,6 @@ export class SystemsRenderer {
 
     this.context.fillStyle = grd;
     this.context.fillRect(0, 0, canvas.width, canvas.height);
-
-    // const treeImg = generateTree(8, 0.5, 65, 3);
-    // this.context.drawImage(treeImg, 530, 200);
   }
 
   renderHills(
@@ -223,9 +207,38 @@ export class SystemsRenderer {
     this.renderHills("#104263", "#061824", 260, 311, 290, 111, 98, 64);
   }
 
+  renderDebug() {
+    // DEBUG
+    this.context.fillStyle = "#f00";
+    this.context.strokeStyle = "#f00";
+    for (const entity of this.engine.getSystem<PhysicsSystem>(PhysicsSystem)
+      .dynamicEntities) {
+      this.context.save();
+      this.context.beginPath();
+      this.context.moveTo(entity.pos.x, entity.pos.y);
+      this.context.lineTo(
+        entity.pos.x + entity.vel.x * 2,
+        entity.pos.y + entity.vel.y * 2,
+      );
+      this.context.closePath();
+
+      this.context.stroke();
+      for (const point of entity.contactPoints) {
+        this.context.beginPath();
+        this.context.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+        this.context.fill();
+        this.context.closePath();
+      }
+      this.context.restore();
+    }
+    this.context.closePath();
+  }
+
   render() {
     this.movingPropsLayer.activate();
     this.renderAgents();
+    this.renderBalls();
+    this.renderDebug();
 
     this.foliageLayer.activate();
     this.renderFoliage();

@@ -11,6 +11,7 @@ import { PhysicsSystem } from "./systems/physics/physics";
 
 import { loadLevel } from "./loader";
 import { FoliageSystem } from "./systems/foliage";
+import { BallSystem } from "./systems/ball";
 
 interface Notification {
   text: string;
@@ -60,6 +61,7 @@ export class Game {
     this.engine.register(new PhysicsSystem());
     this.engine.register(new TerrainSystem());
     this.engine.register(new FoliageSystem());
+    this.engine.register(new BallSystem());
     this.engine.init();
 
     this.initStage();

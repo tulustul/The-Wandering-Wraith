@@ -2,6 +2,7 @@ import { AgentComponent } from "./agent";
 import { EntitySystem, EntityEngine, Entity } from "./ecs";
 import { Vector2 } from "../vector";
 import { PLAYER_MASK } from "../colisions-masks";
+import { BallComponent } from "./ball";
 
 export class PlayerComponent extends Entity {
   agent: AgentComponent;
@@ -29,6 +30,8 @@ export class PlayerSystem extends EntitySystem<PlayerComponent> {
   lastStepTime = 0;
 
   player: PlayerComponent | null;
+
+  lastBall = 0;
 
   constructor() {
     super();
@@ -68,6 +71,19 @@ export class PlayerSystem extends EntitySystem<PlayerComponent> {
     }
     if (control.keys.get("KeyD")) {
       player.agent.moveToDirection(Math.PI * 1.5);
+    }
+    if (control.keys.get("KeyQ")) {
+      if (this.engine.time - this.lastBall > 300) {
+        this.lastBall = this.engine.time;
+        const direction = player.agent.direction === "l" ? 1 : -1;
+        new BallComponent(this.engine, {
+          pos: player.agent.physicalEntity.pos
+            .copy()
+            .add(new Vector2(20 * direction, -20)),
+          radius: Math.random() * 15 + 3,
+          vel: new Vector2(3 * direction, -3),
+        });
+      }
     }
   }
 

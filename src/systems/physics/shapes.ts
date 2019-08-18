@@ -30,6 +30,9 @@ export abstract class Shape {
   checkColisionWithLine(line: LineShape): [Vector2, Vector2] | null {
     return null;
   }
+  checkColisionWithCircle(circle: CircleShape): [Vector2, Vector2] | null {
+    return null;
+  }
 }
 
 export class PointShape extends Shape {
@@ -85,6 +88,28 @@ export class CircleShape extends Shape {
     if (!penetration) {
       return null;
     }
+    return [penetration, closestPoint];
+  }
+
+  checkColisionWithCircle(circle: CircleShape): [Vector2, Vector2] | null {
+    const d = this.pos.distanceTo(circle.pos);
+    const radiusSum = this.radius + circle.radius;
+    if (d > radiusSum) {
+      return null;
+    }
+
+    const penetration = this.pos
+      .copy()
+      .sub(circle.pos)
+      .mul(1 - d / radiusSum);
+
+    const closestPoint = circle.pos.copy().add(
+      penetration
+        .copy()
+        .normalize()
+        .mul(circle.radius),
+    );
+
     return [penetration, closestPoint];
   }
 
