@@ -16,11 +16,15 @@ export interface AgentOptions {
 export class AgentComponent extends Entity {
   maxSpeed = 4;
 
-  ACCELERATION = 0.6;
+  ACCELERATION = 0.7;
 
   physicalEntity: DynamicPhysicalEntity;
 
   direction: "l" | "r" = "r";
+
+  lastJumpTime = 0;
+
+  dashed = false;
 
   onHit: () => void;
 
@@ -66,8 +70,11 @@ export class AgentComponent extends Entity {
     // this.engine
     //   .getSystem<PhysicsSystem>(PhysicsSystem)
     //   .applyImpulse(this.physicalEntity, impulse);
-
-    const acc = new Vector2(0, this.ACCELERATION).rotate(direction);
+    let accScalar = this.ACCELERATION;
+    if (!this.physicalEntity.contactPoints.length) {
+      accScalar /= 3;
+    }
+    const acc = new Vector2(0, accScalar).rotate(direction);
     this.updateVelocity(acc);
     if (direction < Math.PI) {
       this.direction = "r";
@@ -79,22 +86,41 @@ export class AgentComponent extends Entity {
   jump() {
     for (const point of this.physicalEntity.contactPoints) {
       if (point.y - this.physicalEntity.pos.y > 5) {
-        this.physicalEntity.vel.y += -8;
-        break;
+        this.physicalEntity.vel.y = -6;
+        this.lastJumpTime = this.engine.time;
+        this.dashed = false;
+        return;
       }
+    }
+    if (!this.dashed && this.engine.time - this.lastJumpTime > 300) {
+      const control = this.engine.game.control;
+      if (control.keys.get("ArrowLeft")) {
+        this.physicalEntity.vel.x = -6;
+        this.physicalEntity.vel.y = -2;
+      } else if (control.keys.get("ArrowRight")) {
+        this.physicalEntity.vel.x = 6;
+        this.physicalEntity.vel.y = -2;
+      } else {
+        this.physicalEntity.vel.y = -6;
+      }
+      this.dashed = true;
     }
   }
 
   private updateVelocity(acc: Vector2) {
-    const speed = this.maxSpeed;
-    this.physicalEntity.vel.x = Math.min(
-      speed,
-      Math.max(-speed, this.physicalEntity.vel.x + acc.x),
-    );
-    this.physicalEntity.vel.y = Math.min(
-      speed,
-      Math.max(-speed, this.physicalEntity.vel.y + acc.y),
-    );
+    if (Math.abs(this.physicalEntity.vel.x + acc.x) < this.maxSpeed) {
+      this.physicalEntity.vel.x += acc.x;
+    }
+    this.physicalEntity.vel.y += acc.y;
+    // const speed = this.maxSpeed;
+    // this.physicalEntity.vel.x = Math.min(
+    //   speed,
+    //   Math.max(-speed, this.physicalEntity.vel.x + acc.x),
+    // );
+    // this.physicalEntity.vel.y = Math.min(
+    //   speed,
+    //   Math.max(-speed, this.physicalEntity.vel.y + acc.y),
+    // );
   }
 }
 
