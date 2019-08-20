@@ -57,19 +57,19 @@ export class PlayerSystem extends EntitySystem<PlayerComponent> {
 
   updateControls(player: PlayerComponent) {
     const control = this.engine.game.control;
-    if (control.keys.get("Space")) {
+    if (control.keys.get("KeyW")) {
       player.agent.moveToDirection(Math.PI);
     }
-    if (control.keys.get("KeyW")) {
+    if (control.keys.get("Space")) {
       player.agent.jump();
     }
-    if (control.keys.get("KeyA")) {
+    if (control.keys.get("ArrowLeft")) {
       player.agent.moveToDirection(Math.PI * 0.5);
     }
-    if (control.keys.get("KeyS")) {
+    if (control.keys.get("ArrowDown")) {
       player.agent.moveToDirection(0);
     }
-    if (control.keys.get("KeyD")) {
+    if (control.keys.get("ArrowRight")) {
       player.agent.moveToDirection(Math.PI * 1.5);
     }
     if (control.keys.get("KeyQ")) {

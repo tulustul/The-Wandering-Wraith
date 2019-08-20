@@ -87,17 +87,17 @@ export class SystemsRenderer {
 
     // debug below:
     // Toggle terrain colision helpers
-    // this.context.strokeStyle = "#ff0";
-    // this.context.lineWidth = 2;
-    // for (const terrainSegment of this.engine.getSystem<TerrainSystem>(
-    //   TerrainSystem,
-    // ).entities) {
-    //   this.context.beginPath();
-    //   this.context.moveTo(terrainSegment.start.x, terrainSegment.start.y);
-    //   this.context.lineTo(terrainSegment.end.x, terrainSegment.end.y);
-    //   this.context.stroke();
-    //   this.context.closePath();
-    // }
+    this.context.strokeStyle = "#ff0";
+    this.context.lineWidth = 2;
+    for (const terrainSegment of this.engine.getSystem<TerrainSystem>(
+      TerrainSystem,
+    ).entities) {
+      this.context.beginPath();
+      this.context.moveTo(terrainSegment.start.x, terrainSegment.start.y);
+      this.context.lineTo(terrainSegment.end.x, terrainSegment.end.y);
+      this.context.stroke();
+      this.context.closePath();
+    }
   }
 
   renderAgents() {

@@ -30,7 +30,7 @@ export class FoliageSystem extends EntitySystem<FoliageComponent> {
     const physics = this.engine.getSystem<PhysicsSystem>(PhysicsSystem);
 
     for (const treeDefinition of treeDefinitions) {
-      let x = 0;
+      let x = 500;
       while (x < this.engine.worldWidth) {
         x += (r.next() % treeDefinition.density) + 20;
         const pos = physics.castRay(

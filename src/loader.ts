@@ -9,7 +9,7 @@ import { generateBezierSegments } from "./bezier";
 // V - vertical line, y
 // H - vertical line, y
 // z - close path
-const commands = "MLlcVHz";
+const commands = "MLlcvVhHz";
 
 export function loadLevel(engine: EntityEngine, level: string) {
   const svg = document.getElementById(level) as any;
@@ -35,9 +35,13 @@ class PathParser {
   *parse(): IterableIterator<[Vector2, Vector2]> {
     let command!: string;
     let c = this.next();
+    let firstPoint: Vector2 | null = null;
     while (c) {
       if (commands.includes(c)) {
         command = c;
+        if (command === "z") {
+          yield [this.pos, firstPoint!];
+        }
         c = this.next();
         continue;
       }
@@ -45,30 +49,47 @@ class PathParser {
         c = this.next();
         continue;
       }
+      let start: Vector2 | null = null;
+      let x, y: number;
       switch (command) {
         case "M":
           this.pos = this.parseVector();
+          if (!firstPoint) {
+            firstPoint = this.pos.copy();
+          }
           command = "l";
           break;
         case "l":
           yield [this.pos.copy(), this.pos.add(this.parseVector()).copy()];
           break;
         case "L":
-          const start3 = this.pos.copy();
+          start = this.pos.copy();
           this.pos = this.parseVector();
-          yield [start3, this.pos.copy()];
+          yield [start, this.pos.copy()];
+          break;
+        case "v":
+          y = this.parseNumber();
+          start = this.pos.copy();
+          this.pos.y += y;
+          yield [start, this.pos.copy()];
           break;
         case "V":
-          const y = this.parseNumber();
-          const start = this.pos.copy();
+          y = this.parseNumber();
+          start = this.pos.copy();
           this.pos.y = y;
           yield [start, this.pos.copy()];
           break;
-        case "H":
-          const x = this.parseNumber();
-          const start2 = this.pos.copy();
+        case "h":
+          x = this.parseNumber();
+          start = this.pos.copy();
           this.pos.x += x;
-          yield [start2, this.pos.copy()];
+          yield [start, this.pos.copy()];
+          break;
+        case "H":
+          x = this.parseNumber();
+          start = this.pos.copy();
+          this.pos.x = x;
+          yield [start, this.pos.copy()];
           break;
         case "c":
           yield* generateBezierSegments(

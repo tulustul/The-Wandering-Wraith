@@ -76,7 +76,7 @@ export class Game {
   }
 
   initStage() {
-    const player = new PlayerComponent(this.engine, new Vector2(1200, 800));
+    const player = new PlayerComponent(this.engine, new Vector2(1200, 950));
     this.camera.connectWithAgent(player.agent);
 
     loadLevel(this.engine, "a");

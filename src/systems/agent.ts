@@ -79,7 +79,7 @@ export class AgentComponent extends Entity {
   jump() {
     for (const point of this.physicalEntity.contactPoints) {
       if (point.y - this.physicalEntity.pos.y > 5) {
-        this.physicalEntity.vel.y += -5;
+        this.physicalEntity.vel.y += -8;
         break;
       }
     }
