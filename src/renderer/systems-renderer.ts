@@ -8,8 +8,8 @@ import { PhysicsSystem } from "../systems/physics/physics";
 import { TerrainSystem } from "../systems/terrain";
 import { BallSystem } from "../systems/ball";
 
-function svgToImg() {
-  const svg = document.querySelector("svg")!;
+function svgToImg(id: string) {
+  const svg = document.getElementById(id)!;
   const xml = new XMLSerializer().serializeToString(svg);
 
   const svg64 = btoa(xml);
@@ -22,7 +22,11 @@ function svgToImg() {
   return img;
 }
 
-const terrainImg = svgToImg();
+const terrainImg = svgToImg("a");
+const headImg = svgToImg("hero-head");
+const eyesImg = svgToImg("hero-eyes");
+const torsoImg = svgToImg("hero-torso");
+const limbImg = svgToImg("hero-limb");
 
 export class SystemsRenderer {
   terrainLayer = new Layer("terrain", this.renderer, {
@@ -111,11 +115,26 @@ export class SystemsRenderer {
         agent.physicalEntity.pos.x,
         agent.physicalEntity.pos.y,
       );
-      const radius = (agent.physicalEntity.shape as CircleShape).radius;
-      this.context.beginPath();
-      this.context.arc(0, 0, radius, 0, 2 * Math.PI);
-      this.context.fill();
-      this.context.closePath();
+      if (agent.direction === "r") {
+        this.context.scale(-1, 1);
+      }
+      this.context.rotate(agent.physicalEntity.vel.angle());
+      this.context.scale(
+        1,
+        1 + Math.abs(agent.physicalEntity.vel.length() / 20),
+      );
+      this.context.rotate(-agent.physicalEntity.vel.angle());
+      // const radius = (agent.physicalEntity.shape as CircleShape).radius;
+      // this.context.beginPath();
+      // this.context.arc(0, 0, radius, 0, 2 * Math.PI);
+      // this.context.fill();
+      // this.context.closePath();
+      this.context.drawImage(torsoImg, -20, -20, 40, 40);
+
+      this.context.translate(0, agent.animation.headOffset);
+      this.context.drawImage(headImg, -20, -20, 40, 40);
+      this.context.scale(1, agent.animation.eyesScale);
+      this.context.drawImage(eyesImg, 0, -10, 8, 8);
     }
     this.context.restore();
   }
@@ -246,7 +265,7 @@ export class SystemsRenderer {
     this.movingPropsLayer.activate();
     this.renderAgents();
     this.renderBalls();
-    this.renderDebug();
+    // this.renderDebug();
 
     this.foliageBackgroundLayer.activate();
     this.renderFoliage(false);

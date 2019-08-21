@@ -24,7 +24,7 @@ module.exports = env => {
       runPreEmit: true,
     }),
     new ExtraWatchWebpackPlugin({
-      files: ["levels/*.svg"],
+      files: ["levels/*.svg", "assets/*.svg"],
     }),
   ];
 

@@ -1,8 +1,8 @@
-import { Sound } from '../sound';
-import { Game } from '../game';
+import { Sound } from "../sound";
+import { Game } from "../game";
+import { AnimationsManager } from "../animations";
 
 export class EntityEngine {
-
   systemsMap = new Map<Function, EntitySystem<any>>();
 
   systems: EntitySystem<any>[] = [];
@@ -16,6 +16,8 @@ export class EntityEngine {
   level: string[][];
 
   sound = new Sound();
+
+  animations = new AnimationsManager();
 
   constructor(public game: Game) {}
 
@@ -37,6 +39,7 @@ export class EntityEngine {
 
   update(timeStep: number) {
     this.time += timeStep;
+    this.animations.update(this.time);
     for (const system of this.systems) {
       system.update();
     }
@@ -50,14 +53,11 @@ export class EntityEngine {
 }
 
 export abstract class EntitySystem<E> {
-
   entities: E[] = [];
 
   engine: EntityEngine;
 
-  init() {
-
-  }
+  init() {}
 
   add(entity: E) {
     (entity as any).system = this;
@@ -75,20 +75,14 @@ export abstract class EntitySystem<E> {
     this.entities = [];
   }
 
-  start() {
+  start() {}
 
-  }
+  end() {}
 
-  end() {
-
-  }
-
-  abstract update(): void
-
+  abstract update(): void;
 }
 
 export class Entity {
-
   system: EntitySystem<any>;
 
   parent: Entity;
@@ -113,5 +107,4 @@ export class Entity {
   destroy() {
     this.system.remove(this);
   }
-
 }

@@ -7,10 +7,20 @@ import {
 } from "./physics/physics.interface";
 import { PhysicsSystem } from "./physics/physics";
 import { CircleShape } from "./physics/shapes";
+import { SinusAnimation } from "../animations";
 
 export interface AgentOptions {
   maxHealth?: number;
   colisionMask: number;
+}
+
+interface AgentAnimation {
+  headOffset: number;
+  lArmRot: number;
+  rArmRot: number;
+  lLegRot: number;
+  rLegRot: number;
+  eyesScale: number;
 }
 
 export class AgentComponent extends Entity {
@@ -25,6 +35,17 @@ export class AgentComponent extends Entity {
   lastJumpTime = 0;
 
   dashed = false;
+
+  stretch = new Vector2(1, 1);
+
+  animation: AgentAnimation = {
+    headOffset: 0,
+    lArmRot: 0,
+    rArmRot: 0,
+    lLegRot: 0,
+    rLegRot: 0,
+    eyesScale: 1,
+  };
 
   onHit: () => void;
 
@@ -63,13 +84,6 @@ export class AgentComponent extends Entity {
   }
 
   moveToDirection(direction: number) {
-    // const impulse = new Vector2(
-    //   0,
-    //   this.ACCELERATION * this.physicalEntity.weight,
-    // ).rotate(direction);
-    // this.engine
-    //   .getSystem<PhysicsSystem>(PhysicsSystem)
-    //   .applyImpulse(this.physicalEntity, impulse);
     let accScalar = this.ACCELERATION;
     if (!this.physicalEntity.contactPoints.length) {
       accScalar /= 3;
@@ -107,23 +121,28 @@ export class AgentComponent extends Entity {
     }
   }
 
+  blink() {
+    this.engine.animations.animate(
+      new SinusAnimation(Math.PI / 2, Math.PI * 2.5, 200),
+      value => (this.animation.eyesScale = (value + 1) / 2),
+    );
+  }
+
   private updateVelocity(acc: Vector2) {
     if (Math.abs(this.physicalEntity.vel.x + acc.x) < this.maxSpeed) {
       this.physicalEntity.vel.x += acc.x;
     }
     this.physicalEntity.vel.y += acc.y;
-    // const speed = this.maxSpeed;
-    // this.physicalEntity.vel.x = Math.min(
-    //   speed,
-    //   Math.max(-speed, this.physicalEntity.vel.x + acc.x),
-    // );
-    // this.physicalEntity.vel.y = Math.min(
-    //   speed,
-    //   Math.max(-speed, this.physicalEntity.vel.y + acc.y),
-    // );
   }
 }
 
 export class AgentSystem extends EntitySystem<AgentComponent> {
-  update() {}
+  update() {
+    for (const agent of this.entities) {
+      if (Math.random() > 0.99) {
+        agent.blink();
+      }
+      agent.animation.headOffset = Math.sin(this.engine.time / 200);
+    }
+  }
 }
