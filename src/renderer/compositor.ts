@@ -96,7 +96,7 @@ export class Compositor {
 
     for (const nextEntry of COMPOSITOR_ENTRIES) {
       if (nextEntry.target === "base") {
-        this.layers.base.activate();
+        this.layers["base"].activate();
       }
 
       Object.assign(entry, nextEntry);

@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlWebpackInlineSVGPlugin = require("html-webpack-inline-svg-plugin");
 const ExtraWatchWebpackPlugin = require("extra-watch-webpack-plugin");
 const ZipPlugin = require("zip-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = env => {
   const isProd = env === "prod";
@@ -52,5 +53,18 @@ module.exports = env => {
     },
     plugins: plugins,
     devtool: isProd ? false : "source-map",
+    optimization: {
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            mangle: {
+              properties: {
+                keep_quoted: true,
+              },
+            },
+          },
+        }),
+      ],
+    },
   };
 };
