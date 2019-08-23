@@ -1,7 +1,8 @@
-import { EntityEngine } from "./systems/ecs";
+import { Engine } from "./engine";
 import { Vector2 } from "./vector";
-import { TerrainSegmentComponent } from "./systems/terrain";
 import { generateBezierSegments } from "./bezier";
+import { GROUND_MASK, TREE_GROUND_MASK } from "./colisions-masks";
+import { LineShape } from "./systems/physics/shapes";
 
 // M - move to, (x y)
 // l - line to, (x y)+
@@ -11,7 +12,7 @@ import { generateBezierSegments } from "./bezier";
 // z - close path
 const commands = "MLlcvVhHz";
 
-export function loadLevel(engine: EntityEngine, level: string) {
+export function loadLevel(engine: Engine, level: string) {
   const svg = document.getElementById(level) as any;
 
   engine.worldWidth = svg.viewBox.baseVal.width;
@@ -20,8 +21,17 @@ export function loadLevel(engine: EntityEngine, level: string) {
   const paths = svg.querySelectorAll("path");
   for (const path of paths) {
     const d = path.getAttribute("d")!;
+    const clazz = path.getAttribute("class")!;
+    let receiveMask = GROUND_MASK;
+    if (clazz === "t") {
+      receiveMask |= TREE_GROUND_MASK;
+    }
     for (const [start, end] of new PathParser(d).parse()) {
-      new TerrainSegmentComponent(engine, { start, end });
+      engine.physics.addStatic({
+        shape: new LineShape(start, end),
+        receiveMask,
+        pos: new Vector2(0, 0),
+      });
     }
   }
 }

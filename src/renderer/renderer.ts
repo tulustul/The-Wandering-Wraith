@@ -2,7 +2,7 @@ import { Layer } from "./layer";
 import { SystemsRenderer } from "./systems-renderer";
 import { Compositor } from "./compositor";
 
-import { Game } from "../game";
+import { Engine } from "../engine";
 
 const VIEWPORT_HEIGHT = 400;
 
@@ -17,17 +17,17 @@ export class Renderer {
 
   activeLayer: Layer;
 
-  constructor(public game: Game) {}
+  constructor(public engine: Engine) {}
 
   init() {
-    this.compositor = new Compositor(this);
+    this.compositor = new Compositor(this.engine);
 
-    this.systemsRenderer = new SystemsRenderer(this);
+    this.systemsRenderer = new SystemsRenderer(this.engine);
 
-    this.baseLayer = new Layer("base", this, {
+    this.baseLayer = new Layer("base", this.engine, {
       followPlayer: false,
       clear: false,
-      canvas: this.game.canvas,
+      canvas: this.engine.canvas,
     });
 
     this.compositor.init();
@@ -35,15 +35,14 @@ export class Renderer {
 
   render() {
     this.systemsRenderer.render();
-
     this.compositor.compose();
   }
 
   updateSize() {
     const width = (window.innerWidth / window.innerHeight) * VIEWPORT_HEIGHT;
 
-    this.game.canvas.width = Math.floor(width);
-    this.game.canvas.height = VIEWPORT_HEIGHT;
+    this.engine.canvas.width = Math.floor(width);
+    this.engine.canvas.height = VIEWPORT_HEIGHT;
 
     if (this.compositor) {
       for (const layer of Object.values(this.compositor.layers)) {

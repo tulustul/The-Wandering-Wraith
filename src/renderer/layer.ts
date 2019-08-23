@@ -1,4 +1,4 @@
-import { Renderer } from "./renderer";
+import { Engine } from "../engine";
 
 export interface LayerOptions {
   canvas?: HTMLCanvasElement;
@@ -25,12 +25,12 @@ export class Layer {
 
   constructor(
     name: string,
-    private renderer: Renderer,
+    private engine: Engine,
     options: LayerOptions = {},
   ) {
     Object.assign(this, options);
 
-    renderer.compositor.layers[name] = this;
+    engine.renderer.compositor.layers[name] = this;
 
     if (!this.canvas) {
       this.canvas = document.createElement("canvas");
@@ -47,12 +47,12 @@ export class Layer {
   updateSize(force = true) {
     if (this.renderWholeWorld) {
       if (force) {
-        this.canvas.width = this.renderer.game.engine.worldWidth;
-        this.canvas.height = this.renderer.game.engine.worldHeight;
+        this.canvas.width = this.engine.worldWidth;
+        this.canvas.height = this.engine.worldHeight;
       }
     } else {
-      this.canvas.width = this.renderer.game.canvas.width;
-      this.canvas.height = this.renderer.game.canvas.height;
+      this.canvas.width = this.engine.canvas.width;
+      this.canvas.height = this.engine.canvas.height;
     }
     this.clearCanvas();
   }
@@ -62,12 +62,13 @@ export class Layer {
   }
 
   activate() {
-    if (this.renderer.activeLayer) {
-      this.renderer.activeLayer.context.restore();
+    const renderer = this.engine.renderer;
+    if (renderer.activeLayer) {
+      renderer.activeLayer.context.restore();
     }
 
-    this.renderer.activeLayer = this;
-    this.renderer.context = this.context;
+    renderer.activeLayer = this;
+    renderer.context = this.context;
 
     if (this.clear) {
       this.clearCanvas();
@@ -81,8 +82,8 @@ export class Layer {
     if (this.followPlayer) {
       this.context.save();
       this.context.translate(
-        this.renderer.game.camera.pos.x,
-        this.renderer.game.camera.pos.y,
+        -this.engine.player.body.pos.x + this.canvas.width / 2,
+        -this.engine.player.body.pos.y + this.canvas.height / 1.3,
       );
     }
   }

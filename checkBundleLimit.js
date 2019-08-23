@@ -10,20 +10,19 @@ const limit = 13 * 1024;
 const size = fs.statSync("dist/bundle.zip").size;
 
 const color = size < limit ? "green" : "red";
-console.log(`Bundle has ${prettyBytes(size)}.`[color]);
+console.log(`Bundle has ${formatBytes(size)}.`[color]);
 
 if (size < limit) {
   const available = limit - size;
-  console.log(
-    `You have ${prettyBytes(available)} (${available} bytes) available.`[
-      color
-    ],
-  );
+  console.log(`You have ${formatBytes(available)} available.`[color]);
 } else {
   const exceeded = size - limit;
   console.error(
-    `Bundle size limit is exceeded by ${prettyBytes(
-      exceeded,
-    )} (${exceeded} bytes).`[color],
+    `Bundle size limit is exceeded by ${formatBytes(exceeded)}.`[color],
   );
+}
+
+function formatBytes(bytes) {
+  const percent = ((bytes / limit) * 100).toFixed(1);
+  return `${prettyBytes(bytes)} (${bytes} bytes, ${percent}%)`;
 }

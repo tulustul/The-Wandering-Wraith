@@ -1,99 +1,149 @@
-import { AgentComponent } from "./agent";
-import { EntitySystem, EntityEngine, Entity } from "./ecs";
+import { Engine } from "../engine";
 import { Vector2 } from "../vector";
-import { PLAYER_MASK } from "../colisions-masks";
-import { BallComponent } from "./ball";
+import { GROUND_MASK, PLAYER_MASK } from "../colisions-masks";
+import { DynamicBody } from "./physics/physics.interface";
+import { CircleShape } from "./physics/shapes";
+import { SinusAnimation } from "../animations";
 
-export class PlayerComponent extends Entity {
-  agent: AgentComponent;
-
-  constructor(public engine: EntityEngine, pos: Vector2) {
-    super();
-    this.agent = new AgentComponent(this.engine, pos, {
-      colisionMask: PLAYER_MASK,
-    });
-    this.agent.parent = this;
-    engine.getSystem(PlayerSystem).add(this);
-  }
-
-  destroy() {
-    super.destroy();
-    this.agent.destroy();
-  }
+interface AgentAnimation {
+  headOffset: number;
+  lArmRot: number;
+  rArmRot: number;
+  lLegRot: number;
+  rLegRot: number;
+  eyesScale: number;
 }
 
-export class PlayerSystem extends EntitySystem<PlayerComponent> {
+export class Player {
   STEPS_RATE = 270;
+
+  ACCELERATION = 0.7;
 
   currentStep = 0;
 
   lastStepTime = 0;
 
-  player: PlayerComponent | null;
-
   lastBall = 0;
 
-  constructor() {
-    super();
+  maxSpeed = 4;
+
+  body: DynamicBody;
+
+  direction: "l" | "r" = "r";
+
+  lastJumpTime = 0;
+
+  dashed = false;
+
+  stretch = new Vector2(1, 1);
+
+  animation: AgentAnimation = {
+    headOffset: 0,
+    lArmRot: 0,
+    rArmRot: 0,
+    lLegRot: 0,
+    rLegRot: 0,
+    eyesScale: 1,
+  };
+
+  constructor(public engine: Engine, pos: Vector2) {
+    this.body = engine.physics.addDynamic({
+      shape: new CircleShape(pos, 10),
+      parent: this,
+      receiveMask: PLAYER_MASK,
+      hitMask: GROUND_MASK,
+      pos: pos,
+      friction: 0.4,
+      vel: new Vector2(0, 0),
+    });
   }
 
-  add(entity: PlayerComponent) {
-    super.add(entity);
-    this.player = entity;
-  }
-
-  remove(entity: PlayerComponent) {
-    super.remove(entity);
-    this.player = null;
-    this.engine.game.isPlayerDead = true;
-  }
-
-  update() {
-    for (const player of this.entities) {
-      this.updateControls(player);
-      this.makeStep(player);
+  moveToDirection(direction: number) {
+    let accScalar = this.ACCELERATION;
+    if (!this.body.contactPoints.length) {
+      accScalar /= 3;
+    }
+    const acc = new Vector2(0, accScalar).rotate(direction);
+    this.updateVelocity(acc);
+    if (direction < Math.PI) {
+      this.direction = "r";
+    } else {
+      this.direction = "l";
     }
   }
 
-  updateControls(player: PlayerComponent) {
-    const control = this.engine.game.control;
-    if (control.keys.get("KeyW")) {
-      player.agent.moveToDirection(Math.PI);
-    }
-    if (control.keys.get("Space")) {
-      player.agent.jump();
-    }
-    if (control.keys.get("ArrowLeft")) {
-      player.agent.moveToDirection(Math.PI * 0.5);
-    }
-    if (control.keys.get("ArrowDown")) {
-      player.agent.moveToDirection(0);
-    }
-    if (control.keys.get("ArrowRight")) {
-      player.agent.moveToDirection(Math.PI * 1.5);
-    }
-    if (control.keys.get("KeyQ")) {
-      if (this.engine.time - this.lastBall > 300) {
-        this.lastBall = this.engine.time;
-        const direction = player.agent.direction === "l" ? 1 : -1;
-        new BallComponent(this.engine, {
-          pos: player.agent.physicalEntity.pos
-            .copy()
-            .add(new Vector2(20 * direction, -20)),
-          radius: Math.random() * 15 + 3,
-          vel: new Vector2(3 * direction, -3),
-        });
+  jump() {
+    for (const point of this.body.contactPoints) {
+      if (point.y - this.body.pos.y > 5) {
+        this.body.vel.y = -6;
+        this.lastJumpTime = this.engine.time;
+        this.dashed = false;
+        return;
       }
     }
+    if (!this.dashed && this.engine.time - this.lastJumpTime > 300) {
+      const control = this.engine.control;
+      if (control.keys.get("ArrowLeft")) {
+        this.body.vel.x = -6;
+        this.body.vel.y = -2;
+      } else if (control.keys.get("ArrowRight")) {
+        this.body.vel.x = 6;
+        this.body.vel.y = -2;
+      } else {
+        this.body.vel.y = -6;
+      }
+      this.dashed = true;
+    }
   }
 
-  makeStep(player: PlayerComponent) {
+  blink() {
+    this.engine.animations.animate(
+      new SinusAnimation(Math.PI / 2, Math.PI * 2.5, 200),
+      value => (this.animation.eyesScale = (value + 1) / 2),
+    );
+  }
+
+  private updateVelocity(acc: Vector2) {
+    if (Math.abs(this.body.vel.x + acc.x) < this.maxSpeed) {
+      this.body.vel.x += acc.x;
+    }
+    this.body.vel.y += acc.y;
+  }
+
+  updateControls() {
+    const control = this.engine.control;
+    if (control.keys.get("KeyW")) {
+      this.moveToDirection(Math.PI);
+    }
+    if (control.keys.get("Space")) {
+      this.jump();
+    }
+    if (control.keys.get("ArrowLeft")) {
+      this.moveToDirection(Math.PI * 0.5);
+    }
+    if (control.keys.get("ArrowDown")) {
+      this.moveToDirection(0);
+    }
+    if (control.keys.get("ArrowRight")) {
+      this.moveToDirection(Math.PI * 1.5);
+    }
+  }
+
+  makeStep() {
     if (this.engine.time - this.lastStepTime > this.STEPS_RATE) {
-      if (player.agent.physicalEntity.vel.length() > 0.5) {
+      if (this.body.vel.length() > 0.5) {
         this.lastStepTime = this.engine.time;
         this.currentStep = (this.currentStep + 1) % 2;
         // this.engine.sound.play("collectA");
       }
     }
+  }
+
+  update() {
+    this.updateControls();
+    if (Math.random() > 0.99) {
+      this.blink();
+    }
+    this.animation.headOffset = Math.sin(this.engine.time / 200);
   }
 }

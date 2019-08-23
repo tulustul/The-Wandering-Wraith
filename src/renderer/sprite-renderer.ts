@@ -11,12 +11,16 @@ export class SpriteRenderer {
     this.canvas.height = height;
   }
 
-  render(renderFn: (ctx: CanvasRenderingContext2D) => void) {
-    renderFn(this.ctx);
-    const img = new Image();
-    img.src = this.canvas.toDataURL();
-    this.reset();
-    return img;
+  async render(
+    renderFn: (ctx: CanvasRenderingContext2D) => void,
+  ): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      renderFn(this.ctx);
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.src = this.canvas.toDataURL();
+      this.reset();
+    });
   }
 
   private reset() {

@@ -1,59 +1,46 @@
-import { EntitySystem, EntityEngine, Entity } from "./ecs";
+import { Engine } from "../engine";
 
 import { Vector2 } from "../vector";
-import { BARRIER_MASK } from "../colisions-masks";
-import { PhysicsSystem } from "./physics/physics";
+import { TREE_GROUND_MASK } from "../colisions-masks";
 import { Random } from "../random";
-import { treeDefinitions, TreeDefinition } from "../trees";
+import { TreeDefinition } from "../trees";
+import { assets } from "../assets";
 
-interface FoliageOptions {
+interface Foliage {
   pos: Vector2;
   definition: TreeDefinition;
   isForeground: boolean;
 }
 
-export class FoliageComponent extends Entity {
-  pos!: Vector2;
-  definition!: TreeDefinition;
-  isForeground: boolean;
-  constructor(options: FoliageOptions) {
-    super();
-    Object.assign(this, options);
-  }
-}
-
-export class FoliageSystem extends EntitySystem<FoliageComponent> {
-  update() {}
-
-  spawnFoliage() {
+export class FoliageSystem {
+  entities: Foliage[];
+  async spawnFoliage(engine: Engine) {
+    this.entities = [];
     const r = new Random(1);
-    const physics = this.engine.getSystem<PhysicsSystem>(PhysicsSystem);
 
-    for (const treeDefinition of treeDefinitions) {
+    for (const treeDefinition of assets.trees) {
       let x = 500;
-      while (x < this.engine.worldWidth) {
+      while (x < engine.worldWidth) {
         x += (r.next() % treeDefinition.density) + 20;
-        const pos = physics.castRay(
+        const pos = engine.physics.castRay(
           new Vector2(x, 0),
-          new Vector2(x, this.engine.worldHeight),
-          BARRIER_MASK,
+          new Vector2(x, engine.worldHeight),
+          TREE_GROUND_MASK,
           5,
         );
         if (pos) {
           const img = treeDefinition.frames[0];
           const isForeground = Math.random() > 0.5;
-          this.add(
-            new FoliageComponent({
-              pos: pos.add(
-                new Vector2(
-                  img.width / -2,
-                  -img.height + (isForeground ? 20 : 0),
-                ),
+          this.entities.push({
+            pos: pos.add(
+              new Vector2(
+                img.width / -2,
+                -img.height + (isForeground ? 20 : 0),
               ),
-              definition: treeDefinition,
-              isForeground,
-            }),
-          );
+            ),
+            definition: treeDefinition,
+            isForeground,
+          });
         }
       }
     }

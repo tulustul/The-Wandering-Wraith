@@ -87,25 +87,14 @@ function drawTree(
   }
 }
 
-const spritesRenderer = new SpriteRenderer();
-
-export const treeDefinitions: TreeDefinition[] = [
-  { frames: Array.from(animateTree(4, 0.5, 28, 11)), density: 80 },
-  { frames: Array.from(animateTree(5, 0.2, 30, 13)), density: 90 },
-  { frames: Array.from(animateTree(7, 0.5, 45, 3)), density: 400 },
-  { frames: Array.from(animateTree(7, 0.4, 45, 6)), density: 450 },
-  { frames: Array.from(animateTree(8, 0.4, 55, 2)), density: 500 },
-  { frames: Array.from(animateTree(9, 0.35, 65, 1)), density: 700 },
-  { frames: Array.from(animateTree(9, 0.5, 65, 4)), density: 800 },
-  { frames: Array.from(animateTree(10, 0.4, 95, 5)), density: 1200 },
-];
-
-function* animateTree(
+export async function animateTree(
+  spritesRenderer: SpriteRenderer,
   depth: number,
   angle: number,
   segmentLength: number,
   seed: number,
-) {
+): Promise<HTMLImageElement[]> {
+  const frames: HTMLImageElement[] = [];
   const size = (depth * segmentLength) / 1.5;
   spritesRenderer.setSize(size, size);
   const framesCount = 30;
@@ -113,8 +102,11 @@ function* animateTree(
   let time = Math.PI / 2;
   for (let i = 0; i < framesCount; i++) {
     time = time += step;
-    yield spritesRenderer.render(ctx =>
-      generateTree(ctx, size, depth, angle, segmentLength, seed, time),
+    frames.push(
+      await spritesRenderer.render(ctx =>
+        generateTree(ctx, size, depth, angle, segmentLength, seed, time),
+      ),
     );
   }
+  return frames;
 }

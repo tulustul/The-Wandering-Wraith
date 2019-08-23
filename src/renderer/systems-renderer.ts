@@ -1,158 +1,103 @@
 import { Layer } from "./layer";
-import { Renderer } from "./renderer";
-
-import { AgentSystem } from "../systems/agent";
-import { CircleShape } from "../systems/physics/shapes";
-import { FoliageSystem } from "../systems/foliage";
-import { PhysicsSystem } from "../systems/physics/physics";
-import { TerrainSystem } from "../systems/terrain";
-import { BallSystem } from "../systems/ball";
-
-function svgToImg(id: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const svg = document.getElementById(id)!;
-    const xml = new XMLSerializer().serializeToString(svg);
-
-    const svg64 = btoa(xml);
-    const b64Start = "data:image/svg+xml;base64,";
-    const image64 = b64Start + svg64;
-
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.src = image64;
-  });
-}
+import { assets } from "../assets";
+import { Engine } from "../engine";
 
 export class SystemsRenderer {
-  terrainLayer = new Layer("terrain", this.renderer, {
+  terrainLayer = new Layer("terrain", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
     clear: false,
   });
 
-  movingPropsLayer = new Layer("movingProps", this.renderer, {
+  movingPropsLayer = new Layer("movingProps", this.engine, {
     clear: true,
   });
 
-  skyLayer = new Layer("background", this.renderer, {
+  skyLayer = new Layer("background", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
     clear: false,
   });
 
-  hills1 = new Layer("hills1", this.renderer, {
+  hills1 = new Layer("hills1", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
     clear: false,
   });
 
-  hills2 = new Layer("hills2", this.renderer, {
+  hills2 = new Layer("hills2", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
     clear: false,
   });
 
-  hills3 = new Layer("hills3", this.renderer, {
+  hills3 = new Layer("hills3", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
     clear: false,
   });
 
-  foliageBackgroundLayer = new Layer("foliageBackground", this.renderer, {
+  foliageBackgroundLayer = new Layer("foliageBackground", this.engine, {
     followPlayer: true,
     clear: true,
   });
 
-  foliageForegroundLayer = new Layer("foliageForeground", this.renderer, {
+  foliageForegroundLayer = new Layer("foliageForeground", this.engine, {
     followPlayer: true,
     clear: true,
   });
 
-  terrainImg: HTMLImageElement;
-  headImg: HTMLImageElement;
-  eyesImg: HTMLImageElement;
-  torsoImg: HTMLImageElement;
-  limbImg: HTMLImageElement;
-
-  constructor(private renderer: Renderer) {}
+  constructor(private engine: Engine) {}
 
   get context() {
-    return this.renderer.context;
+    return this.engine.renderer.context;
   }
 
-  get engine() {
-    return this.renderer.game.engine;
-  }
+  // get renderer() {
+  //   return this.engine.renderer;
+  // }
 
   renderTerrain() {
     this.context.strokeStyle = "#ffffff";
     this.context.globalCompositeOperation = "source-over";
-
-    this.context.drawImage(this.terrainImg, 0, 0);
-
-    // debug below:
-    // Toggle terrain colision helpers
-    this.context.strokeStyle = "#ff0";
-    this.context.lineWidth = 2;
-    for (const terrainSegment of this.engine.getSystem<TerrainSystem>(
-      TerrainSystem,
-    ).entities) {
-      this.context.beginPath();
-      this.context.moveTo(terrainSegment.start.x, terrainSegment.start.y);
-      this.context.lineTo(terrainSegment.end.x, terrainSegment.end.y);
-      this.context.stroke();
-      this.context.closePath();
-    }
+    this.context.drawImage(assets.terrain, 0, 0);
   }
 
-  renderAgents() {
+  renderPlayer() {
     this.context.fillStyle = "#222";
     this.context.globalCompositeOperation = "source-over";
 
-    for (const agent of this.engine.getSystem<AgentSystem>(AgentSystem)
-      .entities) {
-      this.context.save();
-      this.context.translate(
-        agent.physicalEntity.pos.x,
-        agent.physicalEntity.pos.y,
-      );
-      if (agent.direction === "r") {
-        this.context.scale(-1, 1);
-      }
-      this.context.rotate(agent.physicalEntity.vel.angle());
-      this.context.scale(
-        1,
-        1 + Math.abs(agent.physicalEntity.vel.length() / 20),
-      );
-      this.context.rotate(-agent.physicalEntity.vel.angle());
-      // const radius = (agent.physicalEntity.shape as CircleShape).radius;
-      // this.context.beginPath();
-      // this.context.arc(0, 0, radius, 0, 2 * Math.PI);
-      // this.context.fill();
-      // this.context.closePath();
-      this.context.drawImage(this.torsoImg, -20, -20, 40, 40);
-
-      this.context.translate(0, agent.animation.headOffset);
-      this.context.drawImage(this.headImg, -20, -20, 40, 40);
-      this.context.scale(1, agent.animation.eyesScale);
-      this.context.drawImage(this.eyesImg, 0, -10, 8, 8);
+    const player = this.engine.player;
+    this.context.save();
+    this.context.translate(player.body.pos.x, player.body.pos.y);
+    if (player.direction === "r") {
+      this.context.scale(-1, 1);
     }
+    this.context.rotate(player.body.vel.angle());
+    this.context.scale(1, 1 + Math.abs(player.body.vel.length() / 20));
+    this.context.rotate(-player.body.vel.angle());
+    this.context.drawImage(assets.torso, -20, -20, 40, 40);
+
+    this.context.translate(0, player.animation.headOffset);
+    this.context.drawImage(assets.head, -20, -20, 40, 40);
+    this.context.scale(1, player.animation.eyesScale);
+    this.context.drawImage(assets.eyes, 0, -10, 8, 8);
     this.context.restore();
   }
 
-  renderBalls() {
-    this.context.fillStyle = "#222";
-    for (const ball of this.engine.getSystem<BallSystem>(BallSystem)
-      .entities) {
-      this.context.beginPath();
-      this.context.arc(ball.pos.x, ball.pos.y, ball.radius, 0, 2 * Math.PI);
-      this.context.fill();
-      this.context.closePath();
-    }
-  }
+  // renderBalls() {
+  //   this.context.fillStyle = "#222";
+  //   for (const ball of this.engine.getSystem<BallSystem>(BallSystem)
+  //     .entities) {
+  //     this.context.beginPath();
+  //     this.context.arc(ball.pos.x, ball.pos.y, ball.radius, 0, 2 * Math.PI);
+  //     this.context.fill();
+  //     this.context.closePath();
+  //   }
+  // }
 
   renderSky() {
-    const canvas = this.renderer.activeLayer.canvas;
+    const canvas = this.engine.renderer.activeLayer.canvas;
     var grd = this.context.createLinearGradient(0, 0, 0, canvas.height);
     grd.addColorStop(0, "#a8dfff");
     grd.addColorStop(0.7, "#111");
@@ -171,7 +116,7 @@ export class SystemsRenderer {
     y2: number,
     y3: number,
   ) {
-    const canvas = this.renderer.activeLayer.canvas;
+    const canvas = this.engine.renderer.activeLayer.canvas;
 
     var grd = this.context.createLinearGradient(0, 0, 0, canvas.height);
     grd.addColorStop(0, colorHigh);
@@ -196,11 +141,11 @@ export class SystemsRenderer {
   }
 
   renderFoliage(isForeGround: boolean) {
-    for (const foliage of this.engine.getSystem<FoliageSystem>(FoliageSystem)
-      .entities) {
+    for (const foliage of this.engine.foliage.entities) {
       if (foliage.isForeground !== isForeGround) {
         continue;
       }
+
       const framesCount = foliage.definition.frames.length;
       let frame = Math.abs(
         (Math.round(this.engine.time / 50 + foliage.pos.x) %
@@ -218,13 +163,7 @@ export class SystemsRenderer {
     }
   }
 
-  async prerender() {
-    this.terrainImg = await svgToImg("a");
-    this.headImg = await svgToImg("hero-head");
-    this.eyesImg = await svgToImg("hero-eyes");
-    this.torsoImg = await svgToImg("hero-torso");
-    this.limbImg = await svgToImg("hero-limb");
-
+  prerender() {
     this.skyLayer.activate();
     this.renderSky();
 
@@ -241,37 +180,45 @@ export class SystemsRenderer {
     this.renderHills("#104263", "#061824", 260, 311, 290, 111, 98, 64);
   }
 
-  renderDebug() {
-    // DEBUG
-    this.context.fillStyle = "#f00";
-    this.context.strokeStyle = "#f00";
-    for (const entity of this.engine.getSystem<PhysicsSystem>(PhysicsSystem)
-      .dynamicEntities) {
-      this.context.save();
-      this.context.beginPath();
-      this.context.moveTo(entity.pos.x, entity.pos.y);
-      this.context.lineTo(
-        entity.pos.x + entity.vel.x * 2,
-        entity.pos.y + entity.vel.y * 2,
-      );
-      this.context.closePath();
+  // renderPhysicsDebugHelpers() {
+  //   // DEBUG
+  //   this.context.fillStyle = "#f00";
+  //   this.context.strokeStyle = "#f00";
+  //   for (const entity of this.engine.physics.dynamicBodies) {
+  //     this.context.save();
+  //     this.context.beginPath();
+  //     this.context.moveTo(entity.pos.x, entity.pos.y);
+  //     this.context.lineTo(
+  //       entity.pos.x + entity.vel.x * 2,
+  //       entity.pos.y + entity.vel.y * 2,
+  //     );
+  //     this.context.closePath();
 
-      this.context.stroke();
-      for (const point of entity.contactPoints) {
-        this.context.beginPath();
-        this.context.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-        this.context.fill();
-        this.context.closePath();
-      }
-      this.context.restore();
-    }
-    this.context.closePath();
-  }
+  //     this.context.stroke();
+  //     for (const point of entity.contactPoints) {
+  //       this.context.beginPath();
+  //       this.context.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+  //       this.context.fill();
+  //       this.context.closePath();
+  //     }
+  //     this.context.restore();
+  //   }
+  //   this.context.closePath();
+
+  //   this.context.strokeStyle = "#ff0";
+  //   this.context.lineWidth = 2;
+  //   for (const body of this.engine.physics.staticBodies) {
+  //     this.context.beginPath();
+  //     this.context.moveTo(body.shape.start.x, body.shape.start.y);
+  //     this.context.lineTo(body.shape.end.x, body.shape.end.y);
+  //     this.context.stroke();
+  //     this.context.closePath();
+  //   }
+  // }
 
   render() {
     this.movingPropsLayer.activate();
-    this.renderAgents();
-    this.renderBalls();
+    this.renderPlayer();
     // this.renderDebug();
 
     this.foliageBackgroundLayer.activate();

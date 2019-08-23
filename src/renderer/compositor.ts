@@ -1,5 +1,5 @@
-import { Renderer } from "./renderer";
 import { Layer } from "./layer";
+import { Engine } from "../engine";
 
 type BlendMode =
   | "source-over"
@@ -73,16 +73,12 @@ const COMPOSITOR_ENTRIES: CompositorEntry[] = [
 ];
 
 export class Compositor {
-  constructor(private renderer: Renderer) {}
+  constructor(private engine: Engine) {}
 
   layers: { [key: string]: Layer } = {};
 
-  get camera() {
-    return this.renderer.game.camera;
-  }
-
   get canvas() {
-    return this.renderer.game.canvas;
+    return this.engine.canvas;
   }
 
   init() {
@@ -92,14 +88,14 @@ export class Compositor {
   }
 
   compose() {
-    const entry: CompositorEntry = {};
+    let entry: CompositorEntry = {};
 
     for (const nextEntry of COMPOSITOR_ENTRIES) {
       if (nextEntry.target === "base") {
         this.layers["base"].activate();
       }
 
-      Object.assign(entry, nextEntry);
+      entry = { ...entry, ...nextEntry };
 
       const target = this.layers[entry.target as string];
       const source = this.layers[entry.source as string];
@@ -123,8 +119,9 @@ export class Compositor {
   ) {
     target.context.drawImage(
       source.canvas,
-      -this.camera.pos.x * offsetScale,
-      -this.camera.pos.y * offsetScale,
+      -(-this.engine.player.body.pos.x + this.canvas.width / 2) * offsetScale,
+      -(-this.engine.player.body.pos.y + this.canvas.height / 1.3) *
+        offsetScale,
       this.canvas.width,
       this.canvas.height,
       0,
