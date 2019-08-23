@@ -88,6 +88,7 @@ export class CircleShape extends Shape {
     if (!penetration) {
       return null;
     }
+
     return [penetration, closestPoint];
   }
 

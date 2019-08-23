@@ -47,7 +47,6 @@ export class Game {
     // just let the logic flow
     this.engine.worldWidth = 1;
     this.engine.worldHeight = 1;
-    this.start();
   }
 
   async start() {
@@ -69,10 +68,12 @@ export class Game {
     this.isStarted = true;
 
     this.renderer.init();
-    this.renderer.systemsRenderer.prerender();
+
+    await this.renderer.systemsRenderer.prerender();
 
     this.isLoading = false;
     this.paused = false;
+    document.getElementsByTagName("div")[0].remove();
   }
 
   initStage() {

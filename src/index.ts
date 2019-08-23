@@ -5,10 +5,11 @@ const timeStep = 1000 / 60;
 
 let game: Game;
 
-function init() {
+async function init() {
   const canvas = document.getElementsByTagName("canvas")[0];
 
   game = new Game(canvas);
+  await game.start();
 
   requestAnimationFrame(tick);
 

@@ -233,16 +233,7 @@ export class PhysicsSystem extends EntitySystem<PhysicalEntityDefinition> {
         colision.hitter.vel.add(normal.copy().mul(j / colision.hitter.weight));
       } else {
         colision.hitter.vel.add(colision.penetration);
-        // const speed = colision.hitter.vel.length();
-        // colision.hitter.vel.add(
-        //   colision.penetration
-        //     .copy()
-        //     .normalize()
-        //     .mul(speed * colision.hitter.bounciness),
-        // );
       }
-
-      // colision.hitter.vel.mul(colision.hitter.bounciness);
     }
   }
 

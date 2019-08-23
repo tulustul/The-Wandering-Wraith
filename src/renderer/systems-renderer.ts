@@ -8,25 +8,20 @@ import { PhysicsSystem } from "../systems/physics/physics";
 import { TerrainSystem } from "../systems/terrain";
 import { BallSystem } from "../systems/ball";
 
-function svgToImg(id: string) {
-  const svg = document.getElementById(id)!;
-  const xml = new XMLSerializer().serializeToString(svg);
+function svgToImg(id: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const svg = document.getElementById(id)!;
+    const xml = new XMLSerializer().serializeToString(svg);
 
-  const svg64 = btoa(xml);
-  const b64Start = "data:image/svg+xml;base64,";
-  const image64 = b64Start + svg64;
+    const svg64 = btoa(xml);
+    const b64Start = "data:image/svg+xml;base64,";
+    const image64 = b64Start + svg64;
 
-  const img = new Image();
-  img.src = image64;
-
-  return img;
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.src = image64;
+  });
 }
-
-const terrainImg = svgToImg("a");
-const headImg = svgToImg("hero-head");
-const eyesImg = svgToImg("hero-eyes");
-const torsoImg = svgToImg("hero-torso");
-const limbImg = svgToImg("hero-limb");
 
 export class SystemsRenderer {
   terrainLayer = new Layer("terrain", this.renderer, {
@@ -73,6 +68,12 @@ export class SystemsRenderer {
     clear: true,
   });
 
+  terrainImg: HTMLImageElement;
+  headImg: HTMLImageElement;
+  eyesImg: HTMLImageElement;
+  torsoImg: HTMLImageElement;
+  limbImg: HTMLImageElement;
+
   constructor(private renderer: Renderer) {}
 
   get context() {
@@ -87,7 +88,7 @@ export class SystemsRenderer {
     this.context.strokeStyle = "#ffffff";
     this.context.globalCompositeOperation = "source-over";
 
-    this.context.drawImage(terrainImg, 0, 0);
+    this.context.drawImage(this.terrainImg, 0, 0);
 
     // debug below:
     // Toggle terrain colision helpers
@@ -129,12 +130,12 @@ export class SystemsRenderer {
       // this.context.arc(0, 0, radius, 0, 2 * Math.PI);
       // this.context.fill();
       // this.context.closePath();
-      this.context.drawImage(torsoImg, -20, -20, 40, 40);
+      this.context.drawImage(this.torsoImg, -20, -20, 40, 40);
 
       this.context.translate(0, agent.animation.headOffset);
-      this.context.drawImage(headImg, -20, -20, 40, 40);
+      this.context.drawImage(this.headImg, -20, -20, 40, 40);
       this.context.scale(1, agent.animation.eyesScale);
-      this.context.drawImage(eyesImg, 0, -10, 8, 8);
+      this.context.drawImage(this.eyesImg, 0, -10, 8, 8);
     }
     this.context.restore();
   }
@@ -217,7 +218,13 @@ export class SystemsRenderer {
     }
   }
 
-  prerender() {
+  async prerender() {
+    this.terrainImg = await svgToImg("a");
+    this.headImg = await svgToImg("hero-head");
+    this.eyesImg = await svgToImg("hero-eyes");
+    this.torsoImg = await svgToImg("hero-torso");
+    this.limbImg = await svgToImg("hero-limb");
+
     this.skyLayer.activate();
     this.renderSky();
 

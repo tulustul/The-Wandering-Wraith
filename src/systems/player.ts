@@ -92,7 +92,7 @@ export class PlayerSystem extends EntitySystem<PlayerComponent> {
       if (player.agent.physicalEntity.vel.length() > 0.5) {
         this.lastStepTime = this.engine.time;
         this.currentStep = (this.currentStep + 1) % 2;
-        // this.engine.sound.play('collectA');
+        // this.engine.sound.play("collectA");
       }
     }
   }
