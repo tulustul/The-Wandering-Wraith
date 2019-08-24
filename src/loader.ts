@@ -10,7 +10,7 @@ import { LineShape } from "./systems/physics/shapes";
 // V - vertical line, y
 // H - vertical line, y
 // z - close path
-const commands = "MLlcvVhHz";
+const commands = "mMlLcvVhHz";
 
 export function loadLevel(engine: Engine, level: string) {
   const svg = document.getElementById(level) as any;
@@ -50,6 +50,7 @@ class PathParser {
       if (commands.includes(c)) {
         command = c;
         if (command === "z") {
+          console.log(this.pos, firstPoint!);
           yield [this.pos, firstPoint!];
         }
         c = this.next();
@@ -64,9 +65,8 @@ class PathParser {
       switch (command) {
         case "M":
           this.pos = this.parseVector();
-          if (!firstPoint) {
-            firstPoint = this.pos.copy();
-          }
+          firstPoint = this.pos.copy();
+          console.log(firstPoint);
           command = "l";
           break;
         case "l":

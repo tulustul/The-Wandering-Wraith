@@ -4,7 +4,7 @@ import { Compositor } from "./compositor";
 
 import { Engine } from "../engine";
 
-const VIEWPORT_HEIGHT = 400;
+const VIEWPORT_HEIGHT = 350;
 
 export class Renderer {
   context: CanvasRenderingContext2D;

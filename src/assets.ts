@@ -48,7 +48,7 @@ async function preparePlants(): Promise<PlantDefinition[]> {
   for (let i = 0; i < 4; i++) {
     plants.push({
       frames: await animateGrass(sr, i),
-      spread: 10,
+      spread: 6,
       mask: GROUND_MASK,
     });
   }

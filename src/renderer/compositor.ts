@@ -22,7 +22,7 @@ const COMPOSITOR_ENTRIES: CompositorEntry[] = [
     target: "base",
     source: "background",
     blendMode: "source-over",
-    offset: true,
+    offset: false,
     offsetScale: 0.3,
   },
   {

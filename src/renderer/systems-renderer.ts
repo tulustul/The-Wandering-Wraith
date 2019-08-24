@@ -14,9 +14,8 @@ export class SystemsRenderer {
   });
 
   skyLayer = new Layer("background", this.engine, {
-    renderWholeWorld: true,
+    renderWholeWorld: false,
     followPlayer: false,
-    clear: false,
   });
 
   hills1 = new Layer("hills1", this.engine, {
@@ -79,17 +78,6 @@ export class SystemsRenderer {
     this.context.scale(1, 1 + Math.abs(player.body.vel.y / 20));
     this.context.rotate(-player.body.vel.angle());
 
-    // for (const bodyPart of Object.values(player.bodyParts)) {
-    //   this.context.save();
-    //   this.context.translate(bodyPart.offset.x, bodyPart.offset.y);
-    //   this.context.rotate(bodyPart.rot || 0);
-    //   this.context.scale(bodyPart.scale || 1, bodyPart.scale || 1);
-    //   const image = bodyPart.image;
-    //   this.context.drawImage(image, 0, 0, image.width, image.height);
-    //   this.context.restore();
-    // }
-    // this.context.restore();
-
     // legs
     this.context.save();
     this.context.translate(-3, 3);
@@ -136,24 +124,27 @@ export class SystemsRenderer {
     this.context.restore();
   }
 
-  // renderBalls() {
-  //   this.context.fillStyle = "#222";
-  //   for (const ball of this.engine.getSystem<BallSystem>(BallSystem)
-  //     .entities) {
-  //     this.context.beginPath();
-  //     this.context.arc(ball.pos.x, ball.pos.y, ball.radius, 0, 2 * Math.PI);
-  //     this.context.fill();
-  //     this.context.closePath();
-  //   }
-  // }
-
   renderSky() {
     const canvas = this.engine.renderer.activeLayer.canvas;
     var grd = this.context.createLinearGradient(0, 0, 0, canvas.height);
-    grd.addColorStop(0, "#a8dfff");
-    grd.addColorStop(0.7, "#111");
-
+    grd.addColorStop(0, "#333");
+    grd.addColorStop(1, "#111");
     this.context.fillStyle = grd;
+    this.context.fillRect(0, 0, canvas.width, canvas.height);
+
+    const gradient = this.context.createRadialGradient(
+      100,
+      100,
+      10,
+      100,
+      100,
+      300,
+    );
+    gradient.addColorStop(0, "#ccc");
+    gradient.addColorStop(0.03, "#ccc");
+    gradient.addColorStop(0.04, "#555");
+    gradient.addColorStop(1, "transparent");
+    this.context.fillStyle = gradient;
     this.context.fillRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -171,7 +162,7 @@ export class SystemsRenderer {
 
     var grd = this.context.createLinearGradient(0, 0, 0, canvas.height);
     grd.addColorStop(0, colorHigh);
-    grd.addColorStop(1, colorLow);
+    grd.addColorStop(0.3, colorLow);
 
     this.context.fillStyle = grd;
     this.context.beginPath();
@@ -231,13 +222,13 @@ export class SystemsRenderer {
     this.renderTerrain();
 
     this.hills1.activate();
-    this.renderHills("#ccecff", "#2d3438", 163, 139, 111, 200, 150, 79);
+    this.renderHills("#1a1a1a", "#111", 150, 139, 111, 200, 150, 79);
 
     this.hills2.activate();
-    this.renderHills("#a6ddff", "#1e282e", 197, 211, 380, 140, 35, 80);
+    this.renderHills("#1c1c1c", "#111", 197, 211, 380, 140, 35, 80);
 
     this.hills3.activate();
-    this.renderHills("#104263", "#061824", 260, 311, 290, 111, 98, 64);
+    this.renderHills("#161616", "#111", 260, 311, 290, 111, 98, 64);
   }
 
   renderDebugHelpers() {
@@ -289,12 +280,13 @@ export class SystemsRenderer {
   render() {
     this.movingPropsLayer.activate();
     this.renderPlayer();
-    // this.renderDebugHelpers();
 
     this.foliageBackgroundLayer.activate();
     this.renderFoliage(false);
 
     this.foliageForegroundLayer.activate();
     this.renderFoliage(true);
+
+    // this.renderDebugHelpers();
   }
 }

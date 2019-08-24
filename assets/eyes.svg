@@ -1,1 +1,16 @@
-<svg id="eyes" width="6" height="5" version="1.1" viewBox="0 0 1.5874 1.3229" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-5.3252 -289.37)"><ellipse cx="5.7489" cy="290.03" rx=".31002" ry=".52503" opacity=".476"/><ellipse cx="6.489" cy="290.04" rx=".31002" ry=".52503" opacity=".476"/></g></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="eyes" width="6" height="5" version="1.1" viewBox="0 0 1.5874 1.3229" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g transform="translate(-5.3252 -289.37)">
+  <ellipse cx="5.7489" cy="290.03" rx=".31002" ry=".52503" opacity=".476"/>
+  <ellipse cx="6.489" cy="290.04" rx=".31002" ry=".52503" opacity=".476"/>
+ </g>
+</svg>
