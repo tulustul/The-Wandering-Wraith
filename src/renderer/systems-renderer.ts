@@ -68,20 +68,71 @@ export class SystemsRenderer {
     this.context.globalCompositeOperation = "source-over";
 
     const player = this.engine.player;
+
     this.context.save();
+
     this.context.translate(player.body.pos.x, player.body.pos.y);
     if (player.direction === "r") {
       this.context.scale(-1, 1);
     }
     this.context.rotate(player.body.vel.angle());
-    this.context.scale(1, 1 + Math.abs(player.body.vel.length() / 20));
+    this.context.scale(1, 1 + Math.abs(player.body.vel.y / 20));
     this.context.rotate(-player.body.vel.angle());
-    this.context.drawImage(assets.torso, -20, -20, 40, 40);
 
+    // for (const bodyPart of Object.values(player.bodyParts)) {
+    //   this.context.save();
+    //   this.context.translate(bodyPart.offset.x, bodyPart.offset.y);
+    //   this.context.rotate(bodyPart.rot || 0);
+    //   this.context.scale(bodyPart.scale || 1, bodyPart.scale || 1);
+    //   const image = bodyPart.image;
+    //   this.context.drawImage(image, 0, 0, image.width, image.height);
+    //   this.context.restore();
+    // }
+    // this.context.restore();
+
+    // legs
+    this.context.save();
+    this.context.translate(-3, 3);
+    this.context.rotate(player.animation.lLegRot);
+    this.context.drawImage(assets.limb, 0, 0, 5, 10);
+    this.context.restore();
+
+    this.context.save();
+    this.context.translate(1, 3);
+    this.context.rotate(player.animation.rLegRot);
+    this.context.drawImage(assets.limb, 0, 0, 5, 10);
+    this.context.restore();
+
+    this.context.drawImage(assets.torso, -20, -23, 40, 40);
+
+    this.context.save();
     this.context.translate(0, player.animation.headOffset);
+
+    // arms
+    this.context.save();
+    this.context.translate(-3, 0);
+    this.context.rotate(player.animation.rArmRot);
+    this.context.scale(0.8, 0.8);
+    this.context.drawImage(assets.limb, 0, 0, 5, 10);
+    this.context.restore();
+
+    this.context.save();
+    this.context.translate(3, 3);
+    this.context.rotate(player.animation.lArmRot);
+    this.context.scale(0.8, 0.8);
+    this.context.drawImage(assets.limb, 0, 0, 5, 10);
+    this.context.restore();
+
+    //head
+    this.context.scale(0.9, 0.9);
     this.context.drawImage(assets.head, -20, -20, 40, 40);
+
+    // eyes
+    this.context.translate(0, player.animation.eyesOffset);
     this.context.scale(1, player.animation.eyesScale);
-    this.context.drawImage(assets.eyes, 0, -10, 8, 8);
+    this.context.drawImage(assets.eyes, -3, -10, 10, 10);
+    this.context.restore();
+
     this.context.restore();
   }
 

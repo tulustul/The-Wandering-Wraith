@@ -12,6 +12,7 @@ interface AgentAnimation {
   lLegRot: number;
   rLegRot: number;
   eyesScale: number;
+  eyesOffset: number;
 }
 
 export class Player {
@@ -25,6 +26,8 @@ export class Player {
 
   lastBall = 0;
 
+  lastEyeLook = 0;
+
   maxSpeed = 4;
 
   body: DynamicBody;
@@ -37,6 +40,8 @@ export class Player {
 
   stretch = new Vector2(1, 1);
 
+  isRunning = false;
+
   animation: AgentAnimation = {
     headOffset: 0,
     lArmRot: 0,
@@ -44,6 +49,7 @@ export class Player {
     lLegRot: 0,
     rLegRot: 0,
     eyesScale: 1,
+    eyesOffset: 0,
   };
 
   constructor(public engine: Engine, pos: Vector2) {
@@ -59,6 +65,7 @@ export class Player {
   }
 
   moveToDirection(direction: number) {
+    this.isRunning = !!this.body.contactPoints.length;
     let accScalar = this.ACCELERATION;
     if (!this.body.contactPoints.length) {
       accScalar /= 3;
@@ -111,21 +118,55 @@ export class Player {
   }
 
   updateControls() {
+    this.isRunning = false;
     const control = this.engine.control;
-    if (control.keys.get("KeyW")) {
-      this.moveToDirection(Math.PI);
-    }
     if (control.keys.get("Space")) {
       this.jump();
     }
     if (control.keys.get("ArrowLeft")) {
       this.moveToDirection(Math.PI * 0.5);
     }
-    if (control.keys.get("ArrowDown")) {
-      this.moveToDirection(0);
-    }
     if (control.keys.get("ArrowRight")) {
       this.moveToDirection(Math.PI * 1.5);
+    }
+  }
+
+  updateAnimation() {
+    this.animation.lLegRot = 0;
+    this.animation.rLegRot = 0;
+    this.animation.lArmRot = -1;
+    this.animation.rArmRot = 1;
+    if (this.isRunning) {
+      this.animation.lLegRot = Math.sin(this.engine.time / 30) / 2;
+      this.animation.rLegRot = Math.cos(this.engine.time / 30) / 2;
+      this.animation.lArmRot = 0.5;
+    }
+
+    if (this.engine.time - this.lastEyeLook > 100) {
+      this.lastEyeLook = this.engine.time;
+      if (this.body.vel.y > 1) {
+        this.animation.eyesOffset = 4;
+      } else if (this.body.vel.y < -1) {
+        this.animation.eyesOffset = -6;
+      } else {
+        this.animation.eyesOffset = 0;
+      }
+    }
+
+    if (!this.body.contactPoints.length && Math.abs(this.body.vel.y) > 0.3) {
+      this.animation.lArmRot = -1.5 + Math.sin(this.engine.time / 50) / 3;
+      this.animation.rArmRot = 1.5 + Math.cos(this.engine.time / 50) / 3;
+      this.animation.lLegRot = 0.3;
+      this.animation.rLegRot = -0.3;
+    } else {
+      this.animation.lArmRot = -0.7 + Math.sin(this.engine.time / 200) / 10;
+      this.animation.rArmRot = 0.7 - Math.sin(this.engine.time / 200) / 10;
+    }
+
+    this.animation.headOffset = Math.sin(this.engine.time / 200) - 2;
+
+    if (Math.random() > 0.99) {
+      this.blink();
     }
   }
 
@@ -141,9 +182,6 @@ export class Player {
 
   update() {
     this.updateControls();
-    if (Math.random() > 0.99) {
-      this.blink();
-    }
-    this.animation.headOffset = Math.sin(this.engine.time / 200);
+    this.updateAnimation();
   }
 }

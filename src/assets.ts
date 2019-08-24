@@ -1,4 +1,4 @@
-import { TreeDefinition, animateTree } from "./trees";
+import { TreeDefinition, animateTree } from "./plants";
 import { SpriteRenderer } from "./renderer/sprite-renderer";
 
 interface Assets {
