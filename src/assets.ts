@@ -1,5 +1,7 @@
-import { TreeDefinition, animateTree } from "./plants";
+import { PlantDefinition, animateTree, animateGrass } from "./plants";
 import { SpriteRenderer } from "./renderer/sprite-renderer";
+import { TREE_GROUND_MASK, GROUND_MASK } from "./colisions-masks";
+import { Random } from "./random";
 
 interface Assets {
   terrain: HTMLImageElement;
@@ -7,7 +9,7 @@ interface Assets {
   torso: HTMLImageElement;
   eyes: HTMLImageElement;
   limb: HTMLImageElement;
-  trees: TreeDefinition[];
+  plants: PlantDefinition[];
 }
 
 function svgToImg(id: string): Promise<HTMLImageElement> {
@@ -25,19 +27,32 @@ function svgToImg(id: string): Promise<HTMLImageElement> {
   });
 }
 
-async function prepareTrees(): Promise<TreeDefinition[]> {
+async function preparePlants(): Promise<PlantDefinition[]> {
+  const r = new Random(1);
   const sr = new SpriteRenderer();
+  const plants: PlantDefinition[] = [];
+  for (let depth = 4; depth < 11; depth++) {
+    plants.push({
+      frames: await animateTree(
+        sr,
+        depth,
+        r.nextFloat() / 4 + 0.3,
+        5 * depth,
+        depth,
+      ),
+      spread: 35 * depth,
+      mask: TREE_GROUND_MASK,
+    });
+  }
 
-  return [
-    { frames: await animateTree(sr, 4, 0.5, 28, 11), density: 80 },
-    { frames: await animateTree(sr, 5, 0.2, 30, 13), density: 90 },
-    { frames: await animateTree(sr, 7, 0.5, 45, 3), density: 400 },
-    { frames: await animateTree(sr, 7, 0.4, 45, 6), density: 450 },
-    { frames: await animateTree(sr, 8, 0.4, 55, 2), density: 500 },
-    { frames: await animateTree(sr, 9, 0.35, 65, 1), density: 700 },
-    { frames: await animateTree(sr, 9, 0.5, 65, 4), density: 800 },
-    { frames: await animateTree(sr, 10, 0.4, 95, 5), density: 1200 },
-  ];
+  for (let i = 0; i < 4; i++) {
+    plants.push({
+      frames: await animateGrass(sr, i),
+      spread: 10,
+      mask: GROUND_MASK,
+    });
+  }
+  return plants;
 }
 
 export const assets: Assets = {} as any;
@@ -48,5 +63,5 @@ export async function prepareAssets() {
   assets.eyes = await svgToImg("eyes");
   assets.torso = await svgToImg("torso");
   assets.limb = await svgToImg("limb");
-  assets.trees = await prepareTrees();
+  assets.plants = await preparePlants();
 }

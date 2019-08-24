@@ -71,7 +71,7 @@ export class SystemsRenderer {
 
     this.context.save();
 
-    this.context.translate(player.body.pos.x, player.body.pos.y);
+    this.context.translate(player.body.pos.x, player.body.pos.y - 1);
     if (player.direction === "r") {
       this.context.scale(-1, 1);
     }
@@ -192,25 +192,34 @@ export class SystemsRenderer {
   }
 
   renderFoliage(isForeGround: boolean) {
-    for (const foliage of this.engine.foliage.entities) {
-      if (foliage.isForeground !== isForeGround) {
-        continue;
-      }
+    const minX =
+      this.engine.player.body.pos.x - this.engine.canvas.width / 2 - 300;
+    const maxX =
+      this.engine.player.body.pos.x + this.engine.canvas.width / 2 + 300;
 
-      const framesCount = foliage.definition.frames.length;
-      let frame = Math.abs(
-        (Math.round(this.engine.time / 50 + foliage.pos.x) %
-          (framesCount * 2)) -
-          framesCount,
-      );
-      if (frame === framesCount) {
-        frame = framesCount - 1;
+    for (let x = minX; x < maxX; x += this.engine.foliage.GRID_SIZE) {
+      const cell = Math.floor(x / this.engine.foliage.GRID_SIZE);
+      for (const foliage of this.engine.foliage.entities[cell]) {
+        if (foliage.isForeground !== isForeGround) {
+          continue;
+        }
+
+        const framesCount = foliage.definition.frames.length;
+        let frame = Math.abs(
+          (Math.round(this.engine.time / 50 + foliage.pos.x) %
+            (framesCount * 2)) -
+            framesCount,
+        );
+        if (frame === framesCount) {
+          frame = framesCount - 1;
+        }
+        const image = foliage.definition.frames[frame];
+        this.context.drawImage(
+          image,
+          foliage.pos.x - image.width / 3,
+          foliage.pos.y - image.height + 5,
+        );
       }
-      this.context.drawImage(
-        foliage.definition.frames[frame],
-        foliage.pos.x,
-        foliage.pos.y,
-      );
     }
   }
 
@@ -231,46 +240,56 @@ export class SystemsRenderer {
     this.renderHills("#104263", "#061824", 260, 311, 290, 111, 98, 64);
   }
 
-  // renderPhysicsDebugHelpers() {
-  //   // DEBUG
-  //   this.context.fillStyle = "#f00";
-  //   this.context.strokeStyle = "#f00";
-  //   for (const entity of this.engine.physics.dynamicBodies) {
-  //     this.context.save();
-  //     this.context.beginPath();
-  //     this.context.moveTo(entity.pos.x, entity.pos.y);
-  //     this.context.lineTo(
-  //       entity.pos.x + entity.vel.x * 2,
-  //       entity.pos.y + entity.vel.y * 2,
-  //     );
-  //     this.context.closePath();
+  renderDebugHelpers() {
+    // DEBUG
+    this.context.fillStyle = "#f00";
+    this.context.strokeStyle = "#f00";
+    for (const entity of this.engine.physics.dynamicBodies) {
+      this.context.save();
+      this.context.beginPath();
+      this.context.moveTo(entity.pos.x, entity.pos.y);
+      this.context.lineTo(
+        entity.pos.x + entity.vel.x * 2,
+        entity.pos.y + entity.vel.y * 2,
+      );
+      this.context.closePath();
 
-  //     this.context.stroke();
-  //     for (const point of entity.contactPoints) {
-  //       this.context.beginPath();
-  //       this.context.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-  //       this.context.fill();
-  //       this.context.closePath();
-  //     }
-  //     this.context.restore();
-  //   }
-  //   this.context.closePath();
+      this.context.stroke();
+      for (const point of entity.contactPoints) {
+        this.context.beginPath();
+        this.context.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+        this.context.fill();
+        this.context.closePath();
+      }
+      this.context.restore();
+    }
+    this.context.closePath();
 
-  //   this.context.strokeStyle = "#ff0";
-  //   this.context.lineWidth = 2;
-  //   for (const body of this.engine.physics.staticBodies) {
-  //     this.context.beginPath();
-  //     this.context.moveTo(body.shape.start.x, body.shape.start.y);
-  //     this.context.lineTo(body.shape.end.x, body.shape.end.y);
-  //     this.context.stroke();
-  //     this.context.closePath();
-  //   }
-  // }
+    this.context.strokeStyle = "#ff0";
+    this.context.lineWidth = 2;
+    for (const body of this.engine.physics.staticBodies) {
+      this.context.beginPath();
+      this.context.moveTo(body.shape.start.x, body.shape.start.y);
+      this.context.lineTo(body.shape.end.x, body.shape.end.y);
+      this.context.stroke();
+      this.context.closePath();
+    }
+
+    for (const cell of this.engine.foliage.entities) {
+      for (const foliage of cell) {
+        this.context.fillStyle = "green";
+        this.context.beginPath();
+        this.context.arc(foliage.pos.x, foliage.pos.y, 2, 0, 2 * Math.PI);
+        this.context.fill();
+        this.context.closePath();
+      }
+    }
+  }
 
   render() {
     this.movingPropsLayer.activate();
     this.renderPlayer();
-    // this.renderDebug();
+    // this.renderDebugHelpers();
 
     this.foliageBackgroundLayer.activate();
     this.renderFoliage(false);

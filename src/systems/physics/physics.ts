@@ -74,36 +74,6 @@ export class PhysicsSystem {
   //   this.listeners.get(hitterClass)!.push(callback);
   // }
 
-  castRay(from: Vector2, to: Vector2, hitMask: number, presision: number) {
-    /**
-     * That's a highly ineffective algorithm but simple. We make a range of
-     * circle shapes between `from` and `to` and check which is the first to
-     * collide with something.
-     */
-    const step = new Vector2(0, 1).rotate(from.directionTo(to)).mul(presision);
-    const stepsCount = Math.ceil(from.distanceTo(to) / step.length());
-    const currentPos = from.copy();
-    const hitter: DynamicBody = {
-      pos: currentPos,
-      shape: new CircleShape(currentPos, presision / 2),
-      hitMask,
-      receiveMask: 0,
-      friction: 0,
-      vel: new Vector2(0, 0),
-      contactPoints: [],
-    };
-
-    for (let i = 0; i < stepsCount; i++) {
-      const colision = this.checkHitterColisions(hitter, 0).next().value;
-      if (colision) {
-        colision.hitter.pos.add(colision.penetration);
-        return colision.hitter.pos.copy();
-      }
-      hitter.pos.add(step);
-    }
-    return null;
-  }
-
   applyImpulse(body: DynamicBody, impulse: Vector2) {
     body.vel.add(impulse.copy());
   }

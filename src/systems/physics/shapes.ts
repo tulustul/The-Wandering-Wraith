@@ -2,7 +2,7 @@ import { Vector2 } from "../../vector";
 import { GRID_SIZE } from "./constants";
 import { getIndexOfCell } from "./helpers";
 
-function lineToPointColision(
+export function lineToPointColision(
   lineStart: Vector2,
   lineEnd: Vector2,
   point: Vector2,

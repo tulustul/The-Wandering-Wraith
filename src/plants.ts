@@ -2,9 +2,42 @@ import { Vector2 } from "./vector";
 import { Random } from "./random";
 import { SpriteRenderer } from "./renderer/sprite-renderer";
 
-export interface TreeDefinition {
+export interface PlantDefinition {
   frames: HTMLImageElement[];
-  density: number; // lower - more
+  spread: number;
+  mask: number;
+}
+
+export function generateGrass(
+  ctx: CanvasRenderingContext2D,
+  seed: number,
+  time: number,
+) {
+  const r = new Random(seed);
+
+  var grd = ctx.createLinearGradient(0, 0, 0, 50);
+  grd.addColorStop(0, "#222");
+  grd.addColorStop(1, "#000");
+
+  ctx.strokeStyle = grd;
+
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+    let pos = new Vector2((r.next() % 10) + 25, 50);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    let angle = (r.nextFloat() - 0.5) / 10;
+    let totalAngle = 0;
+    const length = (r.nextFloat() + 1) * 1.5;
+    for (let j = 0; j < 10; j++) {
+      const d = new Vector2(0, -1).rotate(totalAngle).mul(length);
+      pos = pos.copy().add(d);
+      ctx.lineTo(pos.x, pos.y);
+      totalAngle += angle + Math.sin(time) / 30;
+    }
+    ctx.stroke();
+    ctx.closePath();
+  }
 }
 
 export function generateTree(
@@ -106,6 +139,24 @@ export async function animateTree(
       await spritesRenderer.render(ctx =>
         generateTree(ctx, size, depth, angle, segmentLength, seed, time),
       ),
+    );
+  }
+  return frames;
+}
+
+export async function animateGrass(
+  spritesRenderer: SpriteRenderer,
+  seed: number,
+): Promise<HTMLImageElement[]> {
+  const frames: HTMLImageElement[] = [];
+  spritesRenderer.setSize(100, 50);
+  const framesCount = 30;
+  const step = (Math.PI * 2) / framesCount;
+  let time = Math.PI / 2;
+  for (let i = 0; i < framesCount; i++) {
+    time = time += step;
+    frames.push(
+      await spritesRenderer.render(ctx => generateGrass(ctx, seed, time)),
     );
   }
   return frames;
