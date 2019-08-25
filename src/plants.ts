@@ -23,15 +23,15 @@ export function generateGrass(
 
   ctx.lineWidth = 1;
   for (let i = 0; i < 5; i++) {
-    let pos = new Vector2((r.next() % 10) + 25, 50);
+    let pos = new Vector2((r.next_() % 10) + 25, 50);
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
     let angle = (r.nextFloat() - 0.5) / 10;
     let totalAngle = 0;
     const length = (r.nextFloat() + 1) * 1.5;
     for (let j = 0; j < 10; j++) {
-      const d = new Vector2(0, -1).rotate(totalAngle).mul(length);
-      pos = pos.copy().add(d);
+      const d = new Vector2(0, -1).rotate_(totalAngle).mul(length);
+      pos = pos.copy().add_(d);
       ctx.lineTo(pos.x, pos.y);
       totalAngle += angle + Math.sin(time) / 30;
     }
@@ -84,8 +84,8 @@ function drawTree(
   const angleDiff = windDirection - totalAngle;
   totalAngle += ((angleDiff * 1.1 * Math.sin(time)) / depth) * animationPower;
 
-  const d = new Vector2(0, -1).rotate(totalAngle).mul(segmentLength);
-  const newPos = pos.copy().add(d);
+  const d = new Vector2(0, -1).rotate_(totalAngle).mul(segmentLength);
+  const newPos = pos.copy().add_(d);
 
   ctx.beginPath();
   ctx.lineWidth = Math.pow(depth, 1);

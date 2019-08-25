@@ -30,9 +30,9 @@ export class Player {
 
   maxSpeed = 4;
 
-  body: DynamicBody;
+  body_: DynamicBody;
 
-  direction: "l" | "r" = "r";
+  direction_: "l" | "r" = "r";
 
   lastJumpTime = 0;
 
@@ -42,7 +42,7 @@ export class Player {
 
   isRunning = false;
 
-  animation: AgentAnimation = {
+  animation_: AgentAnimation = {
     headOffset: 0,
     lArmRot: 0,
     rArmRot: 0,
@@ -53,8 +53,8 @@ export class Player {
   };
 
   constructor(public engine: Engine, pos: Vector2) {
-    this.body = engine.physics.addDynamic({
-      shape: new CircleShape(pos, 10),
+    this.body_ = engine.physics.addDynamic({
+      shape_: new CircleShape(pos, 10),
       parent: this,
       receiveMask: PLAYER_MASK,
       hitMask: GROUND_MASK,
@@ -65,96 +65,96 @@ export class Player {
   }
 
   moveToDirection(direction: number) {
-    this.isRunning = !!this.body.contactPoints.length;
+    this.isRunning = !!this.body_.contactPoints.length;
     let accScalar = this.ACCELERATION;
-    if (!this.body.contactPoints.length) {
+    if (!this.body_.contactPoints.length) {
       accScalar /= 3;
     }
-    const acc = new Vector2(0, accScalar).rotate(direction);
+    const acc = new Vector2(0, accScalar).rotate_(direction);
     this.updateVelocity(acc);
     if (direction < Math.PI) {
-      this.direction = "r";
+      this.direction_ = "r";
     } else {
-      this.direction = "l";
+      this.direction_ = "l";
     }
   }
 
   jump() {
-    for (const point of this.body.contactPoints) {
-      if (point.y - this.body.pos.y > 5) {
-        this.body.vel.y = -6;
-        this.lastJumpTime = this.engine.time;
+    for (const point of this.body_.contactPoints) {
+      if (point.y - this.body_.pos.y > 5) {
+        this.body_.vel.y = -6;
+        this.lastJumpTime = this.engine.time_;
         this.dashed = false;
         return;
       }
     }
-    if (!this.dashed && this.engine.time - this.lastJumpTime > 300) {
-      this.body.vel.y = -6;
+    if (!this.dashed && this.engine.time_ - this.lastJumpTime > 300) {
+      this.body_.vel.y = -6;
       this.dashed = true;
     }
   }
 
   blink() {
-    this.engine.animations.animate(
+    this.engine.animations.animate_(
       new SinusAnimation(Math.PI / 2, Math.PI * 2.5, 200),
-      value => (this.animation.eyesScale = (value + 1) / 2),
+      value => (this.animation_.eyesScale = (value + 1) / 2),
     );
   }
 
   private updateVelocity(acc: Vector2) {
-    if (Math.abs(this.body.vel.x + acc.x) < this.maxSpeed) {
-      this.body.vel.x += acc.x;
+    if (Math.abs(this.body_.vel.x + acc.x) < this.maxSpeed) {
+      this.body_.vel.x += acc.x;
     }
-    this.body.vel.y += acc.y;
+    this.body_.vel.y += acc.y;
   }
 
   updateControls() {
     this.isRunning = false;
-    const control = this.engine.control;
-    if (control.keys.get("Space")) {
+    const control = this.engine.control_;
+    if (control.keys_.get("Space")) {
       this.jump();
     }
-    if (control.keys.get("ArrowLeft")) {
+    if (control.keys_.get("ArrowLeft")) {
       this.moveToDirection(Math.PI * 0.5);
     }
-    if (control.keys.get("ArrowRight")) {
+    if (control.keys_.get("ArrowRight")) {
       this.moveToDirection(Math.PI * 1.5);
     }
   }
 
   updateAnimation() {
-    this.animation.lLegRot = 0;
-    this.animation.rLegRot = 0;
-    this.animation.lArmRot = -1;
-    this.animation.rArmRot = 1;
+    this.animation_.lLegRot = 0;
+    this.animation_.rLegRot = 0;
+    this.animation_.lArmRot = -1;
+    this.animation_.rArmRot = 1;
     if (this.isRunning) {
-      this.animation.lLegRot = Math.sin(this.engine.time / 30) / 2;
-      this.animation.rLegRot = Math.cos(this.engine.time / 30) / 2;
-      this.animation.lArmRot = 0.5;
+      this.animation_.lLegRot = Math.sin(this.engine.time_ / 30) / 2;
+      this.animation_.rLegRot = Math.cos(this.engine.time_ / 30) / 2;
+      this.animation_.lArmRot = 0.5;
     }
 
-    if (this.engine.time - this.lastEyeLook > 100) {
-      this.lastEyeLook = this.engine.time;
-      if (this.body.vel.y > 1) {
-        this.animation.eyesOffset = 4;
-      } else if (this.body.vel.y < -1) {
-        this.animation.eyesOffset = -6;
+    if (this.engine.time_ - this.lastEyeLook > 100) {
+      this.lastEyeLook = this.engine.time_;
+      if (this.body_.vel.y > 1) {
+        this.animation_.eyesOffset = 4;
+      } else if (this.body_.vel.y < -1) {
+        this.animation_.eyesOffset = -6;
       } else {
-        this.animation.eyesOffset = 0;
+        this.animation_.eyesOffset = 0;
       }
     }
 
-    if (!this.body.contactPoints.length && Math.abs(this.body.vel.y) > 0.3) {
-      this.animation.lArmRot = -1.5 + Math.sin(this.engine.time / 50) / 3;
-      this.animation.rArmRot = 1.5 + Math.cos(this.engine.time / 50) / 3;
-      this.animation.lLegRot = 0.3;
-      this.animation.rLegRot = -0.3;
+    if (!this.body_.contactPoints.length && Math.abs(this.body_.vel.y) > 0.3) {
+      this.animation_.lArmRot = -1.5 + Math.sin(this.engine.time_ / 50) / 3;
+      this.animation_.rArmRot = 1.5 + Math.cos(this.engine.time_ / 50) / 3;
+      this.animation_.lLegRot = 0.3;
+      this.animation_.rLegRot = -0.3;
     } else {
-      this.animation.lArmRot = -0.7 + Math.sin(this.engine.time / 200) / 10;
-      this.animation.rArmRot = 0.7 - Math.sin(this.engine.time / 200) / 10;
+      this.animation_.lArmRot = -0.7 + Math.sin(this.engine.time_ / 200) / 10;
+      this.animation_.rArmRot = 0.7 - Math.sin(this.engine.time_ / 200) / 10;
     }
 
-    this.animation.headOffset = Math.sin(this.engine.time / 200) - 2;
+    this.animation_.headOffset = Math.sin(this.engine.time_ / 200) - 2;
 
     if (Math.random() > 0.99) {
       this.blink();
@@ -162,16 +162,16 @@ export class Player {
   }
 
   makeStep() {
-    if (this.engine.time - this.lastStepTime > this.STEPS_RATE) {
-      if (this.body.vel.length() > 0.5) {
-        this.lastStepTime = this.engine.time;
+    if (this.engine.time_ - this.lastStepTime > this.STEPS_RATE) {
+      if (this.body_.vel.length_() > 0.5) {
+        this.lastStepTime = this.engine.time_;
         this.currentStep = (this.currentStep + 1) % 2;
         // this.engine.sound.play("collectA");
       }
     }
   }
 
-  update() {
+  update_() {
     this.updateControls();
     this.updateAnimation();
   }

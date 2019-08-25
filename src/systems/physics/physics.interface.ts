@@ -3,16 +3,16 @@ import { Shape, LineShape } from "./shapes";
 
 export interface Body {
   pos: Vector2;
-  shape: Shape;
+  shape_: Shape;
   receiveMask: number;
   parent?: any;
 }
 
 export interface StaticBody {
   pos: Vector2;
-  shape: LineShape;
+  shape_: LineShape;
   receiveMask: number;
-  parent?: any;
+  parent_?: any;
 }
 
 export interface DynamicBodyDefinition extends Body {

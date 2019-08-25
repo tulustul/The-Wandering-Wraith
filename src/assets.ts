@@ -5,7 +5,7 @@ import { Random } from "./random";
 
 interface Assets {
   terrain: HTMLImageElement;
-  head: HTMLImageElement;
+  head_: HTMLImageElement;
   torso: HTMLImageElement;
   eyes: HTMLImageElement;
   limb: HTMLImageElement;
@@ -59,7 +59,7 @@ export const assets: Assets = {} as any;
 
 export async function prepareAssets() {
   assets.terrain = await svgToImg("a");
-  assets.head = await svgToImg("head");
+  assets.head_ = await svgToImg("head");
   assets.eyes = await svgToImg("eyes");
   assets.torso = await svgToImg("torso");
   assets.limb = await svgToImg("limb");

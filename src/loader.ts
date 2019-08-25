@@ -26,9 +26,9 @@ export function loadLevel(engine: Engine, level: string) {
     if (clazz === "t") {
       receiveMask |= TREE_GROUND_MASK;
     }
-    for (const [start, end] of new PathParser(d).parse()) {
+    for (const [start, end] of new PathParser(d).parse_()) {
       engine.physics.addStatic({
-        shape: new LineShape(start, end),
+        shape_: new LineShape(start, end),
         receiveMask,
         pos: new Vector2(0, 0),
       });
@@ -42,7 +42,7 @@ class PathParser {
 
   constructor(private d: string) {}
 
-  *parse(): IterableIterator<[Vector2, Vector2]> {
+  *parse_(): IterableIterator<[Vector2, Vector2]> {
     let command!: string;
     let c = this.next();
     let firstPoint: Vector2 | null = null;
@@ -68,7 +68,7 @@ class PathParser {
           command = "l";
           break;
         case "l":
-          yield [this.pos.copy(), this.pos.add(this.parseVector()).copy()];
+          yield [this.pos.copy(), this.pos.add_(this.parseVector()).copy()];
           break;
         case "L":
           start = this.pos.copy();
@@ -103,9 +103,9 @@ class PathParser {
           yield* generateBezierSegments(
             [
               this.pos.copy(),
-              this.pos.copy().add(this.parseVector()),
-              this.pos.copy().add(this.parseVector()),
-              this.pos.add(this.parseVector()).copy(),
+              this.pos.copy().add_(this.parseVector()),
+              this.pos.copy().add_(this.parseVector()),
+              this.pos.add_(this.parseVector()).copy(),
             ],
             0.1,
           );

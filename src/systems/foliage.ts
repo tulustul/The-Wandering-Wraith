@@ -15,12 +15,12 @@ interface Foliage {
 
 export class FoliageSystem {
   GRID_SIZE = 500;
-  entities: Foliage[][];
+  entities_: Foliage[][];
 
   async spawnFoliage(engine: Engine) {
-    this.entities = [];
+    this.entities_ = [];
     for (let x = 0; x < engine.worldWidth; x += this.GRID_SIZE) {
-      this.entities.push([]);
+      this.entities_.push([]);
     }
     const r = new Random(1);
 
@@ -30,13 +30,13 @@ export class FoliageSystem {
         x +=
           treeDefinition.spread +
           treeDefinition.spread * (r.nextFloat() - 0.5);
-        const cell = this.entities[Math.floor(x / this.GRID_SIZE)];
+        const cell = this.entities_[Math.floor(x / this.GRID_SIZE)];
         const positions = this.findGround(engine, x, treeDefinition.mask);
         for (const pos of positions) {
           if (pos) {
             const isForeground = r.nextFloat() > 0.7;
             cell.push({
-              pos: pos.add(
+              pos: pos.add_(
                 new Vector2(0, (isForeground ? 10 : 0) + r.nextFloat() * 5),
               ),
               definition: treeDefinition,
@@ -60,7 +60,7 @@ export class FoliageSystem {
       if (grid.has(cell)) {
         for (const body of grid.get(cell)!) {
           if (body.receiveMask & hitMask) {
-            linesToCheck.add(body.shape as LineShape);
+            linesToCheck.add(body.shape_ as LineShape);
           }
         }
       }
@@ -68,10 +68,10 @@ export class FoliageSystem {
 
     let narrowChecks: [LineShape, Vector2][] = [];
     for (const line of linesToCheck) {
-      const d = line.end.copy().sub(line.start);
+      const d = line.end_.copy().sub_(line.start_);
       const a = d.y / d.x;
       if (Math.abs(a) < 1.5) {
-        const b = line.start.y - a * line.start.x;
+        const b = line.start_.y - a * line.start_.x;
         const crossPoint = new Vector2(x, a * x + b);
         narrowChecks.push([line, crossPoint]);
       }
@@ -81,7 +81,7 @@ export class FoliageSystem {
 
     let add = false;
     for (const [line, crossPoint] of narrowChecks) {
-      if (lineToPointColision(line.start, line.end, crossPoint)) {
+      if (lineToPointColision(line.start_, line.end_, crossPoint)) {
         if (add) {
           yield crossPoint;
         }

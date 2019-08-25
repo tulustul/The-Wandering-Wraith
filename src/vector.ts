@@ -10,7 +10,7 @@ export class Vector2 {
     this.y = 0;
   }
 
-  rotate(angle: number) {
+  rotate_(angle: number) {
     const nx = this.x * Math.cos(angle) - this.y * Math.sin(angle);
     const ny = this.x * Math.sin(angle) + this.y * Math.cos(angle);
 
@@ -20,13 +20,13 @@ export class Vector2 {
     return this;
   }
 
-  add(vec: Vector2) {
+  add_(vec: Vector2) {
     this.x += vec.x;
     this.y += vec.y;
     return this;
   }
 
-  sub(vec: Vector2) {
+  sub_(vec: Vector2) {
     this.x -= vec.x;
     this.y -= vec.y;
     return this;
@@ -37,7 +37,7 @@ export class Vector2 {
     this.y = Math.round(this.y);
   }
 
-  normalize() {
+  normalize_() {
     const length = Math.sqrt(this.x * this.x + this.y * this.y);
     this.x /= length;
     this.y /= length;
@@ -54,11 +54,11 @@ export class Vector2 {
     return this.x * vec.x + this.y * vec.y;
   }
 
-  length() {
+  length_() {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 
-  angle() {
+  angle_() {
     return Math.PI - Math.atan2(-this.x, -this.y);
   }
 
@@ -71,6 +71,6 @@ export class Vector2 {
   }
 
   angleTo(vec: Vector2) {
-    return Math.acos(this.dot(vec) / (this.length() * vec.length()));
+    return Math.acos(this.dot(vec) / (this.length_() * vec.length_()));
   }
 }

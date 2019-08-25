@@ -2,7 +2,7 @@ import { Engine } from "./engine";
 import { loadLevel } from "./loader";
 
 export class Game {
-  paused = true;
+  paused_ = true;
 
   isStarted = false;
 
@@ -19,7 +19,7 @@ export class Game {
     this.engine.init();
     this.isStarted = true;
 
-    this.paused = false;
+    this.paused_ = false;
     document.getElementsByTagName("div")[0].remove();
   }
 }

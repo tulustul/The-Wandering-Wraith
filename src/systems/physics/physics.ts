@@ -39,7 +39,7 @@ export class PhysicsSystem {
     return newBody;
   }
 
-  remove(body: Body) {
+  remove_(body: Body) {
     let index = this.dynamicBodies.indexOf(body as DynamicBody);
     if (index !== -1) {
       this.dynamicBodies.splice(index, 1);
@@ -55,13 +55,13 @@ export class PhysicsSystem {
     }
   }
 
-  clear() {
+  clear_() {
     this.staticGrid.clear();
     this.dynamicGrid.clear();
     this.dynamicBodies = [];
   }
 
-  update() {
+  update_() {
     this.updatePosAndVel();
     const colisions = this.checkColisions();
     this.resolveColisions(colisions);
@@ -75,44 +75,44 @@ export class PhysicsSystem {
   // }
 
   applyImpulse(body: DynamicBody, impulse: Vector2) {
-    body.vel.add(impulse.copy());
+    body.vel.add_(impulse.copy());
   }
 
   private updatePosAndVel() {
     for (const body of this.dynamicBodies) {
       let willSeparate = true;
       for (const point of body.contactPoints) {
-        const velAngle = body.vel.angleTo(point.copy().sub(body.pos));
+        const velAngle = body.vel.angleTo(point.copy().sub_(body.pos));
         willSeparate = willSeparate && velAngle > Math.PI / 2;
       }
 
       if (!willSeparate) {
         const posAngle = body.contactPoints[0]
           .copy()
-          .sub(body.pos)
-          .rotate(Math.PI / 2)
-          .angle();
+          .sub_(body.pos)
+          .rotate_(Math.PI / 2)
+          .angle_();
 
         const friction =
-          Math.min(body.friction, body.vel.length()) * Math.sin(posAngle);
+          Math.min(body.friction, body.vel.length_()) * Math.sin(posAngle);
 
         const frictionForce = body.vel
           .copy()
-          .normalize()
+          .normalize_()
           .mul(-friction);
-        body.vel.add(frictionForce);
+        body.vel.add_(frictionForce);
       }
 
-      body.pos.add(body.vel);
+      body.pos.add_(body.vel);
       body.vel.y += 0.3;
 
       /* 
       Limit the speed to the diameter of circle. 
       This way we avoid tunelling through terrain in high speeds.
       **/
-      const radius = (body.shape as CircleShape).radius;
-      const speed = Math.min(body.vel.length(), radius);
-      body.vel = body.vel.normalize().mul(speed);
+      const radius = (body.shape_ as CircleShape).radius;
+      const speed = Math.min(body.vel.length_(), radius);
+      body.vel = body.vel.normalize_().mul(speed);
     }
   }
 
@@ -127,7 +127,7 @@ export class PhysicsSystem {
     startIndex: number,
   ): IterableIterator<Colision> {
     hitter.contactPoints = [];
-    for (const cell of hitter.shape.getCells()) {
+    for (const cell of hitter.shape_.getCells()) {
       if (this.staticGrid.has(cell)) {
         for (const receiver of this.staticGrid.get(cell)!) {
           if (receiver.receiveMask & hitter.hitMask) {
@@ -158,11 +158,11 @@ export class PhysicsSystem {
     receiver: Body,
   ): Colision | null {
     let result: [Vector2, Vector2] | null;
-    if (receiver.shape instanceof LineShape) {
-      result = hitter.shape.checkColisionWithLine(receiver.shape);
+    if (receiver.shape_ instanceof LineShape) {
+      result = hitter.shape_.checkColisionWithLine(receiver.shape_);
     } else {
-      result = hitter.shape.checkColisionWithCircle(
-        receiver.shape as CircleShape,
+      result = hitter.shape_.checkColisionWithCircle(
+        receiver.shape_ as CircleShape,
       );
     }
     if (result) {
@@ -178,7 +178,7 @@ export class PhysicsSystem {
 
   private resolveColisions(colisions: IterableIterator<Colision>) {
     for (const colision of colisions) {
-      colision.hitter.pos.add(colision.penetration);
+      colision.hitter.pos.add_(colision.penetration);
       colision.hitter.contactPoints.push(colision.point);
       // if (colision.receiver.shape instanceof CircleShape) {
       //   const receiver = colision.receiver as DynamicPhysicalEntity;
@@ -191,13 +191,13 @@ export class PhysicsSystem {
       //   receiver.vel.add(normal.copy().mul(-j / receiver.weight));
       //   colision.hitter.vel.add(normal.copy().mul(j / colision.hitter.weight));
       // } else {
-      colision.hitter.vel.add(colision.penetration);
+      colision.hitter.vel.add_(colision.penetration);
       // }
     }
   }
 
   private putToGrid(grid: ColisionGrid, body: Body) {
-    for (const cell of body.shape.getCells()) {
+    for (const cell of body.shape_.getCells()) {
       this.addToGrid(grid, cell, body);
     }
   }

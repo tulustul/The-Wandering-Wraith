@@ -7,7 +7,7 @@ import { Engine } from "../engine";
 const VIEWPORT_HEIGHT = 350;
 
 export class Renderer {
-  context: CanvasRenderingContext2D;
+  ctx: CanvasRenderingContext2D;
 
   baseLayer: Layer;
 
@@ -26,8 +26,8 @@ export class Renderer {
 
     this.baseLayer = new Layer("base", this.engine, {
       followPlayer: false,
-      clear: false,
-      canvas: this.engine.canvas,
+      clear_: false,
+      canvas_: this.engine.canvas_,
     });
 
     this.compositor.init();
@@ -41,8 +41,8 @@ export class Renderer {
   updateSize() {
     const width = (window.innerWidth / window.innerHeight) * VIEWPORT_HEIGHT;
 
-    this.engine.canvas.width = Math.floor(width);
-    this.engine.canvas.height = VIEWPORT_HEIGHT;
+    this.engine.canvas_.width = Math.floor(width);
+    this.engine.canvas_.height = VIEWPORT_HEIGHT;
 
     if (this.compositor) {
       for (const layer of Object.values(this.compositor.layers)) {

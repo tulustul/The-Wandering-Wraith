@@ -60,7 +60,7 @@ export class LevelSerializer {
           break;
         case "l":
           relTo = this.deserializeVector();
-          absTo = this.pos.add(relTo).copy();
+          absTo = this.pos.add_(relTo).copy();
           pointsMap.set(absTo, {
             type: "lineTo",
             relTo,
@@ -72,11 +72,11 @@ export class LevelSerializer {
           break;
         case "c":
           relTo = this.deserializeVector();
-          absTo = this.pos.add(relTo).copy();
+          absTo = this.pos.add_(relTo).copy();
           const relC1 = this.deserializeVector();
-          const absC1 = this.pos.add(relC1).copy();
+          const absC1 = this.pos.add_(relC1).copy();
           const relC2 = this.deserializeVector();
-          const absC2 = this.pos.add(relC2).copy();
+          const absC2 = this.pos.add_(relC2).copy();
           const bezierCommand = {
             type: "bezierTo",
             relFrom: new Vector2(),

@@ -13,7 +13,7 @@ import { Editor } from "./editor/editor";
 // #endif
 
 export class Engine {
-  time = 0;
+  time_ = 0;
 
   // just let the logic flow
   worldWidth = 1;
@@ -29,7 +29,7 @@ export class Engine {
 
   foliage = new FoliageSystem();
 
-  control = new Control(this.game);
+  control_ = new Control(this.game);
 
   renderer = new Renderer(this);
 
@@ -39,25 +39,21 @@ export class Engine {
   editor = new Editor(this);
   // #endif
 
-  constructor(public game: Game, public canvas: HTMLCanvasElement) {
+  constructor(public game: Game, public canvas_: HTMLCanvasElement) {
     this.renderer.updateSize();
-    this.control.init();
+    this.control_.init();
   }
 
   init() {
     this.renderer.init();
-    this.camera.bindToTarget(this.player.body.pos);
+    this.camera.bindToTarget(this.player.body_.pos);
     this.renderer.systemsRenderer.prerender();
   }
 
-  update(timeStep: number) {
-    this.time += timeStep;
-    this.animations.update(this.time);
-    this.player.update();
-    this.physics.update();
-  }
-
-  clear() {
-    this.time = 0;
+  update_(timeStep: number) {
+    this.time_ += timeStep;
+    this.animations.update_(this.time_);
+    this.player.update_();
+    this.physics.update_();
   }
 }

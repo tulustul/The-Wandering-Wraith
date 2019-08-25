@@ -1,25 +1,25 @@
 interface Animation {
-  update(time: number): number | null;
+  update_(time: number): number | null;
 }
 
 type AnimationCallback = (value: number) => void;
 
 export class SinusAnimation implements Animation {
-  private startTime!: number;
+  private startTime_!: number;
 
   constructor(
-    private from: number,
+    private from_: number,
     private to: number,
-    private duration: number,
+    private duration_: number,
   ) {}
 
-  update(time: number) {
-    if (!this.startTime) {
-      this.startTime = time;
+  update_(time: number) {
+    if (!this.startTime_) {
+      this.startTime_ = time;
     }
-    const t = time - this.startTime;
-    const step = (this.to - this.from) / this.duration;
-    const radians = this.from + t * step;
+    const t = time - this.startTime_;
+    const step = (this.to - this.from_) / this.duration_;
+    const radians = this.from_ + t * step;
     if (radians > this.to) {
       return null;
     }
@@ -30,12 +30,12 @@ export class SinusAnimation implements Animation {
 
 export class AnimationsManager {
   animations = new Map<Animation, AnimationCallback>();
-  animate(animation: Animation, fn: AnimationCallback) {
+  animate_(animation: Animation, fn: AnimationCallback) {
     this.animations.set(animation, fn);
   }
-  update(time: number) {
+  update_(time: number) {
     for (const [animation, fn] of this.animations.entries()) {
-      const value = animation.update(time);
+      const value = animation.update_(time);
       if (value !== null) {
         fn(value);
       } else {

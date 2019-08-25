@@ -6,11 +6,11 @@ export class SystemsRenderer {
   terrainLayer = new Layer("terrain", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
-    clear: false,
+    clear_: false,
   });
 
   movingPropsLayer = new Layer("movingProps", this.engine, {
-    clear: true,
+    clear_: true,
   });
 
   skyLayer = new Layer("background", this.engine, {
@@ -21,35 +21,35 @@ export class SystemsRenderer {
   hills1 = new Layer("hills1", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
-    clear: false,
+    clear_: false,
   });
 
   hills2 = new Layer("hills2", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
-    clear: false,
+    clear_: false,
   });
 
   hills3 = new Layer("hills3", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
-    clear: false,
+    clear_: false,
   });
 
   foliageBackgroundLayer = new Layer("foliageBackground", this.engine, {
     followPlayer: true,
-    clear: true,
+    clear_: true,
   });
 
   foliageForegroundLayer = new Layer("foliageForeground", this.engine, {
     followPlayer: true,
-    clear: true,
+    clear_: true,
   });
 
   constructor(private engine: Engine) {}
 
-  get context() {
-    return this.engine.renderer.context;
+  get ctx() {
+    return this.engine.renderer.ctx;
   }
 
   // get renderer() {
@@ -57,82 +57,83 @@ export class SystemsRenderer {
   // }
 
   renderTerrain() {
-    this.context.strokeStyle = "#ffffff";
-    this.context.globalCompositeOperation = "source-over";
-    this.context.drawImage(assets.terrain, 0, 0);
+    this.ctx.strokeStyle = "#ffffff";
+    this.ctx.globalCompositeOperation = "source-over";
+    this.ctx.drawImage(assets.terrain, 0, 0);
   }
 
   renderPlayer() {
-    this.context.fillStyle = "#222";
-    this.context.globalCompositeOperation = "source-over";
+    const ctx = this.ctx;
+    ctx.fillStyle = "#222";
+    ctx.globalCompositeOperation = "source-over";
 
     const player = this.engine.player;
 
-    this.context.save();
+    ctx.save();
 
-    this.context.translate(player.body.pos.x, player.body.pos.y - 1);
-    if (player.direction === "r") {
-      this.context.scale(-1, 1);
+    ctx.translate(player.body_.pos.x, player.body_.pos.y - 1);
+    if (player.direction_ === "r") {
+      ctx.scale(-1, 1);
     }
-    this.context.rotate(player.body.vel.angle());
-    this.context.scale(1, 1 + Math.abs(player.body.vel.y / 20));
-    this.context.rotate(-player.body.vel.angle());
+    ctx.rotate(player.body_.vel.angle_());
+    ctx.scale(1, 1 + Math.abs(player.body_.vel.y / 20));
+    ctx.rotate(-player.body_.vel.angle_());
 
     // legs
-    this.context.save();
-    this.context.translate(-3, 3);
-    this.context.rotate(player.animation.lLegRot);
-    this.context.drawImage(assets.limb, 0, 0, 5, 10);
-    this.context.restore();
+    ctx.save();
+    ctx.translate(-3, 3);
+    ctx.rotate(player.animation_.lLegRot);
+    ctx.drawImage(assets.limb, 0, 0, 5, 10);
+    ctx.restore();
 
-    this.context.save();
-    this.context.translate(1, 3);
-    this.context.rotate(player.animation.rLegRot);
-    this.context.drawImage(assets.limb, 0, 0, 5, 10);
-    this.context.restore();
+    ctx.save();
+    ctx.translate(1, 3);
+    ctx.rotate(player.animation_.rLegRot);
+    ctx.drawImage(assets.limb, 0, 0, 5, 10);
+    ctx.restore();
 
-    this.context.drawImage(assets.torso, -20, -23, 40, 40);
+    ctx.drawImage(assets.torso, -20, -23, 40, 40);
 
-    this.context.save();
-    this.context.translate(0, player.animation.headOffset);
+    ctx.save();
+    ctx.translate(0, player.animation_.headOffset);
 
     // arms
-    this.context.save();
-    this.context.translate(-3, 0);
-    this.context.rotate(player.animation.rArmRot);
-    this.context.scale(0.8, 0.8);
-    this.context.drawImage(assets.limb, 0, 0, 5, 10);
-    this.context.restore();
+    ctx.save();
+    ctx.translate(-3, 0);
+    ctx.rotate(player.animation_.rArmRot);
+    ctx.scale(0.8, 0.8);
+    ctx.drawImage(assets.limb, 0, 0, 5, 10);
+    ctx.restore();
 
-    this.context.save();
-    this.context.translate(3, 3);
-    this.context.rotate(player.animation.lArmRot);
-    this.context.scale(0.8, 0.8);
-    this.context.drawImage(assets.limb, 0, 0, 5, 10);
-    this.context.restore();
+    ctx.save();
+    ctx.translate(3, 3);
+    ctx.rotate(player.animation_.lArmRot);
+    ctx.scale(0.8, 0.8);
+    ctx.drawImage(assets.limb, 0, 0, 5, 10);
+    ctx.restore();
 
     //head
-    this.context.scale(0.9, 0.9);
-    this.context.drawImage(assets.head, -20, -20, 40, 40);
+    ctx.scale(0.9, 0.9);
+    ctx.drawImage(assets.head_, -20, -20, 40, 40);
 
     // eyes
-    this.context.translate(0, player.animation.eyesOffset);
-    this.context.scale(1, player.animation.eyesScale);
-    this.context.drawImage(assets.eyes, -3, -10, 10, 10);
-    this.context.restore();
+    ctx.translate(0, player.animation_.eyesOffset);
+    ctx.scale(1, player.animation_.eyesScale);
+    ctx.drawImage(assets.eyes, -3, -10, 10, 10);
+    ctx.restore();
 
-    this.context.restore();
+    ctx.restore();
   }
 
   renderSky() {
-    const canvas = this.engine.renderer.activeLayer.canvas;
-    var grd = this.context.createLinearGradient(0, 0, 0, canvas.height);
+    const canvas = this.engine.renderer.activeLayer.canvas_;
+    var grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
     grd.addColorStop(0, "#333");
     grd.addColorStop(1, "#111");
-    this.context.fillStyle = grd;
-    this.context.fillRect(0, 0, canvas.width, canvas.height);
+    this.ctx.fillStyle = grd;
+    this.ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const gradient = this.context.createRadialGradient(
+    const gradient = this.ctx.createRadialGradient(
       100,
       100,
       10,
@@ -144,8 +145,8 @@ export class SystemsRenderer {
     gradient.addColorStop(0.03, "#ccc");
     gradient.addColorStop(0.04, "#555");
     gradient.addColorStop(1, "transparent");
-    this.context.fillStyle = gradient;
-    this.context.fillRect(0, 0, canvas.width, canvas.height);
+    this.ctx.fillStyle = gradient;
+    this.ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   renderHills(
@@ -158,17 +159,17 @@ export class SystemsRenderer {
     y2: number,
     y3: number,
   ) {
-    const canvas = this.engine.renderer.activeLayer.canvas;
+    const canvas = this.engine.renderer.activeLayer.canvas_;
 
-    var grd = this.context.createLinearGradient(0, 0, 0, canvas.height);
+    var grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
     grd.addColorStop(0, colorHigh);
     grd.addColorStop(0.3, colorLow);
 
-    this.context.fillStyle = grd;
-    this.context.beginPath();
-    this.context.moveTo(0, 0);
+    this.ctx.fillStyle = grd;
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, 0);
     for (let x = 0; x <= canvas.width; x++) {
-      this.context.lineTo(
+      this.ctx.lineTo(
         x,
         Math.sin(x / x1) * y1 +
           Math.sin(x / x2) * y2 +
@@ -176,28 +177,28 @@ export class SystemsRenderer {
           canvas.height / 4,
       );
     }
-    this.context.lineTo(canvas.width, canvas.height);
-    this.context.lineTo(0, canvas.height);
-    this.context.closePath();
-    this.context.fill();
+    this.ctx.lineTo(canvas.width, canvas.height);
+    this.ctx.lineTo(0, canvas.height);
+    this.ctx.closePath();
+    this.ctx.fill();
   }
 
   renderFoliage(isForeGround: boolean) {
     const minX =
-      this.engine.player.body.pos.x - this.engine.canvas.width / 2 - 300;
+      this.engine.player.body_.pos.x - this.engine.canvas_.width / 2 - 300;
     const maxX =
-      this.engine.player.body.pos.x + this.engine.canvas.width / 2 + 300;
+      this.engine.player.body_.pos.x + this.engine.canvas_.width / 2 + 300;
 
     for (let x = minX; x < maxX; x += this.engine.foliage.GRID_SIZE) {
       const cell = Math.floor(x / this.engine.foliage.GRID_SIZE);
-      for (const foliage of this.engine.foliage.entities[cell] || []) {
+      for (const foliage of this.engine.foliage.entities_[cell] || []) {
         if (foliage.isForeground !== isForeGround) {
           continue;
         }
 
         const framesCount = foliage.definition.frames.length;
         let frame = Math.abs(
-          (Math.round(this.engine.time / 50 + foliage.pos.x) %
+          (Math.round(this.engine.time_ / 50 + foliage.pos.x) %
             (framesCount * 2)) -
             framesCount,
         );
@@ -205,7 +206,7 @@ export class SystemsRenderer {
           frame = framesCount - 1;
         }
         const image = foliage.definition.frames[frame];
-        this.context.drawImage(
+        this.ctx.drawImage(
           image,
           foliage.pos.x - image.width / 3,
           foliage.pos.y - image.height + 5,

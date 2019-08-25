@@ -152,11 +152,11 @@ export class Editor {
       });
 
     document.getElementById("toggle-pause")!.addEventListener("click", () => {
-      this.engine.game.paused = !this.engine.game.paused;
+      this.engine.game.paused_ = !this.engine.game.paused_;
     });
 
     document.getElementById("clear-plants")!.addEventListener("click", () => {
-      this.engine.foliage.entities = [];
+      this.engine.foliage.entities_ = [];
     });
 
     document.getElementById("spawn-plants")!.addEventListener("click", () => {
@@ -164,14 +164,14 @@ export class Editor {
     });
 
     document.getElementById("move-player")!.addEventListener("click", () => {
-      this.engine.player.body.pos.x = this.engine.camera.target.x;
-      this.engine.player.body.pos.y = this.engine.camera.target.y - 150;
+      this.engine.player.body_.pos.x = this.engine.camera.target.x;
+      this.engine.player.body_.pos.y = this.engine.camera.target.y - 150;
     });
 
     document
       .getElementById("get-player-position")!
       .addEventListener("click", () => {
-        console.log(this.engine.player.body.pos);
+        console.log(this.engine.player.body_.pos);
       });
 
     document
@@ -203,23 +203,23 @@ export class Editor {
 
     document.getElementsByTagName("canvas")[0].classList.add("with-cursor");
 
-    this.engine.canvas.addEventListener("mousedown", event => {
+    this.engine.canvas_.addEventListener("mousedown", event => {
       if (this.focusedPoint) {
         this.selectedPoint = this.focusedPoint;
       }
     });
 
-    this.engine.canvas.addEventListener("mouseup", () => {
+    this.engine.canvas_.addEventListener("mouseup", () => {
       this.selectedPoint = null;
     });
 
-    this.engine.canvas.addEventListener("mousemove", event => {
+    this.engine.canvas_.addEventListener("mousemove", event => {
       this.focusedPoint = null;
 
       if (this.selectedPoint) {
         const newPos = this.mousePosToWorldPos(new Vector2(event.x, event.y));
-        const diff = newPos.copy().sub(this.selectedPoint);
-        this.selectedPoint.add(diff);
+        const diff = newPos.copy().sub_(this.selectedPoint);
+        this.selectedPoint.add_(diff);
         const pathCommand = this.level.pointToCommandMap.get(
           this.selectedPoint,
         )!;
@@ -227,8 +227,8 @@ export class Editor {
           pathCommand.type === "bezierTo" &&
           this.selectedPoint === (pathCommand as BezierCommand).absTo
         ) {
-          (pathCommand as BezierCommand).absC1.add(diff);
-          (pathCommand as BezierCommand).absC2.add(diff);
+          (pathCommand as BezierCommand).absC1.add_(diff);
+          (pathCommand as BezierCommand).absC2.add_(diff);
         }
       }
 
@@ -273,11 +273,11 @@ export class Editor {
     )! as HTMLInputElement;
     editInput.checked = true;
 
-    this.engine.camera.bindToTarget(this.engine.player.body.pos.copy());
+    this.engine.camera.bindToTarget(this.engine.player.body_.pos.copy());
 
     switch (this.mode) {
       case "play":
-        this.engine.camera.bindToTarget(this.engine.player.body.pos);
+        this.engine.camera.bindToTarget(this.engine.player.body_.pos);
         break;
     }
   }
@@ -285,16 +285,16 @@ export class Editor {
   updateControls() {
     if (this.initialized && this.mode !== "play") {
       const pos = this.engine.camera.target;
-      if (this.engine.control.keys.get("KeyW")) {
+      if (this.engine.control_.keys_.get("KeyW")) {
         pos.y -= 10;
       }
-      if (this.engine.control.keys.get("KeyS")) {
+      if (this.engine.control_.keys_.get("KeyS")) {
         pos.y += 10;
       }
-      if (this.engine.control.keys.get("KeyA")) {
+      if (this.engine.control_.keys_.get("KeyA")) {
         pos.x -= 10;
       }
-      if (this.engine.control.keys.get("KeyD")) {
+      if (this.engine.control_.keys_.get("KeyD")) {
         pos.x += 10;
       }
     }
@@ -311,7 +311,7 @@ export class Editor {
       drawPlantsHelpers.bind(systemsRenderer)();
     }
 
-    const ctx = systemsRenderer.context;
+    const ctx = systemsRenderer.ctx;
 
     let to: Vector2;
     ctx.fillStyle = "orange";
@@ -390,7 +390,7 @@ export class Editor {
   }
 
   private mousePosToWorldPos(p: Vector2) {
-    const canvas = this.engine.canvas;
+    const canvas = this.engine.canvas_;
     const scale = canvas.width / canvas.clientWidth;
     const pos = this.engine.camera.pos.copy().mul(-1);
     return new Vector2(pos.x + p.x * scale, pos.y + p.y * scale);
@@ -406,8 +406,8 @@ export class Editor {
       ) {
         const from = (pathCommand as MoveCommand).absTo;
         const to = (nextPathCommand as MoveCommand).absTo;
-        const diff = from.copy().sub(to);
-        const newPoint = from.copy().add(diff.mul(0.5));
+        const diff = from.copy().sub_(to);
+        const newPoint = from.copy().add_(diff.mul(0.5));
         const newCommand: LineCommand = {
           type: "lineTo",
           absTo: newPoint,
@@ -433,8 +433,8 @@ export class Editor {
       pathCommand.type = "bezierTo";
       const bezier = pathCommand as BezierCommand;
       const diff = new Vector2(10, 10);
-      bezier.absC1 = bezier.absTo.copy().add(diff);
-      bezier.absC2 = bezier.absTo.copy().sub(diff);
+      bezier.absC1 = bezier.absTo.copy().add_(diff);
+      bezier.absC2 = bezier.absTo.copy().sub_(diff);
       this.level.pointToCommandMap.set(bezier.absC1, bezier);
       this.level.pointToCommandMap.set(bezier.absC2, bezier);
     } else if (pathCommand.type === "bezierTo") {

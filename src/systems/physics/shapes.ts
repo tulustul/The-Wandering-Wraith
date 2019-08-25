@@ -68,18 +68,22 @@ export class CircleShape extends Shape {
   }
 
   checkColisionWithLine(line: LineShape): [Vector2, Vector2] | null {
-    const length = line.start.distanceTo(line.end);
+    const length = line.start_.distanceTo(line.end_);
     const dot =
-      ((this.pos.x - line.start.x) * (line.end.x - line.start.x) +
-        (this.pos.y - line.start.y) * (line.end.y - line.start.y)) /
+      ((this.pos.x - line.start_.x) * (line.end_.x - line.start_.x) +
+        (this.pos.y - line.start_.y) * (line.end_.y - line.start_.y)) /
       Math.pow(length, 2);
 
     const closestPoint = new Vector2(
-      line.start.x + dot * (line.end.x - line.start.x),
-      line.start.y + dot * (line.end.y - line.start.y),
+      line.start_.x + dot * (line.end_.x - line.start_.x),
+      line.start_.y + dot * (line.end_.y - line.start_.y),
     );
 
-    const onSegment = lineToPointColision(line.start, line.end, closestPoint);
+    const onSegment = lineToPointColision(
+      line.start_,
+      line.end_,
+      closestPoint,
+    );
     if (!onSegment) {
       return null;
     }
@@ -101,13 +105,13 @@ export class CircleShape extends Shape {
 
     const penetration = this.pos
       .copy()
-      .sub(circle.pos)
+      .sub_(circle.pos)
       .mul(1 - d / radiusSum);
 
-    const closestPoint = circle.pos.copy().add(
+    const closestPoint = circle.pos.copy().add_(
       penetration
         .copy()
-        .normalize()
+        .normalize_()
         .mul(circle.radius),
     );
 
@@ -118,26 +122,26 @@ export class CircleShape extends Shape {
     const penetration = this.radius - this.pos.distanceTo(p);
     if (penetration > 0) {
       const angle = this.pos.directionTo(p);
-      return new Vector2(0, 1).mul(-penetration).rotate(angle);
+      return new Vector2(0, 1).mul(-penetration).rotate_(angle);
     }
     return null;
   }
 }
 
 export class LineShape extends Shape {
-  constructor(public start: Vector2, public end: Vector2) {
+  constructor(public start_: Vector2, public end_: Vector2) {
     super();
   }
 
   *getCells() {
-    const minX = Math.floor(Math.min(this.start.x, this.end.x) / GRID_SIZE);
+    const minX = Math.floor(Math.min(this.start_.x, this.end_.x) / GRID_SIZE);
     const maxX = Math.floor(
-      Math.max(this.start.x, this.end.x - 1) / GRID_SIZE,
+      Math.max(this.start_.x, this.end_.x - 1) / GRID_SIZE,
     );
 
-    const minY = Math.floor(Math.min(this.start.y, this.end.y) / GRID_SIZE);
+    const minY = Math.floor(Math.min(this.start_.y, this.end_.y) / GRID_SIZE);
     const maxY = Math.floor(
-      Math.max(this.start.y, this.end.y - 1) / GRID_SIZE,
+      Math.max(this.start_.y, this.end_.y - 1) / GRID_SIZE,
     );
 
     for (let x = minX; x <= maxX; x++) {

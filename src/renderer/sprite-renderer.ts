@@ -1,14 +1,14 @@
 export class SpriteRenderer {
   ctx!: CanvasRenderingContext2D;
-  private canvas!: HTMLCanvasElement;
+  private canvas_!: HTMLCanvasElement;
   constructor() {
-    this.canvas = document.createElement("canvas");
-    this.ctx = this.canvas.getContext("2d")!;
+    this.canvas_ = document.createElement("canvas");
+    this.ctx = this.canvas_.getContext("2d")!;
   }
 
   setSize(width: number, height: number) {
-    this.canvas.width = width;
-    this.canvas.height = height;
+    this.canvas_.width = width;
+    this.canvas_.height = height;
   }
 
   async render(
@@ -18,12 +18,12 @@ export class SpriteRenderer {
       renderFn(this.ctx);
       const img = new Image();
       img.onload = () => resolve(img);
-      img.src = this.canvas.toDataURL();
-      this.reset();
+      img.src = this.canvas_.toDataURL();
+      this.reset_();
     });
   }
 
-  private reset() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  private reset_() {
+    this.ctx.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
   }
 }

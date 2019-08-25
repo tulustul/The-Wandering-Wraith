@@ -9,66 +9,66 @@ type BlendMode =
   | "lighten";
 
 interface CompositorEntry {
-  source?: string;
-  target?: string;
+  source_?: string;
+  target_?: string;
   blendMode?: BlendMode;
-  offset?: boolean;
+  offset_?: boolean;
   offsetScale?: number;
 }
 
 // missing fields just repeat from the last entry
 const COMPOSITOR_ENTRIES: CompositorEntry[] = [
   {
-    target: "base",
-    source: "background",
+    target_: "base",
+    source_: "background",
     blendMode: "source-over",
-    offset: false,
+    offset_: false,
     offsetScale: 0.3,
   },
   {
-    target: "base",
-    source: "hills1",
+    target_: "base",
+    source_: "hills1",
     blendMode: "source-over",
-    offset: true,
+    offset_: true,
     offsetScale: 0.1,
   },
   {
-    target: "base",
-    source: "hills2",
+    target_: "base",
+    source_: "hills2",
     blendMode: "source-over",
-    offset: true,
+    offset_: true,
     offsetScale: 0.15,
   },
   {
-    target: "base",
-    source: "hills3",
+    target_: "base",
+    source_: "hills3",
     blendMode: "source-over",
-    offset: true,
+    offset_: true,
     offsetScale: 0.2,
   },
   {
-    target: "base",
-    source: "foliageBackground",
+    target_: "base",
+    source_: "foliageBackground",
     blendMode: "source-over",
-    offset: false,
+    offset_: false,
   },
   {
-    target: "base",
-    source: "terrain",
+    target_: "base",
+    source_: "terrain",
     blendMode: "source-over",
-    offset: true,
+    offset_: true,
   },
   {
-    target: "base",
-    source: "movingProps",
+    target_: "base",
+    source_: "movingProps",
     blendMode: "source-over",
-    offset: false,
+    offset_: false,
   },
   {
-    target: "base",
-    source: "foliageForeground",
+    target_: "base",
+    source_: "foliageForeground",
     blendMode: "source-over",
-    offset: false,
+    offset_: false,
   },
 ];
 
@@ -77,8 +77,8 @@ export class Compositor {
 
   layers: { [key: string]: Layer } = {};
 
-  get canvas() {
-    return this.engine.canvas;
+  get canvas_() {
+    return this.engine.canvas_;
   }
 
   init() {
@@ -91,23 +91,23 @@ export class Compositor {
     let entry: CompositorEntry = {};
 
     for (const nextEntry of COMPOSITOR_ENTRIES) {
-      if (nextEntry.target === "base") {
+      if (nextEntry.target_ === "base") {
         this.layers["base"].activate();
       }
 
       entry = { ...entry, ...nextEntry };
 
-      const target = this.layers[entry.target as string];
-      const source = this.layers[entry.source as string];
+      const target = this.layers[entry.target_ as string];
+      const source = this.layers[entry.source_ as string];
 
-      target.context.globalCompositeOperation = entry.blendMode as BlendMode;
+      target.ctx.globalCompositeOperation = entry.blendMode as BlendMode;
 
       const offsetScale = nextEntry.offsetScale || 1;
 
-      if (entry.offset) {
+      if (entry.offset_) {
         this.drawLayerWithCameraOffset(target, source, offsetScale);
       } else {
-        target.context.drawImage(source.canvas, 0, 0);
+        target.ctx.drawImage(source.canvas_, 0, 0);
       }
     }
   }
@@ -117,17 +117,17 @@ export class Compositor {
     source: Layer,
     offsetScale: number,
   ) {
-    target.context.drawImage(
-      source.canvas,
+    target.ctx.drawImage(
+      source.canvas_,
       -this.engine.camera.pos.x * offsetScale,
       -this.engine.camera.pos.y * offsetScale,
-      this.canvas.width,
-      this.canvas.height,
+      this.canvas_.width,
+      this.canvas_.height,
       0,
       0,
-      this.canvas.width,
-      this.canvas.height,
+      this.canvas_.width,
+      this.canvas_.height,
     );
-    target.context.restore();
+    target.ctx.restore();
   }
 }

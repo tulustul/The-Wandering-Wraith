@@ -1,11 +1,11 @@
 import { Engine } from "../engine";
 
 export interface LayerOptions {
-  canvas?: HTMLCanvasElement;
+  canvas_?: HTMLCanvasElement;
   renderWholeWorld?: boolean;
   followPlayer?: boolean;
-  fill?: string;
-  clear?: boolean;
+  fill_?: string;
+  clear_?: boolean;
 }
 
 export class Layer {
@@ -13,15 +13,15 @@ export class Layer {
 
   followPlayer = true;
 
-  fill: string | null = null;
+  fill_: string | null = null;
 
   renderWholeWorld = false;
 
-  clear = true;
+  clear_ = true;
 
-  canvas!: HTMLCanvasElement;
+  canvas_!: HTMLCanvasElement;
 
-  context!: CanvasRenderingContext2D;
+  ctx!: CanvasRenderingContext2D;
 
   constructor(
     name: string,
@@ -32,11 +32,11 @@ export class Layer {
 
     engine.renderer.compositor.layers[name] = this;
 
-    if (!this.canvas) {
-      this.canvas = document.createElement("canvas");
+    if (!this.canvas_) {
+      this.canvas_ = document.createElement("canvas");
     }
 
-    this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+    this.ctx = this.canvas_.getContext("2d") as CanvasRenderingContext2D;
   }
 
   init() {
@@ -47,44 +47,41 @@ export class Layer {
   updateSize(force = true) {
     if (this.renderWholeWorld) {
       if (force) {
-        this.canvas.width = this.engine.worldWidth;
-        this.canvas.height = this.engine.worldHeight;
+        this.canvas_.width = this.engine.worldWidth;
+        this.canvas_.height = this.engine.worldHeight;
       }
     } else {
-      this.canvas.width = this.engine.canvas.width;
-      this.canvas.height = this.engine.canvas.height;
+      this.canvas_.width = this.engine.canvas_.width;
+      this.canvas_.height = this.engine.canvas_.height;
     }
     this.clearCanvas();
   }
 
   clearCanvas() {
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
   }
 
   activate() {
     const renderer = this.engine.renderer;
     if (renderer.activeLayer) {
-      renderer.activeLayer.context.restore();
+      renderer.activeLayer.ctx.restore();
     }
 
     renderer.activeLayer = this;
-    renderer.context = this.context;
+    renderer.ctx = this.ctx;
 
-    if (this.clear) {
+    if (this.clear_) {
       this.clearCanvas();
     }
 
-    if (this.fill) {
-      this.context.fillStyle = this.fill;
-      this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    if (this.fill_) {
+      this.ctx.fillStyle = this.fill_;
+      this.ctx.fillRect(0, 0, this.canvas_.width, this.canvas_.height);
     }
 
     if (this.followPlayer) {
-      this.context.save();
-      this.context.translate(
-        this.engine.camera.pos.x,
-        this.engine.camera.pos.y,
-      );
+      this.ctx.save();
+      this.ctx.translate(this.engine.camera.pos.x, this.engine.camera.pos.y);
     }
   }
 }

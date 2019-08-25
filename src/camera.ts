@@ -12,8 +12,8 @@ export class Camera {
     this.target = target;
   }
 
-  update() {
-    this.pos.x = -this.target.x + this.engine.canvas.width / 2;
-    this.pos.y = -this.target.y + this.engine.canvas.height / 1.3;
+  update_() {
+    this.pos.x = -this.target.x + this.engine.canvas_.width / 2;
+    this.pos.y = -this.target.y + this.engine.canvas_.height / 1.3;
   }
 }
