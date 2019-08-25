@@ -89,16 +89,7 @@ export class Player {
       }
     }
     if (!this.dashed && this.engine.time - this.lastJumpTime > 300) {
-      const control = this.engine.control;
-      if (control.keys.get("ArrowLeft")) {
-        this.body.vel.x = -6;
-        this.body.vel.y = -2;
-      } else if (control.keys.get("ArrowRight")) {
-        this.body.vel.x = 6;
-        this.body.vel.y = -2;
-      } else {
-        this.body.vel.y = -6;
-      }
+      this.body.vel.y = -6;
       this.dashed = true;
     }
   }

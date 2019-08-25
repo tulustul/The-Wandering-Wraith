@@ -50,7 +50,6 @@ class PathParser {
       if (commands.includes(c)) {
         command = c;
         if (command === "z") {
-          console.log(this.pos, firstPoint!);
           yield [this.pos, firstPoint!];
         }
         c = this.next();
@@ -66,7 +65,6 @@ class PathParser {
         case "M":
           this.pos = this.parseVector();
           firstPoint = this.pos.copy();
-          console.log(firstPoint);
           command = "l";
           break;
         case "l":

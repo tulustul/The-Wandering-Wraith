@@ -33,6 +33,7 @@ function tick(timestamp: number) {
       game.engine.update(timeStep);
     }
   }
+  game.engine.camera.update();
   game.engine.renderer.render();
   requestAnimationFrame(tick);
 }

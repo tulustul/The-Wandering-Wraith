@@ -119,9 +119,8 @@ export class Compositor {
   ) {
     target.context.drawImage(
       source.canvas,
-      -(-this.engine.player.body.pos.x + this.canvas.width / 2) * offsetScale,
-      -(-this.engine.player.body.pos.y + this.canvas.height / 1.3) *
-        offsetScale,
+      -this.engine.camera.pos.x * offsetScale,
+      -this.engine.camera.pos.y * offsetScale,
       this.canvas.width,
       this.canvas.height,
       0,

@@ -9,6 +9,8 @@ const TerserPlugin = require("terser-webpack-plugin");
 module.exports = env => {
   const isProd = env === "prod";
 
+  process.env["NODE_ENV"] = isProd ? "production" : "development";
+
   const plugins = [
     new HtmlWebpackPlugin({
       template: "src/index.html",
@@ -39,7 +41,7 @@ module.exports = env => {
       rules: [
         {
           test: /\.ts?$/,
-          use: "ts-loader",
+          use: ["ts-loader", "webpack-conditional-loader"],
           exclude: /node_modules/,
         },
       ],
@@ -68,3 +70,5 @@ module.exports = env => {
     },
   };
 };
+
+console.log("process.env.NODE_ENV", process.env.NODE_ENV);

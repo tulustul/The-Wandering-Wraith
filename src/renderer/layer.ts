@@ -82,8 +82,8 @@ export class Layer {
     if (this.followPlayer) {
       this.context.save();
       this.context.translate(
-        -this.engine.player.body.pos.x + this.canvas.width / 2,
-        -this.engine.player.body.pos.y + this.canvas.height / 1.3,
+        this.engine.camera.pos.x,
+        this.engine.camera.pos.y,
       );
     }
   }
