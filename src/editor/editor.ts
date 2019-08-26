@@ -105,18 +105,22 @@ export class Editor {
 
   focusedPoint: Vector2 | null;
 
-  selectedPoint: Vector2 | null;
+  selectedPoints = new Set<Vector2>();
 
   originalRenderFn: () => void;
+
+  selectionArea: [Vector2, Vector2] | null = null;
+
+  isMousePressed = false;
 
   constructor(private engine: Engine) {
     window.addEventListener("keydown", event => {
       if (event.key === "e" && !this.initialized) {
         this.init();
       }
-      if (this.selectedPoint) {
+      if (this.selectedPoints.size === 1) {
         const pathCommand = this.level.pointToCommandMap.get(
-          this.selectedPoint,
+          Array.from(this.selectedPoints)[0],
         )!;
         if (event.key === "c") {
           this.cutAfterPoint(pathCommand);
@@ -204,32 +208,62 @@ export class Editor {
     document.getElementsByTagName("canvas")[0].classList.add("with-cursor");
 
     this.engine.canvas_.addEventListener("mousedown", event => {
+      this.isMousePressed = true;
+      this.selectionArea = null;
       if (this.focusedPoint) {
-        this.selectedPoint = this.focusedPoint;
+        if (!this.selectedPoints.has(this.focusedPoint)) {
+          this.selectedPoints.clear();
+          this.selectedPoints.add(this.focusedPoint);
+        }
+      } else {
+        this.selectedPoints.clear();
+        const pos = this.mousePosToWorldPos(new Vector2(event.x, event.y));
+        this.selectionArea = [pos, pos.copy()];
       }
     });
 
     this.engine.canvas_.addEventListener("mouseup", () => {
-      this.selectedPoint = null;
+      this.isMousePressed = false;
+      if (this.selectionArea) {
+        const [f, t] = this.selectionArea;
+        const [from, to] = [
+          new Vector2(Math.min(f.x, t.x), Math.min(f.y, t.y)),
+          new Vector2(Math.max(f.x, t.x), Math.max(f.y, t.y)),
+        ];
+        this.selectedPoints.clear();
+        for (const p of this.level.pointToCommandMap.keys()) {
+          if (p.x > from.x && p.y > from.y && p.x < to.x && p.y < to.y) {
+            this.selectedPoints.add(p);
+          }
+        }
+        this.selectionArea = null;
+      }
     });
 
     this.engine.canvas_.addEventListener("mousemove", event => {
       this.focusedPoint = null;
 
-      if (this.selectedPoint) {
-        const newPos = this.mousePosToWorldPos(new Vector2(event.x, event.y));
-        const diff = newPos.copy().sub_(this.selectedPoint);
-        this.selectedPoint.add_(diff);
-        const pathCommand = this.level.pointToCommandMap.get(
-          this.selectedPoint,
-        )!;
-        if (
-          pathCommand.type === "bezierTo" &&
-          this.selectedPoint === (pathCommand as BezierCommand).absTo
-        ) {
-          (pathCommand as BezierCommand).absC1.add_(diff);
-          (pathCommand as BezierCommand).absC2.add_(diff);
+      const diff = this.scalePosToWorld(
+        new Vector2(event.movementX, event.movementY),
+      ).mul(0.8); // no idea why 0.8 is needed :(
+
+      if (this.isMousePressed) {
+        for (const point of this.selectedPoints) {
+          point.add_(diff);
+          const pathCommand = this.level.pointToCommandMap.get(point)!;
+          if (
+            pathCommand.type === "bezierTo" &&
+            point === (pathCommand as BezierCommand).absTo
+          ) {
+            (pathCommand as BezierCommand).absC1.add_(diff);
+            (pathCommand as BezierCommand).absC2.add_(diff);
+          }
         }
+      }
+
+      if (this.selectionArea) {
+        const pos = this.mousePosToWorldPos(new Vector2(event.x, event.y));
+        this.selectionArea[1] = pos;
       }
 
       const pointerPos = this.mousePosToWorldPos(
@@ -330,13 +364,9 @@ export class Editor {
           ctx.lineTo(to.x, to.y);
           break;
         case "bezierTo":
-          const from = (pathCommand as BezierCommand).relFrom;
           to = (pathCommand as BezierCommand).absTo;
           const c1 = (pathCommand as BezierCommand).absC1;
           const c2 = (pathCommand as BezierCommand).absC2;
-          // for (const p of generateBezierSegments([from, to, c1, c2], 0.1)) {
-          //   ctx.lineTo(p[1].x, p[1].y);
-          // }
           ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to.x, to.y);
           break;
         case "close":
@@ -376,10 +406,21 @@ export class Editor {
           break;
       }
     }
+
+    if (this.selectionArea) {
+      ctx.fillStyle = "#fff2";
+      const [from, to] = this.selectionArea;
+      const relTo = to.copy().sub_(from);
+      ctx.rect(from.x, from.y, relTo.x, relTo.y);
+      ctx.fill();
+    }
   }
 
   private drawPoint(ctx: CanvasRenderingContext2D, p: Vector2, fill: string) {
     ctx.fillStyle = fill;
+    if (this.selectedPoints.has(p)) {
+      ctx.fillStyle = "red";
+    }
     if (p === this.focusedPoint) {
       ctx.fillStyle = "yellow";
     }
@@ -390,10 +431,15 @@ export class Editor {
   }
 
   private mousePosToWorldPos(p: Vector2) {
+    p = this.scalePosToWorld(p);
+    const pos = this.engine.camera.pos.copy().mul(-1);
+    return new Vector2(pos.x + p.x, pos.y + p.y);
+  }
+
+  private scalePosToWorld(p: Vector2) {
     const canvas = this.engine.canvas_;
     const scale = canvas.width / canvas.clientWidth;
-    const pos = this.engine.camera.pos.copy().mul(-1);
-    return new Vector2(pos.x + p.x * scale, pos.y + p.y * scale);
+    return new Vector2(p.x * scale, p.y * scale);
   }
 
   cutAfterPoint(pathCommand: PathCommand) {
