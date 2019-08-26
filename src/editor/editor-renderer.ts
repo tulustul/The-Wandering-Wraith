@@ -82,15 +82,18 @@ export class EditorRenderer {
     ctx.lineWidth = 1;
     ctx.strokeStyle = "red";
     let to: Vector2;
+    let lastPoint: Vector2;
     for (const pathCommand of this.editor.level.pathCommands) {
       switch (pathCommand.type) {
         case "moveTo":
           to = (pathCommand as MoveCommand).absTo;
           this.drawPoint(ctx, to, "blue");
+          lastPoint = to;
           break;
         case "lineTo":
           to = (pathCommand as LineCommand).absTo;
           this.drawPoint(ctx, to, "darkorange");
+          lastPoint = to;
           break;
         case "bezierTo":
           to = (pathCommand as BezierCommand).absTo;
@@ -100,10 +103,14 @@ export class EditorRenderer {
           this.drawPoint(ctx, c1, "red");
           this.drawPoint(ctx, c2, "red");
           ctx.beginPath();
-          ctx.moveTo(c1.x, c1.y);
-          ctx.lineTo(to.x, to.y);
+          ctx.moveTo(lastPoint!.x, lastPoint!.y);
+          ctx.lineTo(c1.x, c1.y);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(to.x, to.y);
           ctx.lineTo(c2.x, c2.y);
           ctx.stroke();
+          lastPoint = to;
           break;
         case "close":
           ctx.closePath();

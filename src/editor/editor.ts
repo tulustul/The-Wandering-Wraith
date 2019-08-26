@@ -27,6 +27,8 @@ export class Editor {
 
   ui: EditorUI;
 
+  controlsInterval: number;
+
   constructor(public engine: Engine) {
     window.addEventListener("keydown", event => {
       if (event.key === "e" && !this.initialized) {
@@ -38,7 +40,10 @@ export class Editor {
   init() {
     this.manipulator = new Manipulator(this);
     this.ui = new EditorUI(this);
-    setInterval(() => this.updateControls(), 17);
+    this.controlsInterval = window.setInterval(
+      () => this.updateControls(),
+      17,
+    );
 
     this.level = new LevelSerializer().deserialize(LEVELS[0]);
 
@@ -59,7 +64,9 @@ export class Editor {
   destroy() {
     this.setMode("play");
     this.engine.renderer.systemsRenderer.render = this.originalRenderFn;
+    this.manipulator.destroy();
     this.initialized = false;
+    window.clearInterval(this.controlsInterval);
   }
 
   setMode(mode: EditorMode) {
