@@ -46,6 +46,11 @@ export class EditorUI {
       textarea.value = levelString;
     });
 
+    this.listeners.listen("object-type", "change", event => {
+      const objectToAdd = (event.target! as HTMLSelectElement).value;
+      this.editor.manipulator.objectToAdd = objectToAdd as any;
+    });
+
     this.listeners.listen("close-editor", "click", () => {
       this.editor.destroy();
       this.listeners.clear();
@@ -65,6 +70,11 @@ export class EditorUI {
 
   get engine() {
     return this.editor.engine;
+  }
+
+  clearObjectType() {
+    const select = document.getElementById("object-type") as HTMLSelectElement;
+    select.value = "";
   }
 
   private renderHtml() {

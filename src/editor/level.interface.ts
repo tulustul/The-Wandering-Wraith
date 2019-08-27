@@ -18,24 +18,20 @@ export interface PathCommand {
 
 export interface MoveCommand extends PathCommand {
   type: "moveTo" | "lineTo" | "bezierTo";
-  absTo: Vector2;
+  to: Vector2;
 }
 
 export interface LineCommand extends MoveCommand, PathSegment {
   type: "lineTo";
-  absTo: Vector2;
-  relTo: Vector2;
+  to: Vector2;
 }
 
 export interface BezierCommand extends MoveCommand, PathSegment {
   type: "bezierTo";
-  relFrom: Vector2;
-  absTo: Vector2;
-  relTo: Vector2;
-  absC1: Vector2;
-  relC1: Vector2;
-  absC2: Vector2;
-  relC2: Vector2;
+  from: Vector2;
+  to: Vector2;
+  c1: Vector2;
+  c2: Vector2;
 }
 
 export interface CloseCommand extends PathCommand {
@@ -43,6 +39,7 @@ export interface CloseCommand extends PathCommand {
 }
 
 export interface Level {
+  size: Vector2;
   pathCommands: PathCommand[];
   pointToCommandMap: Map<Vector2, PathCommand>;
 }

@@ -7,6 +7,7 @@ import { Vector2 } from "./vector";
 import { Control } from "./control";
 import { Renderer } from "./renderer/renderer";
 import { Camera } from "./camera";
+import { Level } from "./level.interface";
 
 // #if process.env.NODE_ENV === 'development'
 import { Editor } from "./editor/editor";
@@ -34,6 +35,8 @@ export class Engine {
   renderer = new Renderer(this);
 
   camera = new Camera(this);
+
+  level: Level = { pathCommands: [] };
 
   // #if process.env.NODE_ENV === 'development'
   editor = new Editor(this);

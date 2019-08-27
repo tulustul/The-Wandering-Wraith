@@ -1,56 +1,44 @@
 import { Engine } from "./engine";
 import { Vector2 } from "./vector";
 import { generateBezierSegments } from "./bezier";
-import { GROUND_MASK, TREE_GROUND_MASK } from "./colisions-masks";
+import { GROUND_MASK, TREE_GROUND_MASK, PLAYER_MASK } from "./colisions-masks";
 import { LineShape } from "./systems/physics/shapes";
+import { LEVELS } from "./levels";
+import { threadId } from "worker_threads";
+import { PathCommandType } from "./level.interface";
 
-// M - move to, (x y)
+// m - move to, (x y)
 // l - line to, (x y)+
 // c - cubic bezier, (x1 y1 x2 y2 x y)+
-// V - vertical line, y
-// H - vertical line, y
 // z - close path
-const commands = "mMlLcvVhHz";
+const commands = "mlcz";
 
-export function loadLevel(engine: Engine, level: string) {
-  const svg = document.getElementById(level) as any;
-
-  engine.worldWidth = svg.viewBox.baseVal.width;
-  engine.worldHeight = svg.viewBox.baseVal.height;
-
-  const paths = svg.querySelectorAll("path");
-  for (const path of paths) {
-    const d = path.getAttribute("d")!;
-    const clazz = path.getAttribute("class")!;
-    let receiveMask = GROUND_MASK;
-    if (clazz === "t") {
-      receiveMask |= TREE_GROUND_MASK;
-    }
-    for (const [start, end] of new PathParser(d).parse_()) {
-      engine.physics.addStatic({
-        shape_: new LineShape(start, end),
-        receiveMask,
-        pos: new Vector2(0, 0),
-      });
-    }
-  }
+export function loadLevel(engine: Engine, level: number) {
+  const levelDef = LEVELS[level];
+  engine.level = { pathCommands: [] };
+  new PathParser(engine, levelDef).parse_();
 }
 
 class PathParser {
   private pos: Vector2;
   private index = 0;
 
-  constructor(private d: string) {}
+  constructor(private engine: Engine, private d: string) {}
 
-  *parse_(): IterableIterator<[Vector2, Vector2]> {
+  parse_() {
+    this.next();
+    this.engine.worldWidth = this.parseNumber();
+    this.engine.worldHeight = this.parseNumber();
+
     let command!: string;
-    let c = this.next();
     let firstPoint: Vector2 | null = null;
+    let c = this.d[this.index - 1];
     while (c) {
       if (commands.includes(c)) {
         command = c;
         if (command === "z") {
-          yield [this.pos, firstPoint!];
+          this.engine.level.pathCommands.push({ type: PathCommandType.close });
+          this.addStatic(this.pos, firstPoint!);
         }
         c = this.next();
         continue;
@@ -59,56 +47,43 @@ class PathParser {
         c = this.next();
         continue;
       }
-      let start: Vector2 | null = null;
-      let x, y: number;
+      let points: Vector2[] = [];
       switch (command) {
-        case "M":
+        case "m":
           this.pos = this.parseVector();
           firstPoint = this.pos.copy();
+          this.engine.level.pathCommands.push({
+            type: PathCommandType.move,
+            points: [firstPoint],
+          });
           command = "l";
           break;
         case "l":
-          yield [this.pos.copy(), this.pos.add_(this.parseVector()).copy()];
-          break;
-        case "L":
-          start = this.pos.copy();
-          this.pos = this.parseVector();
-          yield [start, this.pos.copy()];
-          break;
-        case "v":
-          y = this.parseNumber();
-          start = this.pos.copy();
-          this.pos.y += y;
-          yield [start, this.pos.copy()];
-          break;
-        case "V":
-          y = this.parseNumber();
-          start = this.pos.copy();
-          this.pos.y = y;
-          yield [start, this.pos.copy()];
-          break;
-        case "h":
-          x = this.parseNumber();
-          start = this.pos.copy();
-          this.pos.x += x;
-          yield [start, this.pos.copy()];
-          break;
-        case "H":
-          x = this.parseNumber();
-          start = this.pos.copy();
-          this.pos.x = x;
-          yield [start, this.pos.copy()];
+          points = [this.pos.copy(), this.pos.add_(this.parseVector()).copy()];
+          this.engine.level.pathCommands.push({
+            type: PathCommandType.line,
+            points: [points[1]],
+          });
+          this.addStatic(points[0], points[1]);
           break;
         case "c":
-          yield* generateBezierSegments(
-            [
-              this.pos.copy(),
-              this.pos.copy().add_(this.parseVector()),
-              this.pos.copy().add_(this.parseVector()),
-              this.pos.add_(this.parseVector()).copy(),
-            ],
+          const oldPos = this.pos.copy();
+          points = [
+            this.pos.copy().add_(this.parseVector()),
+            this.pos.copy().add_(this.parseVector()),
+            this.pos.add_(this.parseVector()).copy(),
+          ];
+          this.engine.level.pathCommands.push({
+            type: PathCommandType.bezier,
+            points: points,
+          });
+          const interpolatedPoints = generateBezierSegments(
+            [oldPos].concat(points),
             0.1,
           );
+          for (const [p1, p2] of interpolatedPoints) {
+            this.addStatic(p1, p2);
+          }
           break;
       }
       c = this.d[this.index - 1];
@@ -131,5 +106,13 @@ class PathParser {
 
   private next() {
     return this.d[this.index++];
+  }
+
+  private addStatic(from_: Vector2, to_: Vector2) {
+    this.engine.physics.addStatic({
+      shape_: new LineShape(from_, to_),
+      receiveMask: TREE_GROUND_MASK | GROUND_MASK,
+      pos: new Vector2(0, 0),
+    });
   }
 }

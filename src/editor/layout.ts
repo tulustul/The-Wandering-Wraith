@@ -64,6 +64,14 @@ export const EDITOR_HTML = `
     <label><input type="radio" name="mode" value="place">Place</label>
     <label><input type="radio" name="mode" value="play">Play</label>
   </div>
+
+  <label>
+    Add
+    <select id="object-type">
+      <option value="">-</option>
+      <option value="shape">Shape</option>
+    </select>
+  </label>
 </div>
 
 <label id="output-wrapper">

@@ -40,15 +40,15 @@ async function preparePlants(): Promise<PlantDefinition[]> {
         5 * depth,
         depth,
       ),
-      spread: 35 * depth,
+      spread: 25 * Math.pow(depth, 1.3),
       mask: TREE_GROUND_MASK,
     });
   }
 
   for (let i = 0; i < 4; i++) {
     plants.push({
-      frames: await animateGrass(sr, i),
-      spread: 6,
+      frames: await animateGrass(sr, 0.8 + i * 0.5, i),
+      spread: 5,
       mask: GROUND_MASK,
     });
   }
@@ -58,7 +58,6 @@ async function preparePlants(): Promise<PlantDefinition[]> {
 export const assets: Assets = {} as any;
 
 export async function prepareAssets() {
-  assets.terrain = await svgToImg("a");
   assets.head_ = await svgToImg("head");
   assets.eyes = await svgToImg("eyes");
   assets.torso = await svgToImg("torso");

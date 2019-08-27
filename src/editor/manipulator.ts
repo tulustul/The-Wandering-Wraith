@@ -8,6 +8,7 @@ import {
 } from "./level.interface";
 import { TREE_GROUND_MASK } from "../colisions-masks";
 import { Listeners } from "./listeners";
+import { ObjectType } from "./objects";
 
 export class Manipulator {
   focusedPoint: Vector2 | null;
@@ -15,6 +16,8 @@ export class Manipulator {
   selectedPoints = new Set<Vector2>();
 
   selectionArea: [Vector2, Vector2] | null = null;
+
+  objectToAdd: ObjectType | "" = "";
 
   private isMousePressed = false;
 
@@ -29,11 +32,15 @@ export class Manipulator {
         if (event.key === "c") {
           this.cutAfterPoint(pathCommand);
         }
-        if (event.key === "Delete") {
-          this.deletePoint(pathCommand);
-        }
         if (event.key === "v") {
           this.togglePointBetweenBezierAndLine(pathCommand);
+        }
+      }
+
+      if (event.key === "Delete") {
+        for (const point of this.selectedPoints) {
+          const pathCommand = this.editor.level.pointToCommandMap.get(point)!;
+          this.deletePoint(pathCommand);
         }
       }
     });
@@ -41,6 +48,14 @@ export class Manipulator {
     const canvas = this.editor.engine.canvas_;
 
     this.listeners.listen(canvas, "mousedown", (event: MouseEvent) => {
+      const pos = this.mousePosToWorldPos(new Vector2(event.x, event.y));
+
+      if (this.objectToAdd !== "") {
+        this.editor.editorObjects.place(this.objectToAdd, pos);
+        this.objectToAdd = "";
+        this.editor.ui.clearObjectType();
+        return;
+      }
       this.isMousePressed = true;
       this.selectionArea = null;
       if (this.focusedPoint) {
@@ -50,7 +65,6 @@ export class Manipulator {
         }
       } else {
         this.selectedPoints.clear();
-        const pos = this.mousePosToWorldPos(new Vector2(event.x, event.y));
         this.selectionArea = [pos, pos.copy()];
       }
     });
@@ -80,20 +94,7 @@ export class Manipulator {
         new Vector2(event.movementX, event.movementY),
       ).mul(0.8); // no idea why 0.8 is needed :(
 
-      if (this.isMousePressed) {
-        for (const point of this.selectedPoints) {
-          point.add_(diff);
-          const pathCommand = this.editor.level.pointToCommandMap.get(point)!;
-          if (
-            this.selectedPoints.size === 1 &&
-            pathCommand.type === "bezierTo" &&
-            point === (pathCommand as BezierCommand).absTo
-          ) {
-            (pathCommand as BezierCommand).absC1.add_(diff);
-            (pathCommand as BezierCommand).absC2.add_(diff);
-          }
-        }
-      }
+      this.move(diff);
 
       if (this.selectionArea) {
         const pos = this.mousePosToWorldPos(new Vector2(event.x, event.y));
@@ -115,6 +116,23 @@ export class Manipulator {
     this.listeners.clear();
   }
 
+  move(v: Vector2) {
+    if (this.isMousePressed) {
+      for (const point of this.selectedPoints) {
+        point.add_(v);
+        const pathCommand = this.editor.level.pointToCommandMap.get(point)!;
+        if (
+          this.selectedPoints.size === 1 &&
+          pathCommand.type === "bezierTo" &&
+          point === (pathCommand as BezierCommand).to
+        ) {
+          (pathCommand as BezierCommand).c1.add_(v);
+          (pathCommand as BezierCommand).c2.add_(v);
+        }
+      }
+    }
+  }
+
   private cutAfterPoint(pathCommand: PathCommand) {
     const index = this.editor.level.pathCommands.indexOf(pathCommand);
     if (index !== -1) {
@@ -123,18 +141,17 @@ export class Manipulator {
         nextPathCommand.type === "lineTo" ||
         nextPathCommand.type === "bezierTo"
       ) {
-        const from = (pathCommand as MoveCommand).absTo;
-        const to = (nextPathCommand as MoveCommand).absTo;
+        const from = (pathCommand as MoveCommand).to;
+        const to = (nextPathCommand as MoveCommand).to;
         const diff = from.copy().sub_(to);
-        const newPoint = from.copy().add_(diff.mul(0.5));
+        const newPoint = from.copy().add_(diff.mul(-0.5));
         const newCommand: LineCommand = {
           type: "lineTo",
-          absTo: newPoint,
+          to: newPoint,
           isDeadly: false,
           mask: TREE_GROUND_MASK,
-          relTo: new Vector2(),
         };
-        this.editor.level.pathCommands.splice(index, 0, newCommand);
+        this.editor.level.pathCommands.splice(index + 1, 0, newCommand);
         this.editor.level.pointToCommandMap.set(newPoint, newCommand);
       }
     }
@@ -152,10 +169,10 @@ export class Manipulator {
       pathCommand.type = "bezierTo";
       const bezier = pathCommand as BezierCommand;
       const diff = new Vector2(10, 10);
-      bezier.absC1 = bezier.absTo.copy().add_(diff);
-      bezier.absC2 = bezier.absTo.copy().sub_(diff);
-      this.editor.level.pointToCommandMap.set(bezier.absC1, bezier);
-      this.editor.level.pointToCommandMap.set(bezier.absC2, bezier);
+      bezier.c1 = bezier.to.copy().add_(diff);
+      bezier.c2 = bezier.to.copy().sub_(diff);
+      this.editor.level.pointToCommandMap.set(bezier.c1, bezier);
+      this.editor.level.pointToCommandMap.set(bezier.c2, bezier);
     } else if (pathCommand.type === "bezierTo") {
       pathCommand.type = "lineTo";
     }

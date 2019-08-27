@@ -5,6 +5,8 @@ import { LEVELS } from "../levels";
 import { Level } from "./level.interface";
 import { Manipulator } from "./manipulator";
 import { EditorUI } from "./editor-ui";
+import { Vector2 } from "../vector";
+import { EditorObjects } from "./objects";
 
 export type EditorMode = "edit" | "draw" | "place" | "play";
 
@@ -22,6 +24,8 @@ export class Editor {
   originalRenderFn: () => void;
 
   editorRenderer = new EditorRenderer(this);
+
+  editorObjects = new EditorObjects(this);
 
   manipulator: Manipulator;
 
@@ -91,15 +95,19 @@ export class Editor {
       const pos = this.engine.camera.target;
       if (this.engine.control_.keys_.get("KeyW")) {
         pos.y -= 10;
+        this.manipulator.move(new Vector2(0, -10));
       }
       if (this.engine.control_.keys_.get("KeyS")) {
         pos.y += 10;
+        this.manipulator.move(new Vector2(0, 10));
       }
       if (this.engine.control_.keys_.get("KeyA")) {
         pos.x -= 10;
+        this.manipulator.move(new Vector2(-10, 0));
       }
       if (this.engine.control_.keys_.get("KeyD")) {
         pos.x += 10;
+        this.manipulator.move(new Vector2(10, 0));
       }
     }
   }

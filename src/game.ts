@@ -13,7 +13,7 @@ export class Game {
   }
 
   start() {
-    loadLevel(this.engine, "a");
+    loadLevel(this.engine, 0);
     this.engine.foliage.spawnFoliage(this.engine);
 
     this.engine.init();

@@ -86,19 +86,19 @@ export class EditorRenderer {
     for (const pathCommand of this.editor.level.pathCommands) {
       switch (pathCommand.type) {
         case "moveTo":
-          to = (pathCommand as MoveCommand).absTo;
+          to = (pathCommand as MoveCommand).to;
           this.drawPoint(ctx, to, "blue");
           lastPoint = to;
           break;
         case "lineTo":
-          to = (pathCommand as LineCommand).absTo;
+          to = (pathCommand as LineCommand).to;
           this.drawPoint(ctx, to, "darkorange");
           lastPoint = to;
           break;
         case "bezierTo":
-          to = (pathCommand as BezierCommand).absTo;
-          const c1 = (pathCommand as BezierCommand).absC1;
-          const c2 = (pathCommand as BezierCommand).absC2;
+          to = (pathCommand as BezierCommand).to;
+          const c1 = (pathCommand as BezierCommand).c1;
+          const c2 = (pathCommand as BezierCommand).c2;
           this.drawPoint(ctx, to, "darkorange");
           this.drawPoint(ctx, c1, "red");
           this.drawPoint(ctx, c2, "red");
@@ -122,24 +122,24 @@ export class EditorRenderer {
   private drawPaths() {
     const ctx = this.systemsRenderer.ctx;
     let to: Vector2;
-    ctx.fillStyle = "orange";
+    ctx.fillStyle = "#ff02";
     ctx.strokeStyle = "orange";
     ctx.lineWidth = 2;
     for (const pathCommand of this.editor.level.pathCommands) {
       switch (pathCommand.type) {
         case "moveTo":
-          to = (pathCommand as MoveCommand).absTo;
+          to = (pathCommand as MoveCommand).to;
           ctx.beginPath();
           ctx.moveTo(to.x, to.y);
           break;
         case "lineTo":
-          to = (pathCommand as LineCommand).absTo;
+          to = (pathCommand as LineCommand).to;
           ctx.lineTo(to.x, to.y);
           break;
         case "bezierTo":
-          to = (pathCommand as BezierCommand).absTo;
-          const c1 = (pathCommand as BezierCommand).absC1;
-          const c2 = (pathCommand as BezierCommand).absC2;
+          to = (pathCommand as BezierCommand).to;
+          const c1 = (pathCommand as BezierCommand).c1;
+          const c2 = (pathCommand as BezierCommand).c2;
           ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to.x, to.y);
           break;
         case "close":
@@ -153,7 +153,7 @@ export class EditorRenderer {
   private drawPoint(ctx: CanvasRenderingContext2D, p: Vector2, fill: string) {
     ctx.fillStyle = fill;
     if (this.editor.manipulator.selectedPoints.has(p)) {
-      ctx.fillStyle = "red";
+      ctx.fillStyle = "green";
     }
     if (p === this.editor.manipulator.focusedPoint) {
       ctx.fillStyle = "yellow";

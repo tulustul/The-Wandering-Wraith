@@ -1,6 +1,8 @@
 import { Layer } from "./layer";
 import { assets } from "../assets";
 import { Engine } from "../engine";
+import { PathCommandType } from "../level.interface";
+import { Vector2 } from "../vector";
 
 export class SystemsRenderer {
   terrainLayer = new Layer("terrain", this.engine, {
@@ -57,9 +59,29 @@ export class SystemsRenderer {
   // }
 
   renderTerrain() {
-    this.ctx.strokeStyle = "#ffffff";
-    this.ctx.globalCompositeOperation = "source-over";
-    this.ctx.drawImage(assets.terrain, 0, 0);
+    let to: Vector2;
+    this.ctx.fillStyle = "#000";
+    for (const pathCommand of this.engine.level.pathCommands) {
+      switch (pathCommand.type) {
+        case PathCommandType.move:
+          to = pathCommand.points![0];
+          this.ctx.beginPath();
+          this.ctx.moveTo(to.x, to.y);
+          break;
+        case PathCommandType.line:
+          to = pathCommand.points![0];
+          this.ctx.lineTo(to.x, to.y);
+          break;
+        case PathCommandType.bezier:
+          const [to_, c1, c2] = pathCommand.points!;
+          this.ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to_.x, to_.y);
+          break;
+        case PathCommandType.close:
+          this.ctx.closePath();
+          this.ctx.fill();
+          break;
+      }
+    }
   }
 
   renderPlayer() {

@@ -24,10 +24,16 @@ export class LevelSerializer {
     this.levelString = levelString;
 
     const pointsMap = new Map<Vector2, PathCommand>();
-    const level: Level = { pathCommands: [], pointToCommandMap: pointsMap };
+    this.next();
+    const size = this.deserializeVector();
+    const level: Level = {
+      size,
+      pathCommands: [],
+      pointToCommandMap: pointsMap,
+    };
 
     let command!: string;
-    let c = this.next();
+    let c = this.levelString[this.index - 1];
     while (c) {
       if (this.commands.includes(c)) {
         command = c;
@@ -46,53 +52,48 @@ export class LevelSerializer {
       }
 
       let relTo: Vector2;
-      let absTo: Vector2;
+      let to: Vector2;
       switch (command) {
         case "m":
           this.pos = this.deserializeVector();
-          absTo = this.pos.copy();
-          pointsMap.set(absTo, {
+          to = this.pos.copy();
+          pointsMap.set(to, {
             type: "moveTo",
-            absTo,
+            to,
           } as MoveCommand);
-          level.pathCommands.push(pointsMap.get(absTo)!);
+          level.pathCommands.push(pointsMap.get(to)!);
           command = "l";
           break;
         case "l":
           relTo = this.deserializeVector();
-          absTo = this.pos.add_(relTo).copy();
-          pointsMap.set(absTo, {
+          to = this.pos.add_(relTo).copy();
+          pointsMap.set(to, {
             type: "lineTo",
-            relTo,
-            absTo,
+            to,
             isDeadly: false,
             mask: TREE_GROUND_MASK,
           } as LineCommand);
-          level.pathCommands.push(pointsMap.get(absTo)!);
+          level.pathCommands.push(pointsMap.get(to)!);
           break;
         case "c":
-          relTo = this.deserializeVector();
-          absTo = this.pos.add_(relTo).copy();
           const relC1 = this.deserializeVector();
-          const absC1 = this.pos.add_(relC1).copy();
+          const c1 = this.pos.copy().add_(relC1);
           const relC2 = this.deserializeVector();
-          const absC2 = this.pos.add_(relC2).copy();
+          const c2 = this.pos.copy().add_(relC2);
+          relTo = this.deserializeVector();
+          to = this.pos.add_(relTo).copy();
           const bezierCommand = {
             type: "bezierTo",
-            relFrom: new Vector2(),
-            relTo,
-            absTo,
-            relC1,
-            absC1,
-            relC2,
-            absC2,
+            from: new Vector2(),
+            to,
+            c1,
+            c2,
             isDeadly: false,
             mask: TREE_GROUND_MASK,
           } as BezierCommand;
-          pointsMap.set(absTo, bezierCommand);
-          pointsMap.set(absC1, bezierCommand);
-          ``;
-          pointsMap.set(absC2, bezierCommand);
+          pointsMap.set(to, bezierCommand);
+          pointsMap.set(c1, bezierCommand);
+          pointsMap.set(c2, bezierCommand);
           level.pathCommands.push(bezierCommand);
           break;
       }
@@ -102,37 +103,55 @@ export class LevelSerializer {
   }
 
   serialize(level: Level): string {
-    const tokens: string[] = [];
+    const tokens: string[] = [this.serializeVector(level.size)];
 
+    let localPos = new Vector2();
+    let to: Vector2;
     for (const pathCommand of level.pathCommands) {
       switch (pathCommand.type) {
         case "moveTo":
-          tokens.push(
-            "m" + this.serializeVector((pathCommand as MoveCommand).absTo),
-          );
+          localPos = (pathCommand as MoveCommand).to;
+          tokens.push("m" + this.serializeVector(localPos));
           break;
         case "lineTo":
-          tokens.push(
-            "l" + this.serializeVector((pathCommand as LineCommand).relTo),
-          );
+          to = (pathCommand as LineCommand).to.copy();
+          tokens.push("l" + this.serializeVector(to.copy().sub_(localPos)));
+          localPos = to.copy();
           break;
         case "bezierTo":
-          tokens.push(
-            "c" + this.serializeVector((pathCommand as BezierCommand).relTo),
-          );
-          tokens.push(
-            this.serializeVector((pathCommand as BezierCommand).relC1),
-          );
-          tokens.push(
-            this.serializeVector((pathCommand as BezierCommand).relC2),
-          );
+          let c1 = (pathCommand as BezierCommand).c1.copy();
+          let c2 = (pathCommand as BezierCommand).c2.copy();
+          to = (pathCommand as BezierCommand).to.copy();
+
+          localPos = to.copy();
+          tokens.push("c" + this.serializeVector(c1.sub_(localPos)));
+          tokens.push(this.serializeVector(c2.sub_(localPos)));
+          tokens.push(this.serializeVector(to.copy().sub_(localPos)));
           break;
         case "close":
           tokens.push("z");
       }
     }
 
+    for (let i = 0; i < tokens.length - 1; i++) {
+      if (
+        this.isLastCharADigit(tokens[i]) &&
+        this.isFirstCharADigit(tokens[i + 1])
+      ) {
+        tokens[i] += " ";
+      }
+    }
     return tokens.join("");
+  }
+
+  private isLastCharADigit(s: string) {
+    const c = s[s.length - 1];
+    return c >= "0" && c <= "9";
+  }
+
+  private isFirstCharADigit(s: string) {
+    const c = s[0];
+    return c >= "0" && c <= "9";
   }
 
   private deserializeVector() {
@@ -140,10 +159,10 @@ export class LevelSerializer {
   }
 
   private serializeVector(v: Vector2) {
-    const x = v.x.toFixed(1);
-    const y = v.y.toFixed(1);
+    const x = v.x.toFixed(0);
+    const y = v.y.toFixed(0);
     const sep = y[0] === "-" ? "" : " ";
-    return " " + x + sep + y;
+    return x + sep + y;
   }
 
   private deserializeNumber() {
