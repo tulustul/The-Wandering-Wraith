@@ -10,6 +10,7 @@ export interface PlantDefinition {
 
 export function generateGrass(
   ctx: CanvasRenderingContext2D,
+  size: number,
   seed: number,
   time: number,
 ) {
@@ -21,14 +22,14 @@ export function generateGrass(
 
   ctx.strokeStyle = grd;
 
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 5; i++) {
+  ctx.lineWidth = 0.2;
+  for (let i = 0; i < 10; i++) {
     let pos = new Vector2((r.next_() % 10) + 25, 50);
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
     let angle = (r.nextFloat() - 0.5) / 10;
     let totalAngle = 0;
-    const length = (r.nextFloat() + 1) * 1.5;
+    const length = (r.nextFloat() + 1) * size;
     for (let j = 0; j < 10; j++) {
       const d = new Vector2(0, -1).rotate_(totalAngle).mul(length);
       pos = pos.copy().add_(d);
@@ -88,7 +89,7 @@ function drawTree(
   const newPos = pos.copy().add_(d);
 
   ctx.beginPath();
-  ctx.lineWidth = Math.pow(depth, 1);
+  ctx.lineWidth = Math.pow(depth, 0.9);
   ctx.moveTo(pos.x, pos.y);
   ctx.lineTo(newPos.x, newPos.y);
   ctx.stroke();
@@ -146,6 +147,7 @@ export async function animateTree(
 
 export async function animateGrass(
   spritesRenderer: SpriteRenderer,
+  size: number,
   seed: number,
 ): Promise<HTMLImageElement[]> {
   const frames: HTMLImageElement[] = [];
@@ -156,7 +158,9 @@ export async function animateGrass(
   for (let i = 0; i < framesCount; i++) {
     time = time += step;
     frames.push(
-      await spritesRenderer.render(ctx => generateGrass(ctx, seed, time)),
+      await spritesRenderer.render(ctx =>
+        generateGrass(ctx, size, seed, time),
+      ),
     );
   }
   return frames;

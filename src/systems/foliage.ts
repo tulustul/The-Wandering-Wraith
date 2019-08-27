@@ -34,10 +34,10 @@ export class FoliageSystem {
         const positions = this.findGround(engine, x, treeDefinition.mask);
         for (const pos of positions) {
           if (pos) {
-            const isForeground = r.nextFloat() > 0.7;
+            const isForeground = r.nextFloat() > 0.8;
             cell.push({
               pos: pos.add_(
-                new Vector2(0, (isForeground ? 10 : 0) + r.nextFloat() * 5),
+                new Vector2(0, (isForeground ? 5 : 0) + r.nextFloat() * 5),
               ),
               definition: treeDefinition,
               isForeground,
@@ -66,26 +66,25 @@ export class FoliageSystem {
       }
     }
 
-    let narrowChecks: [LineShape, Vector2][] = [];
+    let narrowChecks: [LineShape, Vector2, number][] = [];
     for (const line of linesToCheck) {
       const d = line.end_.copy().sub_(line.start_);
-      const a = d.y / d.x;
-      if (Math.abs(a) < 1.5) {
-        const b = line.start_.y - a * line.start_.x;
-        const crossPoint = new Vector2(x, a * x + b);
-        narrowChecks.push([line, crossPoint]);
-      }
+      const slope = d.y / d.x;
+
+      const b = line.start_.y - slope * line.start_.x;
+      const crossPoint = new Vector2(x, slope * x + b);
+      narrowChecks.push([line, crossPoint, slope]);
     }
 
-    narrowChecks.sort((checkA, checkB) => checkB[1].y - checkA[1].y);
+    narrowChecks.sort((checkA, checkB) => checkA[1].y - checkB[1].y);
 
     let add = false;
-    for (const [line, crossPoint] of narrowChecks) {
+    for (const [line, crossPoint, slope] of narrowChecks) {
       if (lineToPointColision(line.start_, line.end_, crossPoint)) {
-        if (add) {
+        add = !add;
+        if (Math.abs(slope) < 1.5 && add) {
           yield crossPoint;
         }
-        add = !add;
       }
     }
   }
