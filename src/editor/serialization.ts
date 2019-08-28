@@ -7,7 +7,7 @@ export class LevelSerializer {
 
     let localPos = new Vector2();
     let to: Vector2;
-    for (const pathCommand of level.pathCommands) {
+    for (const pathCommand of level.editorPathCommands!) {
       switch (pathCommand.type) {
         case PathCommandType.move:
           localPos = pathCommand.points![0];
@@ -28,6 +28,31 @@ export class LevelSerializer {
           break;
         case PathCommandType.close:
           tokens.push("z");
+      }
+    }
+
+    for (const o of level.objects!) {
+      switch (o.type) {
+        case "platform":
+          tokens.push("pP");
+          tokens.push(this.serializeVector(o.pos));
+          break;
+        case "hPlatform1":
+          tokens.push("ph");
+          tokens.push(this.serializeVector(o.pos));
+          break;
+        case "hPlatform2":
+          tokens.push("pH");
+          tokens.push(this.serializeVector(o.pos));
+          break;
+        case "vPlatform1":
+          tokens.push("pv");
+          tokens.push(this.serializeVector(o.pos));
+          break;
+        case "vPlatform2":
+          tokens.push("pV");
+          tokens.push(this.serializeVector(o.pos));
+          break;
       }
     }
 
@@ -53,8 +78,8 @@ export class LevelSerializer {
   }
 
   private serializeVector(v: Vector2) {
-    const x = v.x.toFixed(0);
-    const y = v.y.toFixed(0);
+    const x = (v.x / 10).toFixed(0);
+    const y = (v.y / 10).toFixed(0);
     const sep = y[0] === "-" ? "" : " ";
     return x + sep + y;
   }

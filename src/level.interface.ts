@@ -12,11 +12,16 @@ export interface PathCommand {
   points?: Vector2[];
 }
 
+export interface LevelObject {
+  type: string;
+  pos: Vector2;
+}
+
 export interface Level {
   size: Vector2;
   pathCommands: PathCommand[];
 
-  // #if process.env.NODE_ENV === 'development'
+  editorPathCommands?: PathCommand[];
   pointToCommandMap?: Map<Vector2, PathCommand>;
-  // #endif
+  objects?: LevelObject[];
 }

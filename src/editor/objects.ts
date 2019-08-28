@@ -2,19 +2,35 @@ import { Vector2 } from "../vector";
 import { Editor } from "./editor";
 import { PathCommand, PathCommandType } from "../level.interface";
 
-export type ObjectType = "shape";
+export type ObjectType =
+  | "polygon"
+  | "platform"
+  | "hPlatform1"
+  | "hPlatform2"
+  | "vPlatform1"
+  | "vPlatform2";
 
 export class EditorObjects {
   constructor(private editor: Editor) {}
 
   place(type: ObjectType, pos: Vector2) {
     switch (type) {
-      case "shape":
-        this.createShape(pos);
+      case "polygon":
+        this.createPolygon(pos);
+        break;
+      case "platform":
+      case "hPlatform1":
+      case "hPlatform2":
+      case "vPlatform1":
+      case "vPlatform2":
+        const platform = { type, pos };
+        this.editor.engine.level.objects!.push(platform);
+        this.pointsMap.set(pos, platform as any);
+        break;
     }
   }
 
-  private createShape(pos: Vector2) {
+  private createPolygon(pos: Vector2) {
     const commands = this.editor.engine.level.pathCommands;
 
     let to = pos.copy();

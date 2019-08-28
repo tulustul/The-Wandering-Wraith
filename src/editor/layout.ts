@@ -57,7 +57,7 @@ export const EDITOR_HTML = `
   <button id="spawn-plants">Spawn plants</button>
   <button id="get-player-position">Get player position</button>
   <button id="move-player">Move player</button>
-  <button id="regenerate-colisions">Regenerate colisions</button>
+  <button id="regenerate-level">Regenerate level</button>
 
   <div class="line">
     <label><input type="radio" name="mode" value="edit">Edit</label>
@@ -70,7 +70,12 @@ export const EDITOR_HTML = `
     Add
     <select id="object-type">
       <option value="">-</option>
-      <option value="shape">Shape</option>
+      <option value="polygon">polygon</option>
+      <option value="platform">platform</option>
+      <option value="hPlatform1">hPlatform1</option>
+      <option value="hPlatform2">hPlatform2</option>
+      <option value="vPlatform1">vPlatform1</option>
+      <option value="vPlatform2">vPlatform2</option>
     </select>
   </label>
 </div>

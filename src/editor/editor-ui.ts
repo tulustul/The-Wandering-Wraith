@@ -39,7 +39,7 @@ export class EditorUI {
       console.log(this.engine.player.body_.pos);
     });
 
-    this.listeners.listen("regenerate-colisions", "click", () => {
+    this.listeners.listen("regenerate-level", "click", () => {
       this.engine.physics.staticBodies = [];
       this.engine.physics.staticGrid.clear();
       const level = new LevelSerializer().serialize(this.engine.level);

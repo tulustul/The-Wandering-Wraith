@@ -25,6 +25,7 @@ export class EditorRenderer {
       this.drawPlantsHelpers();
     }
 
+    this.drawObjects();
     this.drawControlPoints();
     this.drawAreaSelection();
   }
@@ -85,7 +86,7 @@ export class EditorRenderer {
     ctx.strokeStyle = "red";
     let to: Vector2;
     let lastPoint: Vector2;
-    for (const pathCommand of this.editor.engine.level.pathCommands) {
+    for (const pathCommand of this.editor.engine.level.editorPathCommands!) {
       switch (pathCommand.type) {
         case PathCommandType.move:
           to = pathCommand.points![0];
@@ -117,6 +118,10 @@ export class EditorRenderer {
           ctx.stroke();
           break;
       }
+    }
+
+    for (const o of this.editor.engine.level.objects!) {
+      this.drawPoint(ctx, o.pos, "blue");
     }
   }
 
@@ -167,6 +172,36 @@ export class EditorRenderer {
       const relTo = to.copy().sub_(from);
       this.ctx.rect(from.x, from.y, relTo.x, relTo.y);
       this.ctx.fill();
+    }
+  }
+
+  private drawObjects() {
+    const sizes: { [key: string]: [number, number] } = {
+      platform: [15, 5],
+      hPlatform1: [40, 10],
+      hPlatform2: [80, 10],
+      vPlatform1: [10, 40],
+      vPlatform2: [10, 80],
+    };
+
+    for (const o of this.editor.engine.level.objects!) {
+      const size = sizes[o.type];
+      switch (o.type) {
+        case "platform":
+        case "hPlatform1":
+        case "hPlatform2":
+        case "vPlatform1":
+        case "vPlatform2":
+          this.ctx.fillStyle = "#ff02";
+          this.ctx.rect(
+            o.pos.x - size[0],
+            o.pos.y - size[1],
+            size[0] * 2,
+            size[1] * 2,
+          );
+          this.ctx.fill();
+          break;
+      }
     }
   }
 }
