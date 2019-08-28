@@ -24,7 +24,7 @@ export function generateGrass(
 
   ctx.lineWidth = 0.2;
   for (let i = 0; i < 10; i++) {
-    let pos = new Vector2((r.next_() % 10) + 25, 50);
+    let pos = new Vector2((r.next_() % 10) + 20, 50);
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
     let angle = (r.nextFloat() - 0.5) / 10;
@@ -151,7 +151,7 @@ export async function animateGrass(
   seed: number,
 ): Promise<HTMLImageElement[]> {
   const frames: HTMLImageElement[] = [];
-  spritesRenderer.setSize(100, 50);
+  spritesRenderer.setSize(50, 50);
   const framesCount = 30;
   const step = (Math.PI * 2) / framesCount;
   let time = Math.PI / 2;

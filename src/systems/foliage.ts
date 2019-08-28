@@ -19,14 +19,14 @@ export class FoliageSystem {
 
   async spawnFoliage(engine: Engine) {
     this.entities_ = [];
-    for (let x = 0; x < engine.worldWidth; x += this.GRID_SIZE) {
+    for (let x = 0; x < engine.level.size.x; x += this.GRID_SIZE) {
       this.entities_.push([]);
     }
     const r = new Random(1);
 
     for (const treeDefinition of assets.plants) {
       let x = 500 + r.nextFloat() * treeDefinition.spread;
-      while (x < engine.worldWidth - 500) {
+      while (x < engine.level.size.x - 500) {
         x +=
           treeDefinition.spread +
           treeDefinition.spread * (r.nextFloat() - 0.5);
@@ -51,7 +51,7 @@ export class FoliageSystem {
   *findGround(engine: Engine, x: number, hitMask: number) {
     const cells = new LineShape(
       new Vector2(x, 0),
-      new Vector2(x, engine.worldHeight),
+      new Vector2(x, engine.level.size.y),
     ).getCells();
 
     const linesToCheck = new Set<LineShape>();

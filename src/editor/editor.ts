@@ -2,7 +2,6 @@ import { Engine } from "../engine";
 import { EditorRenderer } from "./editor-renderer";
 import { LevelSerializer } from "./serialization";
 import { LEVELS } from "../levels";
-import { Level } from "./level.interface";
 import { Manipulator } from "./manipulator";
 import { EditorUI } from "./editor-ui";
 import { Vector2 } from "../vector";
@@ -18,8 +17,6 @@ export class Editor {
   drawPlantsHelpers = false;
 
   mode: EditorMode = "edit";
-
-  level: Level;
 
   originalRenderFn: () => void;
 
@@ -48,8 +45,6 @@ export class Editor {
       () => this.updateControls(),
       17,
     );
-
-    this.level = new LevelSerializer().deserialize(LEVELS[0]);
 
     this.setMode("edit");
 
@@ -93,21 +88,25 @@ export class Editor {
   updateControls() {
     if (this.initialized && this.mode !== "play") {
       const pos = this.engine.camera.target;
+      let speed = 10;
+      if (this.engine.control_.keys_.get("ShiftLeft")) {
+        speed = 30;
+      }
       if (this.engine.control_.keys_.get("KeyW")) {
-        pos.y -= 10;
-        this.manipulator.move(new Vector2(0, -10));
+        pos.y -= speed;
+        this.manipulator.move(new Vector2(0, -speed));
       }
       if (this.engine.control_.keys_.get("KeyS")) {
-        pos.y += 10;
-        this.manipulator.move(new Vector2(0, 10));
+        pos.y += speed;
+        this.manipulator.move(new Vector2(0, speed));
       }
       if (this.engine.control_.keys_.get("KeyA")) {
-        pos.x -= 10;
-        this.manipulator.move(new Vector2(-10, 0));
+        pos.x -= speed;
+        this.manipulator.move(new Vector2(-speed, 0));
       }
       if (this.engine.control_.keys_.get("KeyD")) {
-        pos.x += 10;
-        this.manipulator.move(new Vector2(10, 0));
+        pos.x += speed;
+        this.manipulator.move(new Vector2(speed, 0));
       }
     }
   }

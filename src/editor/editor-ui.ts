@@ -2,6 +2,7 @@ import { Editor, EditorMode } from "./editor";
 import { EDITOR_STYLES, EDITOR_HTML } from "./layout";
 import { LevelSerializer } from "./serialization";
 import { Listeners } from "./listeners";
+import { loadLevel, LevelParser } from "../loader";
 
 export class EditorUI {
   private listeners = new Listeners();
@@ -38,8 +39,17 @@ export class EditorUI {
       console.log(this.engine.player.body_.pos);
     });
 
+    this.listeners.listen("regenerate-colisions", "click", () => {
+      this.engine.physics.staticBodies = [];
+      this.engine.physics.staticGrid.clear();
+      const level = new LevelSerializer().serialize(this.engine.level);
+      new LevelParser(this.engine, level).parse_();
+    });
+
     this.listeners.listen("generate-level-string", "click", () => {
-      const levelString = new LevelSerializer().serialize(this.editor.level);
+      const levelString = new LevelSerializer().serialize(
+        this.editor.engine.level,
+      );
       const textarea = document.getElementById(
         "level-string",
       ) as HTMLTextAreaElement;

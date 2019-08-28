@@ -1,6 +1,6 @@
 import { Editor } from "./editor";
 import { Vector2 } from "../vector";
-import { MoveCommand, LineCommand, BezierCommand } from "./level.interface";
+import { PathCommandType } from "../level.interface";
 
 export class EditorRenderer {
   ctx: CanvasRenderingContext2D;
@@ -10,6 +10,13 @@ export class EditorRenderer {
   render(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
 
+    this.engine.renderer.systemsRenderer.terrainLayer.activate();
+    this.engine.renderer.systemsRenderer.terrainLayer.clearCanvas();
+    this.engine.renderer.systemsRenderer.renderTerrain();
+
+    this.engine.renderer.systemsRenderer.foliageForegroundLayer.activate();
+    this.drawPaths();
+
     if (this.editor.drawColisionHelpers) {
       this.drawColisionHelpers();
     }
@@ -18,17 +25,12 @@ export class EditorRenderer {
       this.drawPlantsHelpers();
     }
 
-    this.drawPaths();
     this.drawControlPoints();
     this.drawAreaSelection();
   }
 
   private get engine() {
     return this.editor.engine;
-  }
-
-  private get systemsRenderer() {
-    return this.engine.renderer.systemsRenderer;
   }
 
   private drawColisionHelpers() {
@@ -83,68 +85,62 @@ export class EditorRenderer {
     ctx.strokeStyle = "red";
     let to: Vector2;
     let lastPoint: Vector2;
-    for (const pathCommand of this.editor.level.pathCommands) {
+    for (const pathCommand of this.editor.engine.level.pathCommands) {
       switch (pathCommand.type) {
-        case "moveTo":
-          to = (pathCommand as MoveCommand).to;
+        case PathCommandType.move:
+          to = pathCommand.points![0];
           this.drawPoint(ctx, to, "blue");
           lastPoint = to;
           break;
-        case "lineTo":
-          to = (pathCommand as LineCommand).to;
+        case PathCommandType.line:
+          to = pathCommand.points![0];
           this.drawPoint(ctx, to, "darkorange");
           lastPoint = to;
           break;
-        case "bezierTo":
-          to = (pathCommand as BezierCommand).to;
-          const c1 = (pathCommand as BezierCommand).c1;
-          const c2 = (pathCommand as BezierCommand).c2;
-          this.drawPoint(ctx, to, "darkorange");
+        case PathCommandType.bezier:
+          const [c1, c2, to_] = pathCommand.points!;
           this.drawPoint(ctx, c1, "red");
           this.drawPoint(ctx, c2, "red");
+          this.drawPoint(ctx, to_, "darkorange");
           ctx.beginPath();
           ctx.moveTo(lastPoint!.x, lastPoint!.y);
           ctx.lineTo(c1.x, c1.y);
           ctx.stroke();
           ctx.beginPath();
-          ctx.moveTo(to.x, to.y);
+          ctx.moveTo(to_.x, to_.y);
           ctx.lineTo(c2.x, c2.y);
           ctx.stroke();
-          lastPoint = to;
+          lastPoint = to_;
           break;
-        case "close":
+        case PathCommandType.close:
           ctx.closePath();
+          ctx.stroke();
           break;
       }
     }
   }
 
   private drawPaths() {
-    const ctx = this.systemsRenderer.ctx;
     let to: Vector2;
-    ctx.fillStyle = "#ff02";
-    ctx.strokeStyle = "orange";
-    ctx.lineWidth = 2;
-    for (const pathCommand of this.editor.level.pathCommands) {
+    this.ctx.strokeStyle = "yellow";
+    for (const pathCommand of this.engine.level.pathCommands) {
       switch (pathCommand.type) {
-        case "moveTo":
-          to = (pathCommand as MoveCommand).to;
-          ctx.beginPath();
-          ctx.moveTo(to.x, to.y);
+        case PathCommandType.move:
+          to = pathCommand.points![0];
+          this.ctx.beginPath();
+          this.ctx.moveTo(to.x, to.y);
           break;
-        case "lineTo":
-          to = (pathCommand as LineCommand).to;
-          ctx.lineTo(to.x, to.y);
+        case PathCommandType.line:
+          to = pathCommand.points![0];
+          this.ctx.lineTo(to.x, to.y);
           break;
-        case "bezierTo":
-          to = (pathCommand as BezierCommand).to;
-          const c1 = (pathCommand as BezierCommand).c1;
-          const c2 = (pathCommand as BezierCommand).c2;
-          ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to.x, to.y);
+        case PathCommandType.bezier:
+          const [c1, c2, to_] = pathCommand.points!;
+          this.ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to_.x, to_.y);
           break;
-        case "close":
-          ctx.closePath();
-          ctx.fill();
+        case PathCommandType.close:
+          this.ctx.closePath();
+          this.ctx.stroke();
           break;
       }
     }

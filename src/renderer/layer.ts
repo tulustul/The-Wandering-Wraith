@@ -47,8 +47,8 @@ export class Layer {
   updateSize(force = true) {
     if (this.renderWholeWorld) {
       if (force) {
-        this.canvas_.width = this.engine.worldWidth;
-        this.canvas_.height = this.engine.worldHeight;
+        this.canvas_.width = this.engine.level.size.x;
+        this.canvas_.height = this.engine.level.size.y;
       }
     } else {
       this.canvas_.width = this.engine.canvas_.width;

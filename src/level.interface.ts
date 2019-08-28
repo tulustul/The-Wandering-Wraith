@@ -7,11 +7,16 @@ export enum PathCommandType {
   close,
 }
 
-export interface PathSegment {
+export interface PathCommand {
   type: PathCommandType;
   points?: Vector2[];
 }
 
 export interface Level {
-  pathCommands: PathSegment[];
+  size: Vector2;
+  pathCommands: PathCommand[];
+
+  // #if process.env.NODE_ENV === 'development'
+  pointToCommandMap?: Map<Vector2, PathCommand>;
+  // #endif
 }

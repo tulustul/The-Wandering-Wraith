@@ -16,10 +16,6 @@ import { Editor } from "./editor/editor";
 export class Engine {
   time_ = 0;
 
-  // just let the logic flow
-  worldWidth = 1;
-  worldHeight = 1;
-
   // sound = new Sound();
 
   animations = new AnimationsManager();
@@ -36,7 +32,7 @@ export class Engine {
 
   camera = new Camera(this);
 
-  level: Level = { pathCommands: [] };
+  level: Level = { size: new Vector2(), pathCommands: [] };
 
   // #if process.env.NODE_ENV === 'development'
   editor = new Editor(this);

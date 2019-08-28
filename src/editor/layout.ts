@@ -57,6 +57,7 @@ export const EDITOR_HTML = `
   <button id="spawn-plants">Spawn plants</button>
   <button id="get-player-position">Get player position</button>
   <button id="move-player">Move player</button>
+  <button id="regenerate-colisions">Regenerate colisions</button>
 
   <div class="line">
     <label><input type="radio" name="mode" value="edit">Edit</label>

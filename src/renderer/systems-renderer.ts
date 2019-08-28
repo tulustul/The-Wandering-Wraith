@@ -54,10 +54,6 @@ export class SystemsRenderer {
     return this.engine.renderer.ctx;
   }
 
-  // get renderer() {
-  //   return this.engine.renderer;
-  // }
-
   renderTerrain() {
     let to: Vector2;
     this.ctx.fillStyle = "#000";
@@ -73,7 +69,7 @@ export class SystemsRenderer {
           this.ctx.lineTo(to.x, to.y);
           break;
         case PathCommandType.bezier:
-          const [to_, c1, c2] = pathCommand.points!;
+          const [c1, c2, to_] = pathCommand.points!;
           this.ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, to_.x, to_.y);
           break;
         case PathCommandType.close:
@@ -230,7 +226,7 @@ export class SystemsRenderer {
         const image = foliage.definition.frames[frame];
         this.ctx.drawImage(
           image,
-          foliage.pos.x - image.width / 3,
+          foliage.pos.x - image.width / 2,
           foliage.pos.y - image.height + 5,
         );
       }
