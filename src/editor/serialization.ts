@@ -1,27 +1,40 @@
 import { Vector2 } from "../vector";
 import { Level, PathCommandType } from "../level.interface";
 
+const COMMAND_MAP = {
+  [PathCommandType.move]: "m",
+  [PathCommandType.line]: "l",
+  [PathCommandType.bezier]: "c",
+  [PathCommandType.close]: "c",
+};
+
 export class LevelSerializer {
   serialize(level: Level): string {
     const tokens: string[] = [this.serializeVector(level.size)];
 
     let localPos = new Vector2();
     let to: Vector2;
+    let lastCommand = "m";
     for (const pathCommand of level.editorPathCommands!) {
+      const command = COMMAND_MAP[pathCommand.type];
+      if (lastCommand !== command) {
+        tokens.push(command);
+        lastCommand = command;
+      }
       switch (pathCommand.type) {
         case PathCommandType.move:
           localPos = pathCommand.points![0];
-          tokens.push("m" + this.serializeVector(localPos));
+          tokens.push(this.serializeVector(localPos));
           break;
         case PathCommandType.line:
           to = pathCommand.points![0].copy();
-          tokens.push("l" + this.serializeVector(to.copy().sub_(localPos)));
+          tokens.push(this.serializeVector(to.copy().sub_(localPos)));
           localPos = to.copy();
           break;
         case PathCommandType.bezier:
           const [c1, c2, to_] = pathCommand.points!;
 
-          tokens.push("c" + this.serializeVector(c1.copy().sub_(localPos)));
+          tokens.push(this.serializeVector(c1.copy().sub_(localPos)));
           tokens.push(this.serializeVector(c2.copy().sub_(localPos)));
           tokens.push(this.serializeVector(to_.copy().sub_(localPos)));
           localPos = to_.copy();
@@ -31,26 +44,27 @@ export class LevelSerializer {
       }
     }
 
+    tokens.push("p");
     for (const o of level.objects!) {
       switch (o.type) {
         case "platform":
-          tokens.push("pP");
+          tokens.push("P");
           tokens.push(this.serializeVector(o.pos));
           break;
         case "hPlatform1":
-          tokens.push("ph");
+          tokens.push("h");
           tokens.push(this.serializeVector(o.pos));
           break;
         case "hPlatform2":
-          tokens.push("pH");
+          tokens.push("H");
           tokens.push(this.serializeVector(o.pos));
           break;
         case "vPlatform1":
-          tokens.push("pv");
+          tokens.push("v");
           tokens.push(this.serializeVector(o.pos));
           break;
         case "vPlatform2":
-          tokens.push("pV");
+          tokens.push("V");
           tokens.push(this.serializeVector(o.pos));
           break;
       }

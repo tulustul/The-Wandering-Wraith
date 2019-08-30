@@ -49,7 +49,7 @@ export class LevelParser {
     this.engine.level.objects = objects;
     // #endif
 
-    let command!: string;
+    let command = "m";
     let firstPoint: Vector2 | null = null;
     let c = this.d[this.index - 1];
     while (c) {
@@ -178,7 +178,7 @@ export class LevelParser {
   private parseNumber() {
     let number = this.d[this.index - 1];
     let c = this.next();
-    while ((c >= "0" && c <= "9") || c == ".") {
+    while (c >= "0" && c <= "9") {
       number += c;
       c = this.next();
     }
