@@ -35,19 +35,6 @@ export abstract class Shape {
   }
 }
 
-export class PointShape extends Shape {
-  constructor(public pos: Vector2) {
-    super();
-  }
-
-  *getCells() {
-    yield getIndexOfCell(
-      Math.floor(this.pos.x / GRID_SIZE),
-      Math.floor(this.pos.y / GRID_SIZE),
-    );
-  }
-}
-
 export class CircleShape extends Shape {
   constructor(public pos: Vector2, public radius: number) {
     super();

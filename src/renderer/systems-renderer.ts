@@ -57,6 +57,8 @@ export class SystemsRenderer {
   renderTerrain() {
     let to: Vector2;
     this.ctx.fillStyle = "#000";
+    this.ctx.strokeStyle = "#111";
+    this.ctx.lineWidth = 5;
     for (const pathCommand of this.engine.level.pathCommands) {
       switch (pathCommand.type) {
         case PathCommandType.move:
@@ -75,15 +77,28 @@ export class SystemsRenderer {
         case PathCommandType.close:
           this.ctx.closePath();
           this.ctx.fill();
+          this.ctx.stroke();
           break;
       }
     }
   }
 
+  renderPlatforms() {
+    this.ctx.strokeStyle = "#000";
+    this.ctx.lineWidth = 1;
+    for (const p of this.engine.level.platforms) {
+      var grd = this.ctx.createLinearGradient(0, p.y, 0, p.y + p.h);
+      grd.addColorStop(0, "#333");
+      grd.addColorStop(1, "#000");
+      this.ctx.fillStyle = grd;
+      this.ctx.rect(p.x, p.y, p.w, p.h);
+      this.ctx.fill();
+      this.ctx.stroke();
+    }
+  }
+
   renderPlayer() {
     const ctx = this.ctx;
-    ctx.fillStyle = "#222";
-    ctx.globalCompositeOperation = "source-over";
 
     const player = this.engine.player;
 
@@ -238,6 +253,7 @@ export class SystemsRenderer {
     this.renderSky();
 
     this.terrainLayer.activate();
+    this.renderPlatforms();
     this.renderTerrain();
 
     this.hills1.activate();

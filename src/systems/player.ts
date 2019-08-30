@@ -18,7 +18,9 @@ interface AgentAnimation {
 export class Player {
   STEPS_RATE = 270;
 
-  ACCELERATION = 0.7;
+  ACCELERATION = 3.7;
+
+  JUMP_ACCELERATION = 0.3;
 
   currentStep = 0;
 
@@ -59,7 +61,7 @@ export class Player {
       receiveMask: PLAYER_MASK,
       hitMask: GROUND_MASK,
       pos: pos,
-      friction: 0.4,
+      friction: 0.7,
       vel: new Vector2(0, 0),
     });
   }
@@ -68,7 +70,7 @@ export class Player {
     this.isRunning = !!this.body_.contactPoints.length;
     let accScalar = this.ACCELERATION;
     if (!this.body_.contactPoints.length) {
-      accScalar /= 3;
+      accScalar = this.JUMP_ACCELERATION;
     }
     const acc = new Vector2(0, accScalar).rotate_(direction);
     this.updateVelocity(acc);

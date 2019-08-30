@@ -32,7 +32,7 @@ export class Engine {
 
   camera = new Camera(this);
 
-  level: Level = { size: new Vector2(), pathCommands: [] };
+  level: Level = { size: new Vector2(), pathCommands: [], platforms: [] };
 
   // #if process.env.NODE_ENV === 'development'
   editor = new Editor(this);

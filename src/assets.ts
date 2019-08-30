@@ -1,6 +1,6 @@
 import { PlantDefinition, animateTree, animateGrass } from "./plants";
 import { SpriteRenderer } from "./renderer/sprite-renderer";
-import { TREE_GROUND_MASK, GROUND_MASK } from "./colisions-masks";
+import { TREE_GROUND_MASK, GROUND_MASK, GRASS_MASK } from "./colisions-masks";
 import { Random } from "./random";
 
 interface Assets {
@@ -49,7 +49,7 @@ async function preparePlants(): Promise<PlantDefinition[]> {
     plants.push({
       frames: await animateGrass(sr, 0.8 + i * 0.5, i),
       spread: 5,
-      mask: GROUND_MASK,
+      mask: GRASS_MASK,
     });
   }
   return plants;

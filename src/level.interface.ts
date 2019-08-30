@@ -17,9 +17,17 @@ export interface LevelObject {
   pos: Vector2;
 }
 
+export interface Platform {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface Level {
   size: Vector2;
   pathCommands: PathCommand[];
+  platforms: Platform[];
 
   editorPathCommands?: PathCommand[];
   pointToCommandMap?: Map<Vector2, PathCommand>;

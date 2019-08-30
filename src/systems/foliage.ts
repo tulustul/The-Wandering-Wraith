@@ -1,7 +1,6 @@
 import { Engine } from "../engine";
 
 import { Vector2 } from "../vector";
-import { TREE_GROUND_MASK } from "../colisions-masks";
 import { Random } from "../random";
 import { PlantDefinition } from "../plants";
 import { assets } from "../assets";

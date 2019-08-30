@@ -1,10 +1,15 @@
 import { Engine } from "./engine";
 import { Vector2 } from "./vector";
 import { generateBezierSegments } from "./bezier";
-import { GROUND_MASK, TREE_GROUND_MASK } from "./colisions-masks";
+import { GROUND_MASK, TREE_GROUND_MASK, GRASS_MASK } from "./colisions-masks";
 import { LineShape } from "./systems/physics/shapes";
 import { LEVELS } from "./levels";
-import { PathCommandType, PathCommand, LevelObject } from "./level.interface";
+import {
+  PathCommandType,
+  PathCommand,
+  LevelObject,
+  Platform,
+} from "./level.interface";
 
 // m - move to, (x y)
 // l - line to, (x y)+
@@ -26,9 +31,11 @@ export class LevelParser {
   parse_() {
     this.next();
     const pathCommands: PathCommand[] = [];
+    const platforms: Platform[] = [];
     this.engine.level = {
       size: this.parseVector(),
       pathCommands,
+      platforms,
     };
 
     // #if process.env.NODE_ENV === 'development'
@@ -83,7 +90,7 @@ export class LevelParser {
             type: PathCommandType.line,
             points: [points[1]],
           });
-          this.addStatic(points[0], points[1]);
+          this.addStatic(points[0], points[1], GRASS_MASK | TREE_GROUND_MASK);
           // #if process.env.NODE_ENV === 'development'
           pointsMap.set(points[1], pathCommands[pathCommands.length - 1]);
           editorPathCommands.push(pathCommands[pathCommands.length - 1]);
@@ -105,7 +112,7 @@ export class LevelParser {
             0.1,
           );
           for (const [p1, p2] of interpolatedPoints) {
-            this.addStatic(p1, p2);
+            this.addStatic(p1, p2, GRASS_MASK | TREE_GROUND_MASK);
           }
           // #if process.env.NODE_ENV === 'development'
           for (const p of points) {
@@ -124,7 +131,14 @@ export class LevelParser {
             v: [10, 40],
             V: [10, 80],
           };
-          this.generatePlatform(pathCommands, pos, ...sizes[c]);
+          const [w, h] = sizes[c];
+          platforms.push({
+            x: pos.x - w,
+            y: pos.y - h,
+            w: sizes[c][0] * 2,
+            h: sizes[c][1] * 2,
+          });
+          this.generatePlatform(pos, w, h);
           // #if process.env.NODE_ENV === 'development'
           const types: { [key: string]: string } = {
             P: "platform",
@@ -142,12 +156,7 @@ export class LevelParser {
     }
   }
 
-  private generatePlatform(
-    pathCommands: PathCommand[],
-    pos: Vector2,
-    w: number,
-    h: number,
-  ) {
+  private generatePlatform(pos: Vector2, w: number, h: number) {
     const [a, b, c, d] = [
       pos.copy().add_(new Vector2(-w, -h)),
       pos.copy().add_(new Vector2(w, -h)),
@@ -155,28 +164,11 @@ export class LevelParser {
       pos.copy().add_(new Vector2(-w, h)),
     ];
 
-    pathCommands.push({
-      type: PathCommandType.move,
-      points: [a],
-    });
-    pathCommands.push({
-      type: PathCommandType.line,
-      points: [b],
-    });
-    pathCommands.push({
-      type: PathCommandType.line,
-      points: [c],
-    });
-    pathCommands.push({
-      type: PathCommandType.line,
-      points: [d],
-    });
-    pathCommands.push({ type: PathCommandType.close });
-
-    this.addStatic(a, b);
-    this.addStatic(b, c);
-    this.addStatic(c, d);
-    this.addStatic(d, a);
+    const mask = w > 50 ? GRASS_MASK : 0;
+    this.addStatic(a, b, mask);
+    this.addStatic(b, c, mask);
+    this.addStatic(c, d, mask);
+    this.addStatic(d, a, mask);
   }
 
   private parseVector() {
@@ -197,10 +189,10 @@ export class LevelParser {
     return this.d[this.index++];
   }
 
-  private addStatic(from_: Vector2, to_: Vector2) {
+  private addStatic(from_: Vector2, to_: Vector2, mask = 0) {
     this.engine.physics.addStatic({
       shape_: new LineShape(from_, to_),
-      receiveMask: TREE_GROUND_MASK | GROUND_MASK,
+      receiveMask: GROUND_MASK | mask,
       pos: new Vector2(0, 0),
     });
   }

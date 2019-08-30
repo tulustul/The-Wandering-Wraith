@@ -10,9 +10,12 @@ export class EditorRenderer {
   render(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
 
-    this.engine.renderer.systemsRenderer.terrainLayer.activate();
-    this.engine.renderer.systemsRenderer.terrainLayer.clearCanvas();
-    this.engine.renderer.systemsRenderer.renderTerrain();
+    if (Math.round(this.engine.time_) % 500 === 0) {
+      this.engine.renderer.systemsRenderer.terrainLayer.activate();
+      this.engine.renderer.systemsRenderer.terrainLayer.clearCanvas();
+      this.engine.renderer.systemsRenderer.renderTerrain();
+      this.engine.renderer.systemsRenderer.renderPlatforms();
+    }
 
     this.engine.renderer.systemsRenderer.foliageForegroundLayer.activate();
     this.drawPaths();
@@ -128,6 +131,7 @@ export class EditorRenderer {
   private drawPaths() {
     let to: Vector2;
     this.ctx.strokeStyle = "yellow";
+    this.ctx.fillStyle = "transparent";
     for (const pathCommand of this.engine.level.pathCommands) {
       switch (pathCommand.type) {
         case PathCommandType.move:
@@ -193,13 +197,12 @@ export class EditorRenderer {
         case "vPlatform1":
         case "vPlatform2":
           this.ctx.fillStyle = "#ff02";
-          this.ctx.rect(
+          this.ctx.fillRect(
             o.pos.x - size[0],
             o.pos.y - size[1],
             size[0] * 2,
             size[1] * 2,
           );
-          this.ctx.fill();
           break;
       }
     }

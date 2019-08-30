@@ -2,7 +2,7 @@ import { Editor, EditorMode } from "./editor";
 import { EDITOR_STYLES, EDITOR_HTML } from "./layout";
 import { LevelSerializer } from "./serialization";
 import { Listeners } from "./listeners";
-import { loadLevel, LevelParser } from "../loader";
+import { LevelParser } from "../loader";
 
 export class EditorUI {
   private listeners = new Listeners();

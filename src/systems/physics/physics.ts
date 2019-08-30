@@ -10,8 +10,6 @@ import { Vector2 } from "../../vector";
 
 type ColisionGrid = Map<number, Body[]>;
 
-// type ColisionCallback = (colision: Colision) => void;
-
 export class PhysicsSystem {
   staticGrid: ColisionGrid = new Map();
 
@@ -20,8 +18,6 @@ export class PhysicsSystem {
   staticBodies: StaticBody[] = [];
 
   dynamicBodies: DynamicBody[] = [];
-
-  // listeners = new Map<Function, ColisionCallback[]>();
 
   addStatic(body: StaticBody) {
     this.staticBodies.push(body);
@@ -67,13 +63,6 @@ export class PhysicsSystem {
     this.resolveColisions(colisions);
   }
 
-  // listenColisions(hitterClass: Function, callback: ColisionCallback) {
-  //   if (!this.listeners.has(hitterClass)) {
-  //     this.listeners.set(hitterClass, []);
-  //   }
-  //   this.listeners.get(hitterClass)!.push(callback);
-  // }
-
   applyImpulse(body: DynamicBody, impulse: Vector2) {
     body.vel.add_(impulse.copy());
   }
@@ -92,15 +81,16 @@ export class PhysicsSystem {
           .sub_(body.pos)
           .rotate_(Math.PI / 2)
           .angle_();
-
         const friction =
           Math.min(body.friction, body.vel.length_()) * Math.sin(posAngle);
-
         const frictionForce = body.vel
           .copy()
           .normalize_()
           .mul(-friction);
         body.vel.add_(frictionForce);
+      } else {
+        // air friction
+        body.vel.x *= 0.95;
       }
 
       body.pos.add_(body.vel);
@@ -179,20 +169,25 @@ export class PhysicsSystem {
   private resolveColisions(colisions: IterableIterator<Colision>) {
     for (const colision of colisions) {
       colision.hitter.pos.add_(colision.penetration);
-      colision.hitter.contactPoints.push(colision.point);
-      // if (colision.receiver.shape instanceof CircleShape) {
-      //   const receiver = colision.receiver as DynamicPhysicalEntity;
-      //   receiver.contactPoints.push(colision.point);
-      //   const relativeVel = receiver.vel.copy().add(colision.hitter.vel);
-      //   const normal = colision.penetration.copy().normalize();
-      //   const j =
-      //     relativeVel.length() *
-      //     (1 / receiver.weight + 1 / colision.hitter.weight);
-      //   receiver.vel.add(normal.copy().mul(-j / receiver.weight));
-      //   colision.hitter.vel.add(normal.copy().mul(j / colision.hitter.weight));
-      // } else {
-      colision.hitter.vel.add_(colision.penetration);
+
+      // colision.hitter.vel.add_(colision.penetration);
+      if (colision.hitter.vel.x ^ colision.penetration.x) {
+        // colision.hitter.vel.x += colision.penetration.x
+        colision.hitter.vel.x = 0;
+      }
+
+      // if (colision.hitter.vel.y ^ colision.penetration.y) {
+      //   colision.hitter.vel.y = 0.3;
       // }
+      colision.hitter.vel.y += colision.penetration.y;
+
+      // const v = colision.hitter.vel
+      //   .copy()
+      //   .normalize_()
+      //   .directionTo(colision.penetration.copy().normalize_());
+      // colision.hitter.vel.mul(Math.cos(v * 2));
+
+      colision.hitter.contactPoints.push(colision.point);
     }
   }
 
