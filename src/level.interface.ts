@@ -34,7 +34,6 @@ export interface Level {
   platforms: Platform[];
   savepoints: number[];
 
-  editorPathCommands?: PathCommand[];
   pointToCommandMap?: Map<Vector2, PathCommand>;
   objects?: LevelObject[];
 }

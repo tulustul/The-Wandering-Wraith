@@ -135,9 +135,9 @@ export class Manipulator {
   }
 
   private cutAfterPoint(pathCommand: PathCommand) {
-    const index = this.editorPathCommands.indexOf(pathCommand);
+    const index = this.pathCommands.indexOf(pathCommand);
     if (index !== -1) {
-      const nextPathCommand = this.editorPathCommands[index + 1];
+      const nextPathCommand = this.pathCommands[index + 1];
       if (
         nextPathCommand.type === PathCommandType.line ||
         nextPathCommand.type === PathCommandType.bezier
@@ -152,7 +152,6 @@ export class Manipulator {
           isDeadly: pathCommand.isDeadly,
         };
         this.pathCommands.splice(index + 1, 0, newCommand);
-        this.editorPathCommands.splice(index + 1, 0, newCommand);
         this.pointsMap!.set(newPoint, newCommand);
       }
     }
@@ -164,9 +163,9 @@ export class Manipulator {
       this.pathCommands.splice(index, 1);
     }
 
-    index = this.editorPathCommands.indexOf(object);
+    index = this.pathCommands.indexOf(object);
     if (index !== -1) {
-      this.editorPathCommands.splice(index, 1);
+      this.pathCommands.splice(index, 1);
     }
 
     index = this.objects.indexOf(object);
@@ -210,10 +209,6 @@ export class Manipulator {
 
   get pathCommands() {
     return this.level.pathCommands;
-  }
-
-  get editorPathCommands() {
-    return this.level.editorPathCommands!;
   }
 
   get objects() {

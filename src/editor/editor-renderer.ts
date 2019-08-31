@@ -97,7 +97,7 @@ export class EditorRenderer {
     ctx.strokeStyle = "red";
     let to: Vector2;
     let lastPoint: Vector2;
-    for (const pathCommand of this.editor.engine.level.editorPathCommands!) {
+    for (const pathCommand of this.editor.engine.level.pathCommands!) {
       switch (pathCommand.type) {
         case PathCommandType.move:
           to = pathCommand.points![0];

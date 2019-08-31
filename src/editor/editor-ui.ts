@@ -4,6 +4,8 @@ import { LevelSerializer } from "./serialization";
 import { Listeners } from "./listeners";
 import { LevelParser } from "../loader";
 import { CanBeDeadly } from "../level.interface";
+import { LEVELS } from "../levels";
+import { Vector2 } from "../vector";
 
 export class EditorUI {
   private listeners = new Listeners();
@@ -83,6 +85,14 @@ export class EditorUI {
       this.editor.manipulator.objectToAdd = objectToAdd as any;
     });
 
+    this.listeners.listen("level", "change", event => {
+      const level = parseInt((event.target! as HTMLSelectElement).value);
+      this.editor.engine.load({
+        level,
+        pos: new Vector2(800, 950),
+      });
+    });
+
     this.listeners.listen("close-editor", "click", () => {
       this.editor.destroy();
       this.listeners.clear();
@@ -129,5 +139,17 @@ export class EditorUI {
     editorEl.id = "editor";
     editorEl.innerHTML = EDITOR_HTML;
     document.body.append(editorEl);
+
+    this.renderLevelOptions();
+  }
+
+  renderLevelOptions() {
+    const levelEl = document.getElementById("level") as HTMLSelectElement;
+    for (let i = 0; i < LEVELS.length; i++) {
+      const option = document.createElement("option");
+      option.value = i.toString();
+      option.innerText = i.toString();
+      levelEl.append(option);
+    }
   }
 }

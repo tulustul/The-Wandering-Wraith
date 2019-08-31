@@ -19,6 +19,10 @@ canvas.with-cursor {
 
 .line {
   display: flex;
+  flex-direction: row;
+}
+.line * {
+  flex: 1;
 }
 
 .stack {
@@ -31,8 +35,9 @@ canvas.with-cursor {
 }
 
 .btn {
-  margin-bottom: 5px;
-  padding: 3px;
+  margin-bottom: 0;
+  border: 1px solid #333;
+  padding: 5px;
   font-size: 15px;
   transition: none;
 }
@@ -69,16 +74,27 @@ export const EDITOR_HTML = `
   </div>
 
   <button class="btn" id="toggle-pause">Toggle pause</button>
-  <button class="btn" id="clear-plants">Clear plants</button>
-  <button class="btn" id="spawn-plants">Spawn plants</button>
-  <button class="btn" id="get-player-position">Get player position</button>
-  <button class="btn" id="move-player">Move player</button>
+  
+  <div class="line">
+    <button class="btn" id="clear-plants">Clear plants</button>
+    <button class="btn" id="spawn-plants">Spawn plants</button>
+  </div>
+  
+  <div class="line">
+    <button class="btn" id="get-player-position">Get player position</button>
+    <button class="btn" id="move-player">Move player</button>
+  </div>
   <button class="btn" id="regenerate-level">Regenerate level</button>
 
   <div class="line">
     <label><input type="radio" name="mode" value="edit">Edit</label>
     <label><input type="radio" name="mode" value="play">Play</label>
   </div>
+
+  <label>
+    Level
+    <select id="level"> </select>
+  </label>
 
   <label>
     Add

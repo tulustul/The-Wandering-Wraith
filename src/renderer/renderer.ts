@@ -22,6 +22,7 @@ export class Renderer {
   terrainLayer = new Layer(this.engine, {
     renderWholeWorld: true,
     offset_: true,
+    clear_: true,
   });
 
   hillsLayers: Layer[];

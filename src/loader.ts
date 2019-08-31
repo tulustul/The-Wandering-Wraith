@@ -44,9 +44,6 @@ export class LevelParser {
     };
 
     // #if process.env.NODE_ENV === 'development'
-    const editorPathCommands: PathCommand[] = [];
-    this.engine.level.editorPathCommands = editorPathCommands;
-
     const pointsMap = new Map<Vector2, PathCommand>();
     this.engine.level.pointToCommandMap = pointsMap;
 
@@ -69,9 +66,6 @@ export class LevelParser {
         if (command === "z") {
           pathCommands.push({ type: PathCommandType.close, isDeadly: false });
           this.addStatic(this.pos, firstPoint!, isDeadly);
-          // #if process.env.NODE_ENV === 'development'
-          editorPathCommands.push(pathCommands[pathCommands.length - 1]);
-          // #endif
         }
         c = this.next();
         continue;
@@ -92,7 +86,6 @@ export class LevelParser {
           });
           // #if process.env.NODE_ENV === 'development'
           pointsMap.set(firstPoint, pathCommands[pathCommands.length - 1]);
-          editorPathCommands.push(pathCommands[pathCommands.length - 1]);
           // #endif
           command = "l";
           break;
@@ -111,7 +104,6 @@ export class LevelParser {
           );
           // #if process.env.NODE_ENV === 'development'
           pointsMap.set(points[1], pathCommands[pathCommands.length - 1]);
-          editorPathCommands.push(pathCommands[pathCommands.length - 1]);
           // #endif
           break;
         case "c":
@@ -137,7 +129,6 @@ export class LevelParser {
           for (const p of points) {
             pointsMap.set(p, pathCommands[pathCommands.length - 1]);
           }
-          editorPathCommands.push(pathCommands[pathCommands.length - 1]);
           // #endif
           break;
         case "p":
@@ -175,11 +166,17 @@ export class LevelParser {
           const savepoint = this.parseNumber();
           savepoints.push(savepoint);
           // #if process.env.NODE_ENV === 'development'
-          objects.push({
+          const savepointPos = new Vector2(
+            savepoint,
+            this.engine.level.size.y / 2,
+          );
+          const save = {
             type: "savepoint",
-            pos: new Vector2(savepoint, this.engine.level.size.y / 2),
+            pos: savepointPos,
             isDeadly: false,
-          });
+          };
+          objects.push(save);
+          pointsMap.set(savepointPos, save as any);
           // #endif
           break;
       }

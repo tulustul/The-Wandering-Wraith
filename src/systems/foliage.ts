@@ -13,15 +13,15 @@ interface Foliage {
 }
 
 export class FoliageSystem {
-  GRID_SIZE = 500;
+  GRID_SIZE = 700;
   entities_: Foliage[][];
 
   async spawnFoliage(engine: Engine) {
     this.entities_ = [];
-    for (let x = 0; x < engine.level.size.x; x += this.GRID_SIZE) {
+    for (let x = 0; x <= engine.level.size.x; x += this.GRID_SIZE) {
       this.entities_.push([]);
     }
-    const r = new Random(1);
+    const r = new Random(engine.currentSave.level);
 
     for (const treeDefinition of assets.plants) {
       let x = 500 + r.nextFloat() * treeDefinition.spread;

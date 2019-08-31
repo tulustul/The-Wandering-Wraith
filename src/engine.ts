@@ -58,8 +58,8 @@ export class Engine {
     this.physics.clear_();
     loadLevel(this, save.level);
     this.player = new Player(this, new Vector2(save.pos.x, save.pos.y));
-    this.foliage.spawnFoliage(this);
     this.renderer.init();
+    this.foliage.spawnFoliage(this);
   }
 
   update_(timeStep: number) {
@@ -69,17 +69,22 @@ export class Engine {
     this.physics.update_();
     this.particles.update_();
 
+    const playerPos = this.player.body_.pos;
     for (const savepoint of this.level.savepoints) {
-      if (
-        savepoint > this.currentSave.pos.x &&
-        this.player.body_.pos.x > savepoint
-      ) {
+      if (savepoint > this.currentSave.pos.x && playerPos.x > savepoint) {
         this.currentSave = {
           level: this.currentSave.level,
-          pos: this.player.body_.pos,
+          pos: playerPos,
         };
         save(this.currentSave);
       }
+    }
+
+    if (playerPos.x > this.level.size.x - 500) {
+      this.currentSave.level++;
+      this.currentSave.pos = new Vector2(800, 950);
+      save(this.currentSave);
+      this.load(this.currentSave);
     }
   }
 }

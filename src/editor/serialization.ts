@@ -16,7 +16,7 @@ export class LevelSerializer {
     let to: Vector2;
     let lastCommand = "m";
     let isDeadly = false;
-    for (const pathCommand of level.editorPathCommands!) {
+    for (const pathCommand of level.pathCommands!) {
       const command = COMMAND_MAP[pathCommand.type];
       if (pathCommand.isDeadly !== isDeadly) {
         tokens.push("d");
