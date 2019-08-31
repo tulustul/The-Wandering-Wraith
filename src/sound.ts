@@ -135,3 +135,26 @@
 //   }
 
 // }
+// ZzFXmicro - Zuper Zmall Zound Zynth - MIT License - Copyright 2019 Frank Force
+
+import "./ZzFX.micro";
+
+declare var zzfx: any;
+
+export type SoundDefinition = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+][];
+
+export function playSound(sound: SoundDefinition) {
+  for (const s of sound) {
+    zzfx(...s);
+  }
+}

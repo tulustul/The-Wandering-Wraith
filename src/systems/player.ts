@@ -4,6 +4,8 @@ import { GROUND_MASK, PLAYER_MASK } from "../colisions-masks";
 import { DynamicBody } from "./physics/physics.interface";
 import { CircleShape } from "./physics/shapes";
 import { SinusAnimation } from "../animations";
+import { playSound } from "../sound";
+import { assets } from "../assets";
 
 interface AgentAnimation {
   headOffset: number;
@@ -16,7 +18,7 @@ interface AgentAnimation {
 }
 
 export class Player {
-  STEPS_RATE = 270;
+  STEPS_RATE = 90;
 
   ACCELERATION = 3.7;
 
@@ -43,6 +45,8 @@ export class Player {
   stretch = new Vector2(1, 1);
 
   isRunning = false;
+
+  isDead = true;
 
   animation_: AgentAnimation = {
     headOffset: 0,
@@ -79,12 +83,14 @@ export class Player {
         this.body_.vel.y = -6;
         this.lastJumpTime = this.engine.time_;
         this.dashed = false;
+        playSound(assets.sounds.jump);
         return;
       }
     }
     if (!this.dashed && this.engine.time_ - this.lastJumpTime > 300) {
       this.body_.vel.y = -6;
       this.dashed = true;
+      playSound(assets.sounds.dash);
     }
   }
 
@@ -157,10 +163,10 @@ export class Player {
 
   makeStep() {
     if (this.engine.time_ - this.lastStepTime > this.STEPS_RATE) {
-      if (this.body_.vel.length_() > 0.5) {
+      if (this.body_.vel.length_() > 1) {
         this.lastStepTime = this.engine.time_;
         this.currentStep = (this.currentStep + 1) % 2;
-        // this.engine.sound.play("collectA");
+        if (this.body_.contactPoints.length) playSound(assets.sounds.walk);
       }
     }
   }
@@ -168,14 +174,32 @@ export class Player {
   update_() {
     this.updateControls();
     this.updateAnimation();
+    this.makeStep();
   }
 
-  moveToSavepoint() {
+  die() {
+    this.isDead = true;
+    this.engine.particles.emit({
+      count: 250,
+      direction: new Vector2(5, 0),
+      lifetime: 150,
+      lifetimeSpread: 5,
+      pos: this.body_.pos,
+      speedSpread: 0.3,
+      spread: Math.PI * 2,
+    });
+
     this.engine.physics.remove_(this.body_);
-    this.createBody(new Vector2(800, 950));
+
+    playSound(assets.sounds.dead);
+
+    setTimeout(() => {
+      this.createBody(new Vector2(800, 950));
+    }, 1000);
   }
 
   createBody(pos: Vector2) {
+    this.isDead = false;
     this.body_ = this.engine.physics.addDynamic({
       shape_: new CircleShape(pos, 10),
       parent: this,
@@ -185,7 +209,7 @@ export class Player {
       friction: 0.7,
       vel: new Vector2(0, 0),
       isDeadly: false,
-      onCollide: () => this.moveToSavepoint(),
+      onCollide: () => this.die(),
     });
     this.engine.camera.bindToTarget(this.body_.pos);
   }

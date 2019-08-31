@@ -301,6 +301,20 @@ export class Renderer {
     }
   }
 
+  renderParticles() {
+    this.ctx.strokeStyle = "#fff";
+    this.ctx.lineWidth = 1;
+    for (const particle of this.engine.particles.particles) {
+      const pos = particle.pos;
+      const vel = particle.vel;
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(pos.x, pos.y);
+      this.ctx.lineTo(pos.x + vel.x, pos.y + vel.y);
+      this.ctx.stroke();
+    }
+  }
+
   render() {
     const pos = this.engine.camera.pos;
 
@@ -318,12 +332,18 @@ export class Renderer {
 
     this.ctx.translate(pos.x, pos.y);
 
-    this.renderPlayer();
+    if (!this.engine.player.isDead) {
+      this.renderPlayer();
+    }
+
+    this.renderParticles();
     this.renderFoliage(true);
 
-    this.ctx.globalCompositeOperation = "screen";
-    this.renderLights();
-    this.ctx.globalCompositeOperation = "source-over";
+    if (!this.engine.player.isDead) {
+      this.ctx.globalCompositeOperation = "screen";
+      this.renderLights();
+      this.ctx.globalCompositeOperation = "source-over";
+    }
 
     this.ctx.translate(-pos.x, -pos.y);
   }

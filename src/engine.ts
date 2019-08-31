@@ -2,6 +2,7 @@ import { Game } from "./game";
 import { AnimationsManager } from "./animations";
 import { PhysicsSystem } from "./systems/physics/physics";
 import { FoliageSystem } from "./systems/foliage";
+import { ParticlesSystem } from "./particles";
 import { Player } from "./systems/player";
 import { Vector2 } from "./vector";
 import { Control } from "./control";
@@ -16,13 +17,13 @@ import { Editor } from "./editor/editor";
 export class Engine {
   time_ = 0;
 
-  // sound = new Sound();
-
   animations = new AnimationsManager();
 
   physics = new PhysicsSystem();
 
   foliage = new FoliageSystem();
+
+  particles = new ParticlesSystem(this);
 
   control_ = new Control(this.game);
 
@@ -53,5 +54,6 @@ export class Engine {
     this.animations.update_(this.time_);
     this.player.update_();
     this.physics.update_();
+    this.particles.update_();
   }
 }
