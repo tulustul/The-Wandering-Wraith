@@ -76,6 +76,9 @@ export class LevelSerializer {
           tokens.push("V");
           tokens.push(this.serializeVector(o.pos));
           break;
+        case "savepoint":
+          tokens.push("s");
+          tokens.push(this.serializeNumber(o.pos.x));
       }
     }
 
@@ -100,9 +103,13 @@ export class LevelSerializer {
     return c >= "0" && c <= "9";
   }
 
+  private serializeNumber(x: number) {
+    return (x / 10).toFixed(0);
+  }
+
   private serializeVector(v: Vector2) {
-    const x = (v.x / 10).toFixed(0);
-    const y = (v.y / 10).toFixed(0);
+    const x = this.serializeNumber(v.x);
+    const y = this.serializeNumber(v.y);
     const sep = y[0] === "-" ? "" : " ";
     return x + sep + y;
   }

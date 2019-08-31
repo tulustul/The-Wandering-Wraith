@@ -3,6 +3,7 @@ import { loadLevel } from "./loader";
 import { LineShape } from "./systems/physics/shapes";
 import { Vector2 } from "./vector";
 import { GROUND_MASK } from "./colisions-masks";
+import { Save, loadSave } from "./saves";
 
 export class Game {
   paused_ = true;
@@ -16,11 +17,9 @@ export class Game {
   }
 
   start() {
-    loadLevel(this.engine, 0);
-    this.engine.foliage.spawnFoliage(this.engine);
-
-    this.engine.init();
     this.isStarted = true;
+
+    this.engine.load(loadSave());
 
     this.paused_ = false;
     document.getElementsByTagName("div")[0].remove();

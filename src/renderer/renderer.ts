@@ -6,7 +6,7 @@ import { PathCommandType } from "../level.interface";
 import { assets } from "../assets";
 import { Random } from "../random";
 
-const VIEWPORT_HEIGHT = 350;
+const VIEWPORT_HEIGHT = 450;
 
 export class Renderer {
   ctx: CanvasRenderingContext2D;
@@ -89,7 +89,7 @@ export class Renderer {
 
   renderSpikes() {
     const r = new Random(1);
-    this.ctx.fillStyle = "#888";
+    this.ctx.fillStyle = "#555";
 
     const deadlyBodies = this.engine.physics.staticBodies.filter(
       b => b.isDeadly,
@@ -105,10 +105,10 @@ export class Renderer {
         this.ctx.beginPath();
         this.ctx.moveTo(0, y);
         this.ctx.lineTo(0, y + 2);
-        this.ctx.lineTo(5 + 5 * r.nextFloat(), y + 1);
+        this.ctx.lineTo(8 + 5 * r.nextFloat(), y + 1);
         this.ctx.closePath();
         this.ctx.fill();
-        y += 10 * r.nextFloat();
+        y += 5; // * r.nextFloat();
       }
       this.ctx.restore();
     }

@@ -194,7 +194,12 @@ export class Player {
     playSound(assets.sounds.dead);
 
     setTimeout(() => {
-      this.createBody(new Vector2(800, 950));
+      this.createBody(
+        new Vector2(
+          this.engine.currentSave.pos.x,
+          this.engine.currentSave.pos.y,
+        ),
+      );
     }, 1000);
   }
 

@@ -15,9 +15,10 @@ import {
 // l - line to, (x y)+
 // c - cubic bezier, (x1 y1 x2 y2 x y)+
 // z - close path
-// p - platform
+// p - platform (x, y)
 // d - toggling is deadly flag
-const commands = "mlczpd";
+// s - savepoint (x)
+const commands = "mlczpds";
 
 export function loadLevel(engine: Engine, level: number) {
   const levelDef = LEVELS[level];
@@ -34,10 +35,12 @@ export class LevelParser {
     this.next();
     const pathCommands: PathCommand[] = [];
     const platforms: Platform[] = [];
+    const savepoints: number[] = [];
     this.engine.level = {
       size: this.parseVector(),
       pathCommands,
       platforms,
+      savepoints,
     };
 
     // #if process.env.NODE_ENV === 'development'
@@ -166,6 +169,17 @@ export class LevelParser {
           };
           objects.push({ type: types[c], pos, isDeadly });
           pointsMap.set(pos, objects[objects.length - 1] as any);
+          // #endif
+          break;
+        case "s":
+          const savepoint = this.parseNumber();
+          savepoints.push(savepoint);
+          // #if process.env.NODE_ENV === 'development'
+          objects.push({
+            type: "savepoint",
+            pos: new Vector2(savepoint, this.engine.level.size.y / 2),
+            isDeadly: false,
+          });
           // #endif
           break;
       }

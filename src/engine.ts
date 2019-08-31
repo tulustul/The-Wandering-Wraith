@@ -12,6 +12,8 @@ import { Level } from "./level.interface";
 
 // #if process.env.NODE_ENV === 'development'
 import { Editor } from "./editor/editor";
+import { Save, save } from "./saves";
+import { loadLevel } from "./loader";
 // #endif
 
 export class Engine {
@@ -31,9 +33,16 @@ export class Engine {
 
   camera = new Camera(this);
 
-  player = new Player(this, new Vector2(800, 950));
+  player: Player;
 
-  level: Level = { size: new Vector2(), pathCommands: [], platforms: [] };
+  level: Level = {
+    size: new Vector2(),
+    pathCommands: [],
+    platforms: [],
+    savepoints: [],
+  };
+
+  currentSave: Save;
 
   // #if process.env.NODE_ENV === 'development'
   editor = new Editor(this);
@@ -44,9 +53,13 @@ export class Engine {
     this.control_.init();
   }
 
-  init() {
+  load(save: Save) {
+    this.currentSave = save;
+    this.physics.clear_();
+    loadLevel(this, save.level);
+    this.player = new Player(this, new Vector2(save.pos.x, save.pos.y));
+    this.foliage.spawnFoliage(this);
     this.renderer.init();
-    // this.camera.bindToTarget(this.player.body_.pos);
   }
 
   update_(timeStep: number) {
@@ -55,5 +68,17 @@ export class Engine {
     this.player.update_();
     this.physics.update_();
     this.particles.update_();
+
+    for (const savepoint of this.level.savepoints) {
+      if (
+        savepoint > this.currentSave.pos.x &&
+        this.player.body_.pos.x > savepoint
+      ) {
+        save({
+          level: this.currentSave.level,
+          pos: this.player.body_.pos,
+        });
+      }
+    }
   }
 }

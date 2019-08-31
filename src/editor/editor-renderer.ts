@@ -212,6 +212,15 @@ export class EditorRenderer {
             size[1] * 2,
           );
           break;
+        case "savepoint":
+          this.ctx.lineWidth = 1;
+          this.ctx.strokeStyle = "blue";
+          this.ctx.beginPath();
+          this.ctx.moveTo(o.pos.x, 0);
+          this.ctx.lineTo(o.pos.x, this.editor.engine.level.size.y);
+          this.ctx.closePath();
+          this.ctx.stroke();
+          break;
       }
     }
   }

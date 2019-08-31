@@ -32,6 +32,7 @@ export interface Level {
   size: Vector2;
   pathCommands: PathCommand[];
   platforms: Platform[];
+  savepoints: number[];
 
   editorPathCommands?: PathCommand[];
   pointToCommandMap?: Map<Vector2, PathCommand>;

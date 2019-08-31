@@ -78,6 +78,7 @@ export const EDITOR_HTML = `
       <option value="hPlatform2">hPlatform2</option>
       <option value="vPlatform1">vPlatform1</option>
       <option value="vPlatform2">vPlatform2</option>
+      <option value="savepoint">save point</option> 
     </select>
   </label>
 
