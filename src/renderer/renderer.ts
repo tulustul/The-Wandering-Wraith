@@ -4,6 +4,7 @@ import { Engine } from "../engine";
 import { Vector2 } from "../vector";
 import { PathCommandType } from "../level.interface";
 import { assets } from "../assets";
+import { Random } from "../random";
 
 const VIEWPORT_HEIGHT = 350;
 
@@ -26,7 +27,7 @@ export class Renderer {
   hillsLayers: Layer[];
 
   constructor(public engine: Engine) {
-    this.hillsLayers = [0.1, 0.15, 0.2].map(
+    this.hillsLayers = [0.2, 0.35, 0.5].map(
       offsetScale =>
         new Layer(this.engine, {
           renderWholeWorld: true,
@@ -151,7 +152,7 @@ export class Renderer {
   renderSky() {
     const canvas = this.engine.renderer.activeLayer.canvas_;
     var grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grd.addColorStop(0, "#333");
+    grd.addColorStop(0, "#444");
     grd.addColorStop(1, "#111");
     this.ctx.fillStyle = grd;
     this.ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -166,46 +167,42 @@ export class Renderer {
     );
     gradient.addColorStop(0, "#ccc");
     gradient.addColorStop(0.03, "#ccc");
-    gradient.addColorStop(0.04, "#555");
+    gradient.addColorStop(0.04, "#666");
     gradient.addColorStop(1, "transparent");
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   renderHills(
-    colorHigh: string,
-    colorLow: string,
-    x1: number,
-    x2: number,
-    x3: number,
-    y1: number,
-    y2: number,
-    y3: number,
+    color: string,
+    size: number,
+    amplitude: number,
+    spread: number,
+    seed: number,
   ) {
+    const r = new Random(seed);
     const canvas = this.engine.renderer.activeLayer.canvas_;
-    const blur = 2 + 0.5 / this.engine.renderer.activeLayer.offsetScale;
-    this.ctx.filter = `blur(${blur}px)`;
+    const blur = 1.5 / this.engine.renderer.activeLayer.offsetScale;
 
     var grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grd.addColorStop(0, colorHigh);
-    grd.addColorStop(0.3, colorLow);
+    grd.addColorStop(0, color);
+    grd.addColorStop(1, "#111");
+    this.ctx.filter = `blur(${blur}px)`;
 
     this.ctx.fillStyle = grd;
-    this.ctx.beginPath();
-    this.ctx.moveTo(0, 0);
-    for (let x = 0; x <= canvas.width; x++) {
-      this.ctx.lineTo(
-        x,
-        Math.sin(x / x1) * y1 +
-          Math.sin(x / x2) * y2 +
-          Math.sin(x / x3) * y3 +
-          canvas.height / 4,
-      );
+    this.ctx.lineWidth = 0;
+    let x = 0;
+    while (x < canvas.width) {
+      this.ctx.beginPath();
+      this.ctx.save();
+      this.ctx.translate(x, canvas.height + size);
+      this.ctx.scale(1, amplitude + r.nextVariation() * amplitude * 0.1);
+      this.ctx.arc(0, 0, size, Math.PI, Math.PI * 2);
+      this.ctx.closePath();
+      this.ctx.fill();
+      this.ctx.restore();
+      x += spread + r.nextVariation() * spread * 0.5;
     }
-    this.ctx.lineTo(canvas.width, canvas.height);
-    this.ctx.lineTo(0, canvas.height);
-    this.ctx.closePath();
-    this.ctx.fill();
   }
 
   renderFoliage(isForeGround: boolean) {
@@ -249,7 +246,7 @@ export class Renderer {
     const size = 50 + Math.sin(this.engine.time_ / 300) * 5;
 
     var grd = this.ctx.createRadialGradient(0, 0, 10, 0, 0, size);
-    grd.addColorStop(0, "#222");
+    grd.addColorStop(0, "#333");
     grd.addColorStop(1, "transparent");
     this.ctx.fillStyle = grd;
     this.ctx.fillRect(-size, -size, size * 2, size * 2);
@@ -265,19 +262,10 @@ export class Renderer {
     this.renderPlatforms();
     this.renderTerrain();
 
-    const hillsParams: [
-      string,
-      string,
-      number,
-      number,
-      number,
-      number,
-      number,
-      number,
-    ][] = [
-      ["#1a1a1a", "#111", 150, 139, 111, 200, 150, 79],
-      ["#1c1c1c", "#111", 197, 211, 380, 140, 35, 80],
-      ["#161616", "#111", 260, 311, 290, 111, 98, 64],
+    const hillsParams: [string, number, number, number, number][] = [
+      ["#222", 700, 1.6, 1300, 1],
+      ["#1c1c1c", 350, 3, 1100, 2],
+      ["#161616", 200, 5, 800, 3],
     ];
     for (const [index, hillsLayer] of this.hillsLayers.entries()) {
       hillsLayer.activate();
@@ -326,17 +314,17 @@ export class Renderer {
 
   drawLayer(layer: Layer) {
     if (layer.offset_) {
-      this.drawLayerWithCameraOffset(layer, layer.offsetScale);
+      this.drawLayerWithCameraOffset(layer);
     } else {
       this.ctx.drawImage(layer.canvas_, 0, 0);
     }
   }
 
-  drawLayerWithCameraOffset(source: Layer, offsetScale: number) {
+  drawLayerWithCameraOffset(layer: Layer) {
     this.ctx.drawImage(
-      source.canvas_,
-      -this.engine.camera.pos.x * offsetScale,
-      -this.engine.camera.pos.y * offsetScale,
+      layer.canvas_,
+      -this.engine.camera.pos.x * layer.offsetScale,
+      -this.engine.camera.pos.y * layer.offsetScale,
       this.activeLayer.canvas_.width,
       this.activeLayer.canvas_.height,
       0,
@@ -344,6 +332,5 @@ export class Renderer {
       this.activeLayer.canvas_.width,
       this.activeLayer.canvas_.height,
     );
-    this.ctx.restore();
   }
 }
