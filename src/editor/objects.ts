@@ -1,6 +1,6 @@
 import { Vector2 } from "../vector";
 import { Editor } from "./editor";
-import { PathCommand, PathCommandType } from "../level.interface";
+import { PathCommand, PathCommandType, Platform } from "../level.interface";
 
 export type ObjectType =
   | "polygon"
@@ -23,7 +23,7 @@ export class EditorObjects {
       case "hPlatform2":
       case "vPlatform1":
       case "vPlatform2":
-        const platform = { type, pos };
+        const platform = { type, pos, isDeadly: false };
         this.editor.engine.level.objects!.push(platform);
         this.pointsMap.set(pos, platform as any);
         break;

@@ -1,5 +1,5 @@
 import { Vector2 } from "../vector";
-import { Level, PathCommandType } from "../level.interface";
+import { Level, PathCommandType, CanBeDeadly } from "../level.interface";
 
 const COMMAND_MAP = {
   [PathCommandType.move]: "m",
@@ -15,8 +15,13 @@ export class LevelSerializer {
     let localPos = new Vector2();
     let to: Vector2;
     let lastCommand = "m";
+    let isDeadly = false;
     for (const pathCommand of level.editorPathCommands!) {
       const command = COMMAND_MAP[pathCommand.type];
+      if (pathCommand.isDeadly !== isDeadly) {
+        tokens.push("d");
+        isDeadly = pathCommand.isDeadly;
+      }
       if (lastCommand !== command) {
         tokens.push(command);
         lastCommand = command;
@@ -46,6 +51,10 @@ export class LevelSerializer {
 
     tokens.push("p");
     for (const o of level.objects!) {
+      if (o.isDeadly != isDeadly) {
+        tokens.push("d");
+        isDeadly = o.isDeadly;
+      }
       switch (o.type) {
         case "platform":
           tokens.push("P");

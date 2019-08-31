@@ -1,13 +1,11 @@
 import { Engine } from "../engine";
 import { EditorRenderer } from "./editor-renderer";
-import { LevelSerializer } from "./serialization";
-import { LEVELS } from "../levels";
 import { Manipulator } from "./manipulator";
 import { EditorUI } from "./editor-ui";
 import { Vector2 } from "../vector";
 import { EditorObjects } from "./objects";
 
-export type EditorMode = "edit" | "draw" | "place" | "play";
+export type EditorMode = "edit" | "play";
 
 export class Editor {
   initialized = false;

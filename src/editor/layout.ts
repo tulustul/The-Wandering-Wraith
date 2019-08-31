@@ -26,6 +26,10 @@ canvas.with-cursor {
   flex-direction: column;
 }
 
+.hidden {
+  display: none;
+}
+
 #content {
   flex: 1;
 }
@@ -61,8 +65,6 @@ export const EDITOR_HTML = `
 
   <div class="line">
     <label><input type="radio" name="mode" value="edit">Edit</label>
-    <label><input type="radio" name="mode" value="draw">Draw</label>
-    <label><input type="radio" name="mode" value="place">Place</label>
     <label><input type="radio" name="mode" value="play">Play</label>
   </div>
 
@@ -77,6 +79,11 @@ export const EDITOR_HTML = `
       <option value="vPlatform1">vPlatform1</option>
       <option value="vPlatform2">vPlatform2</option>
     </select>
+  </label>
+
+  <label id="deadly-input-label">
+    Is deadly
+    <input id="deadly-input" type="checkbox">
   </label>
 </div>
 

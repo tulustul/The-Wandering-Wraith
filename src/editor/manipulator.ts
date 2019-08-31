@@ -2,7 +2,7 @@ import { Vector2 } from "../vector";
 import { Editor } from "./editor";
 import { Listeners } from "./listeners";
 import { ObjectType } from "./objects";
-import { PathCommandType, PathCommand } from "../level.interface";
+import { PathCommandType, PathCommand, CanBeDeadly } from "../level.interface";
 
 export class Manipulator {
   focusedPoint: Vector2 | null;
@@ -79,6 +79,13 @@ export class Manipulator {
         }
         this.selectionArea = null;
       }
+      if (this.selectedPoints.size === 1) {
+        const p = Array.from(this.selectedPoints)[0];
+        const object = this.editor.engine.level.pointToCommandMap!.get(p);
+        this.editor.ui.showDeadlyToggle(object as CanBeDeadly);
+      } else {
+        this.editor.ui.hideDeadlyToggle();
+      }
     });
 
     this.listeners.listen(canvas, "mousemove", (event: MouseEvent) => {
@@ -142,6 +149,7 @@ export class Manipulator {
         const newCommand: PathCommand = {
           type: PathCommandType.line,
           points: [newPoint],
+          isDeadly: pathCommand.isDeadly,
         };
         this.pathCommands.splice(index + 1, 0, newCommand);
         this.editorPathCommands.splice(index + 1, 0, newCommand);

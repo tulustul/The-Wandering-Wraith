@@ -168,6 +168,12 @@ export class PhysicsSystem {
 
   private resolveColisions(colisions: IterableIterator<Colision>) {
     for (const colision of colisions) {
+      if (colision.receiver.isDeadly) {
+        if (colision.hitter.onCollide) {
+          colision.hitter.onCollide();
+        }
+      }
+
       colision.hitter.pos.add_(colision.penetration);
 
       // colision.hitter.vel.add_(colision.penetration);

@@ -15,6 +15,7 @@ export class EditorRenderer {
       this.engine.renderer.terrainLayer.clearCanvas();
       this.engine.renderer.renderTerrain();
       this.engine.renderer.renderPlatforms();
+      this.engine.renderer.renderSpikes();
     }
 
     this.engine.renderer.baseLayer.activate();

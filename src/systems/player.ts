@@ -55,15 +55,7 @@ export class Player {
   };
 
   constructor(public engine: Engine, pos: Vector2) {
-    this.body_ = engine.physics.addDynamic({
-      shape_: new CircleShape(pos, 10),
-      parent: this,
-      receiveMask: PLAYER_MASK,
-      hitMask: GROUND_MASK,
-      pos: pos,
-      friction: 0.7,
-      vel: new Vector2(0, 0),
-    });
+    this.createBody(pos);
   }
 
   moveToDirection(direction: number) {
@@ -176,5 +168,25 @@ export class Player {
   update_() {
     this.updateControls();
     this.updateAnimation();
+  }
+
+  moveToSavepoint() {
+    this.engine.physics.remove_(this.body_);
+    this.createBody(new Vector2(800, 950));
+  }
+
+  createBody(pos: Vector2) {
+    this.body_ = this.engine.physics.addDynamic({
+      shape_: new CircleShape(pos, 10),
+      parent: this,
+      receiveMask: PLAYER_MASK,
+      hitMask: GROUND_MASK,
+      pos: pos,
+      friction: 0.7,
+      vel: new Vector2(0, 0),
+      isDeadly: false,
+      onCollide: () => this.moveToSavepoint(),
+    });
+    this.engine.camera.bindToTarget(this.body_.pos);
   }
 }

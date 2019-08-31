@@ -7,17 +7,21 @@ export enum PathCommandType {
   close,
 }
 
-export interface PathCommand {
+export interface CanBeDeadly {
+  isDeadly: boolean;
+}
+
+export interface PathCommand extends CanBeDeadly {
   type: PathCommandType;
   points?: Vector2[];
 }
 
-export interface LevelObject {
+export interface LevelObject extends CanBeDeadly {
   type: string;
   pos: Vector2;
 }
 
-export interface Platform {
+export interface Platform extends CanBeDeadly {
   x: number;
   y: number;
   w: number;

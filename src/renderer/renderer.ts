@@ -48,7 +48,7 @@ export class Renderer {
     let to: Vector2;
     this.ctx.fillStyle = "#000";
     this.ctx.strokeStyle = "#111";
-    this.ctx.lineWidth = 5;
+    // this.ctx.lineWidth = 5;
     for (const pathCommand of this.engine.level.pathCommands) {
       switch (pathCommand.type) {
         case PathCommandType.move:
@@ -84,6 +84,33 @@ export class Renderer {
       this.ctx.rect(p.x, p.y, p.w, p.h);
       this.ctx.fill();
       this.ctx.stroke();
+    }
+  }
+
+  renderSpikes() {
+    const r = new Random(1);
+    this.ctx.fillStyle = "#888";
+
+    const deadlyBodies = this.engine.physics.staticBodies.filter(
+      b => b.isDeadly,
+    );
+    for (const body of deadlyBodies) {
+      const angle = body.shape_.start_.directionTo(body.shape_.end_);
+      const length = body.shape_.start_.distanceTo(body.shape_.end_);
+      this.ctx.save();
+      this.ctx.translate(body.shape_.start_.x, body.shape_.start_.y);
+      this.ctx.rotate(angle);
+      let y = 0;
+      while (y < length) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, y);
+        this.ctx.lineTo(0, y + 2);
+        this.ctx.lineTo(5 + 5 * r.nextFloat(), y + 1);
+        this.ctx.closePath();
+        this.ctx.fill();
+        y += 10 * r.nextFloat();
+      }
+      this.ctx.restore();
     }
   }
 
@@ -165,8 +192,8 @@ export class Renderer {
       100,
       300,
     );
-    gradient.addColorStop(0, "#ccc");
-    gradient.addColorStop(0.03, "#ccc");
+    gradient.addColorStop(0, "#ddd");
+    gradient.addColorStop(0.03, "#ddd");
     gradient.addColorStop(0.04, "#666");
     gradient.addColorStop(1, "transparent");
     this.ctx.fillStyle = gradient;
@@ -260,6 +287,7 @@ export class Renderer {
 
     this.terrainLayer.activate();
     this.renderPlatforms();
+    this.renderSpikes();
     this.renderTerrain();
 
     const hillsParams: [string, number, number, number, number][] = [

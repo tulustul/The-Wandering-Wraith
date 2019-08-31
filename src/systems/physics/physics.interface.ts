@@ -6,19 +6,18 @@ export interface Body {
   shape_: Shape;
   receiveMask: number;
   parent?: any;
+  isDeadly: boolean;
 }
 
-export interface StaticBody {
-  pos: Vector2;
+export interface StaticBody extends Body {
   shape_: LineShape;
-  receiveMask: number;
-  parent_?: any;
 }
 
 export interface DynamicBodyDefinition extends Body {
   vel: Vector2;
   friction: number;
   hitMask: number;
+  onCollide?: () => void;
 }
 
 export interface DynamicBody extends DynamicBodyDefinition {

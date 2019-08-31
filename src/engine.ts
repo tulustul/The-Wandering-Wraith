@@ -22,8 +22,6 @@ export class Engine {
 
   physics = new PhysicsSystem();
 
-  player = new Player(this, new Vector2(1200, 950));
-
   foliage = new FoliageSystem();
 
   control_ = new Control(this.game);
@@ -31,6 +29,8 @@ export class Engine {
   renderer = new Renderer(this);
 
   camera = new Camera(this);
+
+  player = new Player(this, new Vector2(800, 950));
 
   level: Level = { size: new Vector2(), pathCommands: [], platforms: [] };
 
@@ -45,7 +45,7 @@ export class Engine {
 
   init() {
     this.renderer.init();
-    this.camera.bindToTarget(this.player.body_.pos);
+    // this.camera.bindToTarget(this.player.body_.pos);
   }
 
   update_(timeStep: number) {

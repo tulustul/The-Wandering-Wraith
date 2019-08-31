@@ -3,12 +3,25 @@ import { EDITOR_STYLES, EDITOR_HTML } from "./layout";
 import { LevelSerializer } from "./serialization";
 import { Listeners } from "./listeners";
 import { LevelParser } from "../loader";
+import { CanBeDeadly } from "../level.interface";
 
 export class EditorUI {
   private listeners = new Listeners();
 
+  deadlyInputLabel: HTMLLabelElement;
+  deadlyInput: HTMLInputElement;
+
   constructor(private editor: Editor) {
     this.renderHtml();
+
+    this.deadlyInputLabel = document.getElementById(
+      "deadly-input-label",
+    )! as HTMLLabelElement;
+    this.deadlyInput = document.getElementById(
+      "deadly-input",
+    )! as HTMLInputElement;
+
+    this.hideDeadlyToggle();
 
     this.listeners.listen("draw-colision-helpers", "change", event => {
       this.editor.drawColisionHelpers = (event.target as HTMLInputElement).checked;
@@ -37,6 +50,15 @@ export class EditorUI {
 
     this.listeners.listen("get-player-position", "click", () => {
       console.log(this.engine.player.body_.pos);
+    });
+
+    this.listeners.listen("deadly-input", "change", event => {
+      for (const p of this.editor.manipulator.selectedPoints) {
+        const object = this.editor.engine.level.pointToCommandMap!.get(p);
+        if (object) {
+          object.isDeadly = (event.target as HTMLInputElement).checked;
+        }
+      }
     });
 
     this.listeners.listen("regenerate-level", "click", () => {
@@ -85,6 +107,15 @@ export class EditorUI {
   clearObjectType() {
     const select = document.getElementById("object-type") as HTMLSelectElement;
     select.value = "";
+  }
+
+  showDeadlyToggle(object: CanBeDeadly) {
+    this.deadlyInput.checked = object.isDeadly;
+    this.deadlyInputLabel.classList.remove("hidden");
+  }
+
+  hideDeadlyToggle() {
+    this.deadlyInputLabel.classList.add("hidden");
   }
 
   private renderHtml() {

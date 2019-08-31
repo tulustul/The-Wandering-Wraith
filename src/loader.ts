@@ -15,7 +15,9 @@ import {
 // l - line to, (x y)+
 // c - cubic bezier, (x1 y1 x2 y2 x y)+
 // z - close path
-const commands = "mlczp";
+// p - platform
+// d - toggling is deadly flag
+const commands = "mlczpd";
 
 export function loadLevel(engine: Engine, level: number) {
   const levelDef = LEVELS[level];
@@ -52,12 +54,18 @@ export class LevelParser {
     let command = "m";
     let firstPoint: Vector2 | null = null;
     let c = this.d[this.index - 1];
+    let isDeadly = false;
     while (c) {
       if (commands.includes(c)) {
+        if (c === "d") {
+          isDeadly = !isDeadly;
+          c = this.next();
+          continue;
+        }
         command = c;
         if (command === "z") {
-          pathCommands.push({ type: PathCommandType.close });
-          this.addStatic(this.pos, firstPoint!);
+          pathCommands.push({ type: PathCommandType.close, isDeadly: false });
+          this.addStatic(this.pos, firstPoint!, isDeadly);
           // #if process.env.NODE_ENV === 'development'
           editorPathCommands.push(pathCommands[pathCommands.length - 1]);
           // #endif
@@ -77,6 +85,7 @@ export class LevelParser {
           pathCommands.push({
             type: PathCommandType.move,
             points: [firstPoint],
+            isDeadly,
           });
           // #if process.env.NODE_ENV === 'development'
           pointsMap.set(firstPoint, pathCommands[pathCommands.length - 1]);
@@ -89,8 +98,14 @@ export class LevelParser {
           pathCommands.push({
             type: PathCommandType.line,
             points: [points[1]],
+            isDeadly,
           });
-          this.addStatic(points[0], points[1], GRASS_MASK | TREE_GROUND_MASK);
+          this.addStatic(
+            points[0],
+            points[1],
+            isDeadly,
+            GRASS_MASK | TREE_GROUND_MASK,
+          );
           // #if process.env.NODE_ENV === 'development'
           pointsMap.set(points[1], pathCommands[pathCommands.length - 1]);
           editorPathCommands.push(pathCommands[pathCommands.length - 1]);
@@ -106,13 +121,14 @@ export class LevelParser {
           pathCommands.push({
             type: PathCommandType.bezier,
             points: points,
+            isDeadly,
           });
           const interpolatedPoints = generateBezierSegments(
             [oldPos].concat(points),
             0.1,
           );
           for (const [p1, p2] of interpolatedPoints) {
-            this.addStatic(p1, p2, GRASS_MASK | TREE_GROUND_MASK);
+            this.addStatic(p1, p2, isDeadly, GRASS_MASK | TREE_GROUND_MASK);
           }
           // #if process.env.NODE_ENV === 'development'
           for (const p of points) {
@@ -137,8 +153,9 @@ export class LevelParser {
             y: pos.y - h,
             w: sizes[c][0] * 2,
             h: sizes[c][1] * 2,
+            isDeadly,
           });
-          this.generatePlatform(pos, w, h);
+          this.generatePlatform(pos, w, h, isDeadly);
           // #if process.env.NODE_ENV === 'development'
           const types: { [key: string]: string } = {
             P: "platform",
@@ -147,7 +164,7 @@ export class LevelParser {
             v: "vPlatform1",
             V: "vPlatform2",
           };
-          objects.push({ type: types[c], pos });
+          objects.push({ type: types[c], pos, isDeadly });
           pointsMap.set(pos, objects[objects.length - 1] as any);
           // #endif
           break;
@@ -156,7 +173,12 @@ export class LevelParser {
     }
   }
 
-  private generatePlatform(pos: Vector2, w: number, h: number) {
+  private generatePlatform(
+    pos: Vector2,
+    w: number,
+    h: number,
+    isDeadly: boolean,
+  ) {
     const [a, b, c, d] = [
       pos.copy().add_(new Vector2(-w, -h)),
       pos.copy().add_(new Vector2(w, -h)),
@@ -165,10 +187,10 @@ export class LevelParser {
     ];
 
     const mask = w > 50 ? GRASS_MASK : 0;
-    this.addStatic(a, b, mask);
-    this.addStatic(b, c, mask);
-    this.addStatic(c, d, mask);
-    this.addStatic(d, a, mask);
+    this.addStatic(a, b, isDeadly, mask);
+    this.addStatic(b, c, isDeadly, mask);
+    this.addStatic(c, d, isDeadly, mask);
+    this.addStatic(d, a, isDeadly, mask);
   }
 
   private parseVector() {
@@ -189,11 +211,20 @@ export class LevelParser {
     return this.d[this.index++];
   }
 
-  private addStatic(from_: Vector2, to_: Vector2, mask = 0) {
+  private addStatic(
+    from_: Vector2,
+    to_: Vector2,
+    isDeadly: boolean,
+    mask = 0,
+  ) {
+    if (isDeadly) {
+      mask = 0;
+    }
     this.engine.physics.addStatic({
       shape_: new LineShape(from_, to_),
       receiveMask: GROUND_MASK | mask,
       pos: new Vector2(0, 0),
+      isDeadly,
     });
   }
 }
