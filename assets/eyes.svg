@@ -10,7 +10,7 @@
   </rdf:RDF>
  </metadata>
  <g transform="translate(-5.3252 -289.37)">
-  <ellipse cx="5.7489" cy="290.03" rx=".31002" ry=".52503" opacity=".476"/>
-  <ellipse cx="6.489" cy="290.04" rx=".31002" ry=".52503" opacity=".476"/>
+  <ellipse transform="rotate(-9.621)" cx="-42.854" cy="286.9" rx=".31002" ry=".52503" opacity=".476"/>
+  <ellipse transform="rotate(11.84)" cx="65.914" cy="282.52" rx=".31002" ry=".52503" opacity=".476"/>
  </g>
 </svg>
