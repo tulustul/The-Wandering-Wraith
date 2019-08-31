@@ -3,26 +3,28 @@ import { loadLevel } from "./loader";
 import { LineShape } from "./systems/physics/shapes";
 import { Vector2 } from "./vector";
 import { GROUND_MASK } from "./colisions-masks";
-import { Save, loadSave } from "./saves";
+import { Save, loadSave, clearSave } from "./saves";
+import { Menu } from "./menu";
 
 export class Game {
   paused_ = true;
 
-  isStarted = false;
-
   engine!: Engine;
+
+  menu: Menu;
 
   constructor(public canvas: HTMLCanvasElement) {
     this.engine = new Engine(this, canvas);
+    this.menu = new Menu(this);
   }
 
   start() {
-    this.isStarted = true;
-
     this.engine.load(loadSave());
 
-    this.paused_ = false;
-    document.getElementsByTagName("div")[0].remove();
+    setTimeout(() => {
+      this.paused_ = false;
+      this.menu.hide();
+    }, 100);
 
     // this.engine.physics.addStatic({
     //   shape_: new LineShape(new Vector2(1100, 910), new Vector2(1300, 910)),
@@ -36,5 +38,15 @@ export class Game {
     //   pos: new Vector2(0, 0),
     //   isDeadly: false,
     // });
+  }
+
+  togglePause() {
+    this.paused_ = !this.paused_;
+    this.paused_ ? this.menu.show() : this.menu.hide();
+  }
+
+  startNewGame() {
+    clearSave();
+    this.start();
   }
 }

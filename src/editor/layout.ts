@@ -30,6 +30,18 @@ canvas.with-cursor {
   display: none;
 }
 
+.btn {
+  margin-bottom: 5px;
+  padding: 3px;
+  font-size: 15px;
+  transition: none;
+}
+
+.btn:hover {
+  font-size: 15px;
+  background: #222;
+}
+
 #content {
   flex: 1;
 }
@@ -56,12 +68,12 @@ export const EDITOR_HTML = `
     </label>
   </div>
 
-  <button id="toggle-pause">Toggle pause</button>
-  <button id="clear-plants">Clear plants</button>
-  <button id="spawn-plants">Spawn plants</button>
-  <button id="get-player-position">Get player position</button>
-  <button id="move-player">Move player</button>
-  <button id="regenerate-level">Regenerate level</button>
+  <button class="btn" id="toggle-pause">Toggle pause</button>
+  <button class="btn" id="clear-plants">Clear plants</button>
+  <button class="btn" id="spawn-plants">Spawn plants</button>
+  <button class="btn" id="get-player-position">Get player position</button>
+  <button class="btn" id="move-player">Move player</button>
+  <button class="btn" id="regenerate-level">Regenerate level</button>
 
   <div class="line">
     <label><input type="radio" name="mode" value="edit">Edit</label>
@@ -89,9 +101,9 @@ export const EDITOR_HTML = `
 </div>
 
 <label id="output-wrapper">
-  <button id="generate-level-string">Generate level string</button>
+  <button class="btn" id="generate-level-string">Generate level string</button>
   Level string
   <textarea id="level-string" rows="5"></textarea>
-  <button id="close-editor">Close editor</button>
+  <button class="btn" id="close-editor">Close editor</button>
   </label>
 `;

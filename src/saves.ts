@@ -18,3 +18,7 @@ export function loadSave(): Save {
 export function save(save: Save) {
   localStorage.setItem("tul_s", JSON.stringify(save));
 }
+
+export function clearSave() {
+  localStorage.removeItem("tul_s");
+}

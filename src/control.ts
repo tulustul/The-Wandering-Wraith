@@ -10,9 +10,7 @@ export class Control {
       this.keys_.set(event.code, true);
 
       if (event.key === "Escape") {
-        if (this.game.isStarted) {
-          this.game.paused_ = !this.game.paused_;
-        }
+        this.game.togglePause();
       }
     });
 

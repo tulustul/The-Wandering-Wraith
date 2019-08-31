@@ -9,11 +9,11 @@ import { Control } from "./control";
 import { Renderer } from "./renderer/renderer";
 import { Camera } from "./camera";
 import { Level } from "./level.interface";
+import { Save, save } from "./saves";
+import { loadLevel } from "./loader";
 
 // #if process.env.NODE_ENV === 'development'
 import { Editor } from "./editor/editor";
-import { Save, save } from "./saves";
-import { loadLevel } from "./loader";
 // #endif
 
 export class Engine {
@@ -74,10 +74,11 @@ export class Engine {
         savepoint > this.currentSave.pos.x &&
         this.player.body_.pos.x > savepoint
       ) {
-        save({
+        this.currentSave = {
           level: this.currentSave.level,
           pos: this.player.body_.pos,
-        });
+        };
+        save(this.currentSave);
       }
     }
   }
