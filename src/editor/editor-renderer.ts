@@ -11,13 +11,18 @@ export class EditorRenderer {
     this.ctx = ctx;
 
     if (Math.round(this.engine.time_) % 500 === 0) {
-      this.engine.renderer.systemsRenderer.terrainLayer.activate();
-      this.engine.renderer.systemsRenderer.terrainLayer.clearCanvas();
-      this.engine.renderer.systemsRenderer.renderTerrain();
-      this.engine.renderer.systemsRenderer.renderPlatforms();
+      this.engine.renderer.terrainLayer.activate();
+      this.engine.renderer.terrainLayer.clearCanvas();
+      this.engine.renderer.renderTerrain();
+      this.engine.renderer.renderPlatforms();
     }
 
-    this.engine.renderer.systemsRenderer.foliageForegroundLayer.activate();
+    this.engine.renderer.baseLayer.activate();
+
+    const pos = this.engine.camera.pos;
+    this.ctx.save();
+    this.ctx.translate(pos.x, pos.y);
+
     this.drawPaths();
 
     if (this.editor.drawColisionHelpers) {
@@ -31,6 +36,8 @@ export class EditorRenderer {
     this.drawObjects();
     this.drawControlPoints();
     this.drawAreaSelection();
+
+    this.ctx.restore();
   }
 
   private get engine() {

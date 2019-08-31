@@ -50,11 +50,11 @@ export class Editor {
 
     document.getElementsByTagName("canvas")[0].classList.add("with-cursor");
 
-    const systemsRenderer = this.engine.renderer.systemsRenderer;
-    this.originalRenderFn = systemsRenderer.render;
-    systemsRenderer.render = () => {
-      this.originalRenderFn.bind(systemsRenderer)();
-      this.editorRenderer.render(systemsRenderer.ctx);
+    const renderer = this.engine.renderer;
+    this.originalRenderFn = renderer.render;
+    renderer.render = () => {
+      this.originalRenderFn.bind(renderer)();
+      this.editorRenderer.render(renderer.ctx);
     };
 
     this.initialized = true;
@@ -62,7 +62,7 @@ export class Editor {
 
   destroy() {
     this.setMode("play");
-    this.engine.renderer.systemsRenderer.render = this.originalRenderFn;
+    this.engine.renderer.render = this.originalRenderFn;
     this.manipulator.destroy();
     this.initialized = false;
     window.clearInterval(this.controlsInterval);

@@ -46,7 +46,6 @@ export class Engine {
   init() {
     this.renderer.init();
     this.camera.bindToTarget(this.player.body_.pos);
-    this.renderer.systemsRenderer.prerender();
   }
 
   update_(timeStep: number) {

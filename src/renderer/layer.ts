@@ -3,23 +3,17 @@ import { Engine } from "../engine";
 export interface LayerOptions {
   canvas_?: HTMLCanvasElement;
   renderWholeWorld?: boolean;
-  followPlayer?: boolean;
-  fill_?: string;
   clear_?: boolean;
   offset_?: boolean;
   offsetScale?: number;
 }
 
 export class Layer {
-  options: LayerOptions;
-
-  followPlayer = true;
-
-  fill_: string | null = null;
+  static layers: Layer[] = [];
 
   renderWholeWorld = false;
 
-  clear_ = true;
+  clear_ = false;
 
   offset_ = false;
 
@@ -29,14 +23,9 @@ export class Layer {
 
   ctx!: CanvasRenderingContext2D;
 
-  constructor(
-    name: string,
-    private engine: Engine,
-    options: LayerOptions = {},
-  ) {
+  constructor(private engine: Engine, options: LayerOptions = {}) {
+    Layer.layers.push(this);
     Object.assign(this, options);
-
-    engine.renderer.compositor.layers[name] = this;
 
     if (!this.canvas_) {
       this.canvas_ = document.createElement("canvas");
@@ -50,12 +39,10 @@ export class Layer {
     this.clearCanvas();
   }
 
-  updateSize(force = true) {
+  updateSize() {
     if (this.renderWholeWorld) {
-      if (force) {
-        this.canvas_.width = this.engine.level.size.x;
-        this.canvas_.height = this.engine.level.size.y;
-      }
+      this.canvas_.width = this.engine.level.size.x;
+      this.canvas_.height = this.engine.level.size.y;
     } else {
       this.canvas_.width = this.engine.canvas_.width;
       this.canvas_.height = this.engine.canvas_.height;
@@ -69,25 +56,12 @@ export class Layer {
 
   activate() {
     const renderer = this.engine.renderer;
-    if (renderer.activeLayer) {
-      renderer.activeLayer.ctx.restore();
-    }
 
     renderer.activeLayer = this;
     renderer.ctx = this.ctx;
 
     if (this.clear_) {
       this.clearCanvas();
-    }
-
-    if (this.fill_) {
-      this.ctx.fillStyle = this.fill_;
-      this.ctx.fillRect(0, 0, this.canvas_.width, this.canvas_.height);
-    }
-
-    if (this.followPlayer) {
-      this.ctx.save();
-      this.ctx.translate(this.engine.camera.pos.x, this.engine.camera.pos.y);
     }
   }
 }
