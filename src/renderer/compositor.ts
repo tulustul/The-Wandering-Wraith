@@ -6,6 +6,9 @@ type BlendMode =
   | "destination-in"
   | "multiply"
   | "overlay"
+  | "soft-light"
+  | "hard-light"
+  | "screen"
   | "lighten";
 
 interface CompositorEntry {
@@ -68,6 +71,12 @@ const COMPOSITOR_ENTRIES: CompositorEntry[] = [
     target_: "base",
     source_: "foliageForeground",
     blendMode: "source-over",
+    offset_: false,
+  },
+  {
+    target_: "base",
+    source_: "lights",
+    blendMode: "screen",
     offset_: false,
   },
 ];

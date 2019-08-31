@@ -9,6 +9,7 @@ export class SystemsRenderer {
     renderWholeWorld: true,
     followPlayer: false,
     clear_: false,
+    offset_: true,
   });
 
   movingPropsLayer = new Layer("movingProps", this.engine, {
@@ -24,18 +25,24 @@ export class SystemsRenderer {
     renderWholeWorld: true,
     followPlayer: false,
     clear_: false,
+    offset_: true,
+    offsetScale: 0.1,
   });
 
   hills2 = new Layer("hills2", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
     clear_: false,
+    offset_: true,
+    offsetScale: 0.15,
   });
 
   hills3 = new Layer("hills3", this.engine, {
     renderWholeWorld: true,
     followPlayer: false,
     clear_: false,
+    offset_: true,
+    offsetScale: 0.2,
   });
 
   foliageBackgroundLayer = new Layer("foliageBackground", this.engine, {
@@ -44,6 +51,11 @@ export class SystemsRenderer {
   });
 
   foliageForegroundLayer = new Layer("foliageForeground", this.engine, {
+    followPlayer: true,
+    clear_: true,
+  });
+
+  lightsLayer = new Layer("lights", this.engine, {
     followPlayer: true,
     clear_: true,
   });
@@ -105,6 +117,7 @@ export class SystemsRenderer {
     ctx.save();
 
     ctx.translate(player.body_.pos.x, player.body_.pos.y - 1);
+
     if (player.direction_ === "r") {
       ctx.scale(-1, 1);
     }
@@ -193,6 +206,8 @@ export class SystemsRenderer {
     y3: number,
   ) {
     const canvas = this.engine.renderer.activeLayer.canvas_;
+    const blur = 2 + 0.5 / this.engine.renderer.activeLayer.offsetScale;
+    this.ctx.filter = `blur(${blur}px)`;
 
     var grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
     grd.addColorStop(0, colorHigh);
@@ -248,6 +263,23 @@ export class SystemsRenderer {
     }
   }
 
+  renderLights() {
+    const player = this.engine.player;
+
+    this.ctx.save();
+    this.ctx.translate(player.body_.pos.x, player.body_.pos.y - 1);
+
+    const size = 50 + Math.sin(this.engine.time_ / 300) * 5;
+
+    var grd = this.ctx.createRadialGradient(0, 0, 10, 0, 0, size);
+    grd.addColorStop(0, "#333");
+    grd.addColorStop(1, "transparent");
+    this.ctx.fillStyle = grd;
+    this.ctx.fillRect(-size, -size, size * 2, size * 2);
+
+    this.ctx.restore();
+  }
+
   prerender() {
     this.skyLayer.activate();
     this.renderSky();
@@ -275,5 +307,8 @@ export class SystemsRenderer {
 
     this.foliageForegroundLayer.activate();
     this.renderFoliage(true);
+
+    this.lightsLayer.activate();
+    this.renderLights();
   }
 }

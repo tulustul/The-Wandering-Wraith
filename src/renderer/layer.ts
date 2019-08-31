@@ -6,6 +6,8 @@ export interface LayerOptions {
   followPlayer?: boolean;
   fill_?: string;
   clear_?: boolean;
+  offset_?: boolean;
+  offsetScale?: number;
 }
 
 export class Layer {
@@ -18,6 +20,10 @@ export class Layer {
   renderWholeWorld = false;
 
   clear_ = true;
+
+  offset_ = false;
+
+  offsetScale = 1;
 
   canvas_!: HTMLCanvasElement;
 
