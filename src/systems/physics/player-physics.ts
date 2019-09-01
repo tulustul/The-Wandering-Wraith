@@ -18,7 +18,7 @@ export enum MotionMode {
 export class PlayerPhysics {
   direction_: "l" | "r" = "r";
 
-  maxSpeed = 4;
+  maxSpeed = 3.5;
 
   lastJumpTime = 0;
 
@@ -92,10 +92,13 @@ export class PlayerPhysics {
       this.physics.checkHitterColisions(this.body_),
     );
 
-    if (this.mode === MotionMode.falling) {
-      for (const colision of colisions) {
+    for (const colision of colisions) {
+      const dy = colision.point.y - this.body_.pos.y;
+      if (dy <= 3.5) {
         colision.hitter.pos.sub_(colision.penetration);
+      }
 
+      if (this.mode === MotionMode.falling) {
         const d = colision.hitter.pos.copy().sub_(colision.hitter.oldPos);
         const v = colision.hitter.vel;
 
@@ -111,10 +114,10 @@ export class PlayerPhysics {
     for (const point of this.body_.contactPoints) {
       const dy = point.y - this.body_.pos.y;
       const dx = point.x - this.body_.pos.x;
-      if (dy > 4) {
+      if (dy > 3.5) {
         this.mode = MotionMode.running;
         return;
-      } else if (Math.abs(dy) < 1) {
+      } else if (Math.abs(dy) <= 3.5) {
         this.climbContact = dx;
       }
     }
@@ -125,6 +128,9 @@ export class PlayerPhysics {
         (this.climbContact < 0 && keys_.get("ArrowLeft")) ||
         (this.climbContact > 0 && keys_.get("ArrowRight"))
       ) {
+        if (this.mode !== MotionMode.climbing) {
+          this.lastJumpTime = this.player.engine.time_;
+        }
         this.mode = MotionMode.climbing;
         return;
       }
@@ -172,10 +178,10 @@ export class PlayerPhysics {
   // }
 
   moveToDirection(direction: number) {
-    this.player.isRunning = this.body_.contactPoints.length > 0;
+    this.player.isRunning = this.mode === MotionMode.running;
     let accScalar = 0.3;
-    if (this.body_.contactPoints.length > 0) {
-      accScalar = 0.6;
+    if (this.mode === MotionMode.running) {
+      accScalar = 0.3;
     }
     const acc = new Vector2(0, accScalar).rotate_(direction);
     this.updateVelocity(acc);
@@ -199,12 +205,12 @@ export class PlayerPhysics {
       this.mode === MotionMode.running ||
       this.mode === MotionMode.climbing
     ) {
-      if (this.player.engine.time_ - this.lastJumpTime > 200) {
+      if (this.player.engine.time_ - this.lastJumpTime > 150) {
         // this.currentSegment = null;
         this.body_.vel.y = -5;
-        if (this.climbContact) {
-          this.body_.vel.x = -this.climbContact / 3;
-          this.body_.vel.y = -7;
+        if (this.mode === MotionMode.climbing) {
+          this.body_.vel.x = -this.climbContact! / 3;
+          this.body_.vel.y = -6;
         }
         // this.body_.pos.y -= 5;
         this.body_.contactPoints = [];

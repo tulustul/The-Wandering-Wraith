@@ -78,10 +78,18 @@ export class Player {
     this.animation_.rLegRot = 0;
     this.animation_.lArmRot = -1;
     this.animation_.rArmRot = 1;
+
     if (this.isRunning) {
       this.animation_.lLegRot = Math.sin(this.engine.time_ / 30) / 2;
       this.animation_.rLegRot = Math.cos(this.engine.time_ / 30) / 2;
-      this.animation_.lArmRot = 0.5;
+      // this.animation_.lArmRot = -0.5;
+    }
+
+    if (this.physics.mode === MotionMode.climbing) {
+      this.animation_.lLegRot = -0.6;
+      this.animation_.rLegRot = -0.7;
+      this.animation_.lArmRot = -1.3;
+      this.animation_.rArmRot = -0.7;
     }
 
     if (this.engine.time_ - this.lastEyeLook > 100) {
@@ -95,17 +103,17 @@ export class Player {
       }
     }
 
-    if (
-      this.body_.contactPoints.length === 0 &&
-      Math.abs(this.body_.vel.y) > 0.3
-    ) {
-      this.animation_.lArmRot = -1.5 + Math.sin(this.engine.time_ / 50) / 3;
-      this.animation_.rArmRot = 1.5 + Math.cos(this.engine.time_ / 50) / 3;
-      this.animation_.lLegRot = 0.3;
-      this.animation_.rLegRot = -0.3;
-    } else {
-      this.animation_.lArmRot = -0.7 + Math.sin(this.engine.time_ / 200) / 10;
-      this.animation_.rArmRot = 0.7 - Math.sin(this.engine.time_ / 200) / 10;
+    if (this.physics.mode === MotionMode.falling) {
+      if (this.body_.vel.y > 0.3) {
+        this.animation_.lArmRot = -1.5 + Math.sin(this.engine.time_ / 50) / 3;
+        this.animation_.rArmRot = 1.5 + Math.cos(this.engine.time_ / 50) / 3;
+        this.animation_.lLegRot = 0.3;
+        this.animation_.rLegRot = -0.3;
+      } else {
+        this.animation_.lArmRot =
+          -0.7 + Math.sin(this.engine.time_ / 200) / 10;
+        this.animation_.rArmRot = 0.7 - Math.sin(this.engine.time_ / 200) / 10;
+      }
     }
 
     this.animation_.headOffset = Math.sin(this.engine.time_ / 200) - 2;
