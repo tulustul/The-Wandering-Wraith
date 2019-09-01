@@ -2,10 +2,10 @@ import { Engine } from "../engine";
 import { Vector2 } from "../vector";
 import { GROUND_MASK, PLAYER_MASK } from "../colisions-masks";
 import { DynamicBody } from "./physics/physics.interface";
-import { CircleShape } from "./physics/shapes";
 import { SinusAnimation } from "../animations";
 import { playSound } from "../sound";
 import { assets } from "../assets";
+import { PlayerPhysics } from "./physics/player-physics";
 
 interface AgentAnimation {
   headOffset: number;
@@ -24,23 +24,11 @@ export class Player {
 
   lastStepTime = 0;
 
-  lastBall = 0;
-
   lastEyeLook = 0;
-
-  maxSpeed = 4.5;
 
   body_: DynamicBody;
 
-  direction_: "l" | "r" = "r";
-
-  lastJumpTime = 0;
-
-  dashed = false;
-
   stretch = new Vector2(1, 1);
-
-  isRunning = false;
 
   isDead = true;
 
@@ -54,40 +42,13 @@ export class Player {
     eyesOffset: 0,
   };
 
+  physics: PlayerPhysics;
+
+  isRunning = false;
+
   constructor(public engine: Engine, pos: Vector2) {
     this.createBody(pos);
-  }
-
-  moveToDirection(direction: number) {
-    this.isRunning = !!this.body_.contactPoints.length;
-    let accScalar = 0.6;
-    if (!this.body_.contactPoints.length) {
-      accScalar = 0.3;
-    }
-    const acc = new Vector2(0, accScalar).rotate_(direction);
-    this.updateVelocity(acc);
-    if (direction < Math.PI) {
-      this.direction_ = "r";
-    } else {
-      this.direction_ = "l";
-    }
-  }
-
-  jump() {
-    for (const point of this.body_.contactPoints) {
-      if (point.y - this.body_.pos.y > 5) {
-        this.body_.vel.y = -5;
-        this.lastJumpTime = this.engine.time_;
-        this.dashed = false;
-        playSound(assets.sounds.jump);
-        return;
-      }
-    }
-    if (!this.dashed && this.engine.time_ - this.lastJumpTime > 300) {
-      this.body_.vel.y = -6;
-      this.dashed = true;
-      playSound(assets.sounds.dash);
-    }
+    this.physics = new PlayerPhysics(engine.physics, this);
   }
 
   blink() {
@@ -97,24 +58,16 @@ export class Player {
     );
   }
 
-  private updateVelocity(acc: Vector2) {
-    if (Math.abs(this.body_.vel.x + acc.x) < this.maxSpeed) {
-      this.body_.vel.x += acc.x;
-    }
-    this.body_.vel.y += acc.y;
-  }
-
   updateControls() {
-    this.isRunning = false;
     const control = this.engine.control_;
     if (control.keys_.get("Space")) {
-      this.jump();
+      this.physics.jump();
     }
     if (control.keys_.get("ArrowLeft")) {
-      this.moveToDirection(Math.PI * 0.5);
+      this.physics.moveToDirection(Math.PI * 0.5);
     }
     if (control.keys_.get("ArrowRight")) {
-      this.moveToDirection(Math.PI * 1.5);
+      this.physics.moveToDirection(Math.PI * 1.5);
     }
   }
 
@@ -140,7 +93,10 @@ export class Player {
       }
     }
 
-    if (!this.body_.contactPoints.length && Math.abs(this.body_.vel.y) > 0.3) {
+    if (
+      this.body_.contactPoints.length === 0 &&
+      Math.abs(this.body_.vel.y) > 0.3
+    ) {
       this.animation_.lArmRot = -1.5 + Math.sin(this.engine.time_ / 50) / 3;
       this.animation_.rArmRot = 1.5 + Math.cos(this.engine.time_ / 50) / 3;
       this.animation_.lLegRot = 0.3;
@@ -162,16 +118,18 @@ export class Player {
       if (this.body_.vel.length_() > 1) {
         this.lastStepTime = this.engine.time_;
         this.currentStep = (this.currentStep + 1) % 2;
-        if (this.body_.contactPoints.length) playSound(assets.sounds.walk);
+        if (this.body_.contactPoints.length > 0) {
+          playSound(assets.sounds.walk);
+        }
       }
     }
   }
 
   update_() {
-    this.body_.vel.y += 0.3;
+    this.isRunning = false;
     this.updateControls();
+    this.physics.update_();
     this.updateAnimation();
-    this.makeStep();
   }
 
   die() {
@@ -203,7 +161,7 @@ export class Player {
   createBody(pos: Vector2) {
     this.isDead = false;
     this.body_ = this.engine.physics.addDynamic({
-      shape_: new CircleShape(pos, 10),
+      radius: 10,
       parent: this,
       receiveMask: PLAYER_MASK,
       hitMask: GROUND_MASK,

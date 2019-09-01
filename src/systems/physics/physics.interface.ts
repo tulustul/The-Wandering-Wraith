@@ -1,22 +1,22 @@
 import { Vector2 } from "../../vector";
-import { Shape, LineShape } from "./shapes";
 
 export interface Body {
-  pos: Vector2;
-  shape_: Shape;
   receiveMask: number;
   parent?: any;
   isDeadly: boolean;
 }
 
 export interface StaticBody extends Body {
-  shape_: LineShape;
+  start_: Vector2;
+  end_: Vector2;
 }
 
 export interface DynamicBodyDefinition extends Body {
+  pos: Vector2;
   vel: Vector2;
   friction: number;
   hitMask: number;
+  radius: number;
   onCollide?: () => void;
 }
 
@@ -25,9 +25,9 @@ export interface DynamicBody extends DynamicBodyDefinition {
   contactPoints: Vector2[];
 }
 
-export interface Colision {
+export interface StaticBodyColision {
   hitter: DynamicBody;
-  receiver: Body;
+  receiver: StaticBody;
   point: Vector2;
   penetration: Vector2;
 }

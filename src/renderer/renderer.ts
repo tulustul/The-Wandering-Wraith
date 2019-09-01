@@ -94,10 +94,10 @@ export class Renderer {
       b => b.isDeadly,
     );
     for (const body of deadlyBodies) {
-      const angle = body.shape_.start_.directionTo(body.shape_.end_);
-      const length = body.shape_.start_.distanceTo(body.shape_.end_);
+      const angle = body.start_.directionTo(body.end_);
+      const length = body.start_.distanceTo(body.end_);
       this.ctx.save();
-      this.ctx.translate(body.shape_.start_.x, body.shape_.start_.y);
+      this.ctx.translate(body.start_.x, body.start_.y);
       this.ctx.rotate(angle);
       let y = 0;
       while (y < length) {
@@ -122,7 +122,7 @@ export class Renderer {
 
     ctx.translate(player.body_.pos.x, player.body_.pos.y - 3);
 
-    if (player.direction_ === "r") {
+    if (player.physics.direction_ === "r") {
       ctx.scale(-1, 1);
     }
     ctx.rotate(player.body_.vel.angle_());

@@ -75,6 +75,6 @@ export class Vector2 {
   }
 
   angleTo(vec: Vector2) {
-    return Math.acos(this.dot(vec) / (this.length_() * vec.length_()));
+    return Math.acos(this.dot(vec) / (this.length_() * vec.length_())) || 0;
   }
 }

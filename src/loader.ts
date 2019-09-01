@@ -2,7 +2,6 @@ import { Engine } from "./engine";
 import { Vector2 } from "./vector";
 import { generateBezierSegments } from "./bezier";
 import { GROUND_MASK, TREE_GROUND_MASK, GRASS_MASK } from "./colisions-masks";
-import { LineShape } from "./systems/physics/shapes";
 import { LEVELS } from "./levels";
 import {
   PathCommandType,
@@ -223,8 +222,8 @@ export class LevelParser {
   }
 
   private addStatic(
-    from_: Vector2,
-    to_: Vector2,
+    start_: Vector2,
+    end_: Vector2,
     isDeadly: boolean,
     mask = 0,
   ) {
@@ -232,9 +231,9 @@ export class LevelParser {
       mask = 0;
     }
     this.engine.physics.addStatic({
-      shape_: new LineShape(from_, to_),
+      start_,
+      end_,
       receiveMask: GROUND_MASK | mask,
-      pos: new Vector2(0, 0),
       isDeadly,
     });
   }

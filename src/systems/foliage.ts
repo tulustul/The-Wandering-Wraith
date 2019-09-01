@@ -4,7 +4,7 @@ import { Vector2 } from "../vector";
 import { Random } from "../random";
 import { PlantDefinition } from "../plants";
 import { assets } from "../assets";
-import { LineShape, lineToPointColision } from "./physics/shapes";
+import { lineToPointColision, getLineCells } from "./physics/shapes";
 
 interface Foliage {
   pos: Vector2;
@@ -48,38 +48,38 @@ export class FoliageSystem {
   }
 
   *findGround(engine: Engine, x: number, hitMask: number) {
-    const cells = new LineShape(
+    const cells = getLineCells(
       new Vector2(x, 0),
       new Vector2(x, engine.level.size.y),
-    ).getCells();
+    );
 
-    const linesToCheck = new Set<LineShape>();
+    const linesToCheck = new Set<[Vector2, Vector2]>();
     const grid = engine.physics.staticGrid;
     for (const cell of cells) {
       if (grid.has(cell)) {
         for (const body of grid.get(cell)!) {
           if (body.receiveMask & hitMask) {
-            linesToCheck.add(body.shape_ as LineShape);
+            linesToCheck.add([body.start_, body.end_]);
           }
         }
       }
     }
 
-    let narrowChecks: [LineShape, Vector2, number][] = [];
-    for (const line of linesToCheck) {
-      const d = line.end_.copy().sub_(line.start_);
+    let narrowChecks: [Vector2, Vector2, Vector2, number][] = [];
+    for (const [start_, end_] of linesToCheck) {
+      const d = end_.copy().sub_(start_);
       const slope = d.y / d.x;
 
-      const b = line.start_.y - slope * line.start_.x;
+      const b = start_.y - slope * start_.x;
       const crossPoint = new Vector2(x, slope * x + b);
-      narrowChecks.push([line, crossPoint, slope]);
+      narrowChecks.push([start_, end_, crossPoint, slope]);
     }
 
     narrowChecks.sort((checkA, checkB) => checkA[1].y - checkB[1].y);
 
     let add = false;
-    for (const [line, crossPoint, slope] of narrowChecks) {
-      if (lineToPointColision(line.start_, line.end_, crossPoint)) {
+    for (const [start_, end_, crossPoint, slope] of narrowChecks) {
+      if (lineToPointColision(start_, end_, crossPoint)) {
         add = !add;
         if (Math.abs(slope) < 1.5 && add) {
           yield crossPoint;

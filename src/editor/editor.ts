@@ -90,6 +90,9 @@ export class Editor {
       if (this.engine.control_.keys_.get("ShiftLeft")) {
         speed = 30;
       }
+      if (this.engine.control_.keys_.get("AltLeft")) {
+        speed = 1;
+      }
       if (this.engine.control_.keys_.get("KeyW")) {
         pos.y -= speed;
         this.manipulator.move(new Vector2(0, -speed));

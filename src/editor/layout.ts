@@ -122,7 +122,7 @@ export const EDITOR_HTML = `
 <label id="output-wrapper">
   <button class="btn" id="generate-level-string">Generate level string</button>
   Level string
-  <textarea id="level-string" rows="5"></textarea>
+  <textarea id="level-string" rows="15"></textarea>
   <button class="btn" id="close-editor">Close editor</button>
   </label>
 `;

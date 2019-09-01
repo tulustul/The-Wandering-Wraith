@@ -49,8 +49,8 @@ export class EditorRenderer {
     this.ctx.lineWidth = 2;
     for (const body of this.engine.physics.staticBodies) {
       this.ctx.beginPath();
-      this.ctx.moveTo(body.shape_.start_.x, body.shape_.start_.y);
-      this.ctx.lineTo(body.shape_.end_.x, body.shape_.end_.y);
+      this.ctx.moveTo(body.start_.x, body.start_.y);
+      this.ctx.lineTo(body.end_.x, body.end_.y);
       this.ctx.stroke();
       this.ctx.closePath();
     }
@@ -66,8 +66,8 @@ export class EditorRenderer {
         entity.pos.y + entity.vel.y * 2,
       );
       this.ctx.closePath();
-
       this.ctx.stroke();
+
       for (const point of entity.contactPoints) {
         this.ctx.beginPath();
         this.ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
