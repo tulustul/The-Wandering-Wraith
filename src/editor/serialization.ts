@@ -49,30 +49,37 @@ export class LevelSerializer {
       }
     }
 
-    tokens.push("p");
-    for (const o of level.objects!) {
+    const objects = level.objects!.sort((a, b) =>
+      a.type.localeCompare(b.type),
+    );
+    let serializingPlatforms = false;
+    for (const o of objects) {
       if (o.isDeadly != isDeadly) {
         tokens.push("d");
         isDeadly = o.isDeadly;
+      }
+      if (o.type.startsWith("platform") && !serializingPlatforms) {
+        serializingPlatforms = true;
+        tokens.push("p");
       }
       switch (o.type) {
         case "platform":
           tokens.push("P");
           tokens.push(this.serializeVector(o.pos));
           break;
-        case "hPlatform1":
+        case "platformH1":
           tokens.push("h");
           tokens.push(this.serializeVector(o.pos));
           break;
-        case "hPlatform2":
+        case "platformH2":
           tokens.push("H");
           tokens.push(this.serializeVector(o.pos));
           break;
-        case "vPlatform1":
+        case "platformV1":
           tokens.push("v");
           tokens.push(this.serializeVector(o.pos));
           break;
-        case "vPlatform2":
+        case "platformV2":
           tokens.push("V");
           tokens.push(this.serializeVector(o.pos));
           break;

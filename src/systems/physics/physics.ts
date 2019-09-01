@@ -28,6 +28,7 @@ export class PhysicsSystem {
   addDynamic(body: DynamicBodyDefinition) {
     const newBody: DynamicBody = {
       ...body,
+      oldPos: body.pos.copy(),
       contactPoints: [],
     };
     this.dynamicBodies.push(newBody);
@@ -69,6 +70,7 @@ export class PhysicsSystem {
 
   private updatePosAndVel() {
     for (const body of this.dynamicBodies) {
+      body.oldPos = body.pos.copy();
       let willSeparate = true;
       for (const point of body.contactPoints) {
         const velAngle = body.vel.angleTo(point.copy().sub_(body.pos));
@@ -90,11 +92,11 @@ export class PhysicsSystem {
         body.vel.add_(frictionForce);
       } else {
         // air friction
-        body.vel.x *= 0.95;
+        body.vel.x *= 0.94;
       }
 
       body.pos.add_(body.vel);
-      body.vel.y += 0.3;
+      // body.vel.y += 0.3;
 
       /* 
       Limit the speed to the diameter of circle. 
@@ -179,13 +181,21 @@ export class PhysicsSystem {
       // colision.hitter.vel.add_(colision.penetration);
       if (colision.hitter.vel.x ^ colision.penetration.x) {
         // colision.hitter.vel.x += colision.penetration.x
-        colision.hitter.vel.x = 0;
+        // colision.hitter.vel.x = 0;
       }
 
       // if (colision.hitter.vel.y ^ colision.penetration.y) {
       //   colision.hitter.vel.y = 0.3;
       // }
-      colision.hitter.vel.y += colision.penetration.y;
+      // colision.hitter.vel.y += colision.penetration.y;
+      const d = colision.hitter.pos
+        .copy()
+        .sub_(colision.hitter.oldPos)
+        .mul(5);
+      const v = colision.hitter.vel;
+
+      colision.hitter.vel.x = Math.abs(v.x) < Math.abs(d.x) ? v.x : d.x;
+      colision.hitter.vel.y = Math.abs(v.y) < Math.abs(d.y) ? v.y : d.y;
 
       // const v = colision.hitter.vel
       //   .copy()

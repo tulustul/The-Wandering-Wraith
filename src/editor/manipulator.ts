@@ -45,7 +45,7 @@ export class Manipulator {
       const pos = this.mousePosToWorldPos(new Vector2(event.x, event.y));
 
       if (this.objectToAdd !== "") {
-        this.editor.editorObjects.place(this.objectToAdd, pos);
+        this.editor.editorObjects.place(this.objectToAdd, pos.copy());
         this.objectToAdd = "";
         this.editor.ui.clearObjectType();
         return;

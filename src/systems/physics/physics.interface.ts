@@ -21,6 +21,7 @@ export interface DynamicBodyDefinition extends Body {
 }
 
 export interface DynamicBody extends DynamicBodyDefinition {
+  oldPos: Vector2;
   contactPoints: Vector2[];
 }
 

@@ -73,7 +73,10 @@ export const EDITOR_HTML = `
     </label>
   </div>
 
-  <button class="btn" id="toggle-pause">Toggle pause</button>
+  <div class="line">
+    <button class="btn" id="toggle-pause">Toggle pause</button>
+    <button class="btn" id="save-game">Save game</button>
+  </div>
   
   <div class="line">
     <button class="btn" id="clear-plants">Clear plants</button>
@@ -102,10 +105,10 @@ export const EDITOR_HTML = `
       <option value="">-</option>
       <option value="polygon">polygon</option>
       <option value="platform">platform</option>
-      <option value="hPlatform1">hPlatform1</option>
-      <option value="hPlatform2">hPlatform2</option>
-      <option value="vPlatform1">vPlatform1</option>
-      <option value="vPlatform2">vPlatform2</option>
+      <option value="platformH1">platformH1</option>
+      <option value="platformH2">platformH2</option>
+      <option value="platformV1">platformV1</option>
+      <option value="platformV2">platformV2</option>
       <option value="savepoint">save point</option> 
     </select>
   </label>

@@ -5,10 +5,10 @@ import { PathCommand, PathCommandType } from "../level.interface";
 export type ObjectType =
   | "polygon"
   | "platform"
-  | "hPlatform1"
-  | "hPlatform2"
-  | "vPlatform1"
-  | "vPlatform2"
+  | "platformH1"
+  | "platformH2"
+  | "platformV1"
+  | "platformV2"
   | "savepoint";
 
 export class EditorObjects {
@@ -20,23 +20,24 @@ export class EditorObjects {
         this.createPolygon(pos);
         break;
       case "platform":
-      case "hPlatform1":
-      case "hPlatform2":
-      case "vPlatform1":
-      case "vPlatform2":
+      case "platformH1":
+      case "platformH2":
+      case "platformV1":
+      case "platformV2":
         const platform = { type, pos, isDeadly: false };
         this.editor.engine.level.objects!.push(platform);
         this.pointsMap.set(pos, platform as any);
         break;
       case "savepoint":
         const savepoint = {
-          type: "savepoint",
+          type,
           pos,
           isDeadly: false,
         };
         this.editor.engine.level.savepoints.push(pos.x);
         this.editor.engine.level.objects!.push(savepoint);
         this.pointsMap.set(pos, savepoint as any);
+        break;
     }
   }
 

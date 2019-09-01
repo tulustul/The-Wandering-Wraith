@@ -12,7 +12,6 @@ export class EditorRenderer {
 
     if (Math.round(this.engine.time_) % 500 === 0) {
       this.engine.renderer.terrainLayer.activate();
-      this.engine.renderer.terrainLayer.clearCanvas();
       this.engine.renderer.renderTerrain();
       this.engine.renderer.renderPlatforms();
       this.engine.renderer.renderSpikes();
@@ -46,6 +45,16 @@ export class EditorRenderer {
   }
 
   private drawColisionHelpers() {
+    this.ctx.strokeStyle = "#ff0";
+    this.ctx.lineWidth = 2;
+    for (const body of this.engine.physics.staticBodies) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(body.shape_.start_.x, body.shape_.start_.y);
+      this.ctx.lineTo(body.shape_.end_.x, body.shape_.end_.y);
+      this.ctx.stroke();
+      this.ctx.closePath();
+    }
+
     this.ctx.fillStyle = "#f00";
     this.ctx.strokeStyle = "#f00";
     for (const entity of this.engine.physics.dynamicBodies) {
@@ -68,16 +77,6 @@ export class EditorRenderer {
       this.ctx.restore();
     }
     this.ctx.closePath();
-
-    this.ctx.strokeStyle = "#ff0";
-    this.ctx.lineWidth = 2;
-    for (const body of this.engine.physics.staticBodies) {
-      this.ctx.beginPath();
-      this.ctx.moveTo(body.shape_.start_.x, body.shape_.start_.y);
-      this.ctx.lineTo(body.shape_.end_.x, body.shape_.end_.y);
-      this.ctx.stroke();
-      this.ctx.closePath();
-    }
   }
 
   private drawPlantsHelpers() {
@@ -190,20 +189,20 @@ export class EditorRenderer {
   private drawObjects() {
     const sizes: { [key: string]: [number, number] } = {
       platform: [15, 5],
-      hPlatform1: [40, 10],
-      hPlatform2: [80, 10],
-      vPlatform1: [10, 40],
-      vPlatform2: [10, 80],
+      platformH1: [40, 10],
+      platformH2: [80, 10],
+      platformV1: [10, 40],
+      platformV2: [10, 80],
     };
 
     for (const o of this.editor.engine.level.objects!) {
       const size = sizes[o.type];
       switch (o.type) {
         case "platform":
-        case "hPlatform1":
-        case "hPlatform2":
-        case "vPlatform1":
-        case "vPlatform2":
+        case "platformH1":
+        case "platformH2":
+        case "platformV1":
+        case "platformV2":
           this.ctx.fillStyle = "#ff02";
           this.ctx.fillRect(
             o.pos.x - size[0],

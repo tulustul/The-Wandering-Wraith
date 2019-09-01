@@ -8,6 +8,7 @@ export class Vector2 {
   zero() {
     this.x = 0;
     this.y = 0;
+    return this;
   }
 
   rotate_(angle: number) {
@@ -39,6 +40,9 @@ export class Vector2 {
 
   normalize_() {
     const length = Math.sqrt(this.x * this.x + this.y * this.y);
+    if (!length) {
+      return this.zero();
+    }
     this.x /= length;
     this.y /= length;
     return this;

@@ -20,10 +20,6 @@ interface AgentAnimation {
 export class Player {
   STEPS_RATE = 90;
 
-  ACCELERATION = 3.7;
-
-  JUMP_ACCELERATION = 0.3;
-
   currentStep = 0;
 
   lastStepTime = 0;
@@ -32,7 +28,7 @@ export class Player {
 
   lastEyeLook = 0;
 
-  maxSpeed = 4;
+  maxSpeed = 4.5;
 
   body_: DynamicBody;
 
@@ -64,9 +60,9 @@ export class Player {
 
   moveToDirection(direction: number) {
     this.isRunning = !!this.body_.contactPoints.length;
-    let accScalar = this.ACCELERATION;
+    let accScalar = 0.6;
     if (!this.body_.contactPoints.length) {
-      accScalar = this.JUMP_ACCELERATION;
+      accScalar = 0.3;
     }
     const acc = new Vector2(0, accScalar).rotate_(direction);
     this.updateVelocity(acc);
@@ -80,7 +76,7 @@ export class Player {
   jump() {
     for (const point of this.body_.contactPoints) {
       if (point.y - this.body_.pos.y > 5) {
-        this.body_.vel.y = -6;
+        this.body_.vel.y = -5;
         this.lastJumpTime = this.engine.time_;
         this.dashed = false;
         playSound(assets.sounds.jump);
@@ -172,6 +168,7 @@ export class Player {
   }
 
   update_() {
+    this.body_.vel.y += 0.3;
     this.updateControls();
     this.updateAnimation();
     this.makeStep();
@@ -211,7 +208,7 @@ export class Player {
       receiveMask: PLAYER_MASK,
       hitMask: GROUND_MASK,
       pos: pos,
-      friction: 0.7,
+      friction: 0.45,
       vel: new Vector2(0, 0),
       isDeadly: false,
       onCollide: () => this.die(),

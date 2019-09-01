@@ -13,7 +13,7 @@ interface Foliage {
 }
 
 export class FoliageSystem {
-  GRID_SIZE = 700;
+  GRID_SIZE = 100;
   entities_: Foliage[][];
 
   async spawnFoliage(engine: Engine) {

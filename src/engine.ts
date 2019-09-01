@@ -62,6 +62,14 @@ export class Engine {
     this.foliage.spawnFoliage(this);
   }
 
+  save() {
+    this.currentSave = {
+      level: this.currentSave.level,
+      pos: this.player.body_.pos.copy(),
+    };
+    save(this.currentSave);
+  }
+
   update_(timeStep: number) {
     this.time_ += timeStep;
     this.animations.update_(this.time_);
@@ -72,11 +80,7 @@ export class Engine {
     const playerPos = this.player.body_.pos;
     for (const savepoint of this.level.savepoints) {
       if (savepoint > this.currentSave.pos.x && playerPos.x > savepoint) {
-        this.currentSave = {
-          level: this.currentSave.level,
-          pos: playerPos,
-        };
-        save(this.currentSave);
+        this.save();
       }
     }
 

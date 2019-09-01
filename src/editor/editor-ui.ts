@@ -23,6 +23,10 @@ export class EditorUI {
       "deadly-input",
     )! as HTMLInputElement;
 
+    (document.getElementById(
+      "level",
+    ) as HTMLSelectElement).value = this.engine.currentSave.level.toString();
+
     this.hideDeadlyToggle();
 
     this.listeners.listen("draw-colision-helpers", "change", event => {
@@ -35,6 +39,10 @@ export class EditorUI {
 
     this.listeners.listen("toggle-pause", "click", () => {
       this.engine.game.paused_ = !this.engine.game.paused_;
+    });
+
+    this.listeners.listen("save-game", "click", () => {
+      this.engine.save();
     });
 
     this.listeners.listen("clear-plants", "click", () => {

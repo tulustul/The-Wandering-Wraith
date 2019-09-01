@@ -48,8 +48,6 @@ export class Renderer {
   renderTerrain() {
     let to: Vector2;
     this.ctx.fillStyle = "#000";
-    this.ctx.strokeStyle = "#111";
-    // this.ctx.lineWidth = 5;
     for (const pathCommand of this.engine.level.pathCommands) {
       switch (pathCommand.type) {
         case PathCommandType.move:
@@ -68,7 +66,6 @@ export class Renderer {
         case PathCommandType.close:
           this.ctx.closePath();
           this.ctx.fill();
-          this.ctx.stroke();
           break;
       }
     }
@@ -77,6 +74,7 @@ export class Renderer {
   renderPlatforms() {
     this.ctx.strokeStyle = "#000";
     this.ctx.lineWidth = 1;
+    this.ctx.beginPath();
     for (const p of this.engine.level.platforms) {
       var grd = this.ctx.createLinearGradient(0, p.y, 0, p.y + p.h);
       grd.addColorStop(0, "#333");
@@ -122,7 +120,7 @@ export class Renderer {
 
     ctx.save();
 
-    ctx.translate(player.body_.pos.x, player.body_.pos.y - 1);
+    ctx.translate(player.body_.pos.x, player.body_.pos.y - 3);
 
     if (player.direction_ === "r") {
       ctx.scale(-1, 1);
@@ -292,9 +290,9 @@ export class Renderer {
     this.renderTerrain();
 
     const hillsParams: [string, number, number, number, number][] = [
-      ["#222", 700, 1.6, 1300, 1],
-      ["#1c1c1c", 350, 3, 1100, 2],
-      ["#161616", 200, 5, 800, 3],
+      ["#1e1e1e", 700, 1.6, 1100, 1],
+      ["#1c1c1c", 350, 3, 800, 2],
+      ["#161616", 200, 5, 600, 3],
     ];
     for (const [index, hillsLayer] of this.hillsLayers.entries()) {
       hillsLayer.activate();

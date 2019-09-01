@@ -153,10 +153,10 @@ export class LevelParser {
           // #if process.env.NODE_ENV === 'development'
           const types: { [key: string]: string } = {
             P: "platform",
-            h: "hPlatform1",
-            H: "hPlatform2",
-            v: "vPlatform1",
-            V: "vPlatform2",
+            h: "platformH1",
+            H: "platformH2",
+            v: "platformV1",
+            V: "platformV2",
           };
           objects.push({ type: types[c], pos, isDeadly });
           pointsMap.set(pos, objects[objects.length - 1] as any);
