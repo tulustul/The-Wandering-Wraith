@@ -57,11 +57,11 @@ export class PhysicsSystem {
     this.dynamicBodies = [];
   }
 
-  update_() {
-    this.updatePosAndVel();
-    const colisions = this.checkColisions();
-    this.resolveColisions(colisions);
-  }
+  // update_() {
+  //   this.updatePosAndVel();
+  //   const colisions = this.checkColisions();
+  //   this.resolveColisions(colisions);
+  // }
 
   private updatePosAndVel() {
     // for (const body of this.dynamicBodies) {
@@ -101,14 +101,14 @@ export class PhysicsSystem {
   }
 
   private *checkColisions(): IterableIterator<StaticBodyColision> {
-    for (const [index, hitter] of this.dynamicBodies.entries()) {
-      yield* this.checkHitterColisions(hitter, index + 1);
-    }
+    // for (const [index, hitter] of this.dynamicBodies.entries()) {
+    //   yield* this.checkHitterColisions(hitter, index + 1);
+    // }
   }
 
-  private *checkHitterColisions(
+  *checkHitterColisions(
     hitter: DynamicBody,
-    startIndex: number,
+    // startIndex: number,
   ): IterableIterator<StaticBodyColision> {
     hitter.contactPoints = [];
     for (const cell of getCircleCells(hitter.pos, hitter.radius)) {
@@ -117,6 +117,7 @@ export class PhysicsSystem {
           if (receiver.receiveMask & hitter.hitMask) {
             const colision = this.checkNarrowColision(hitter, receiver);
             if (colision) {
+              this.resolveColision(colision);
               yield colision;
             }
           }
@@ -127,28 +128,28 @@ export class PhysicsSystem {
     // Dynamic to dynamic colisions. Here we are using brute force on every
     // pair of objects. The result is simply true of false without any colision
     // data.
-    for (let i = startIndex; i < this.dynamicBodies.length; i++) {
-      const receiver = this.dynamicBodies[i];
-      if (receiver !== hitter) {
-        if (receiver.receiveMask & hitter.hitMask) {
-          if (
-            checkCircleCircleColision(
-              hitter.pos,
-              hitter.radius,
-              receiver.pos,
-              receiver.radius,
-            )
-          ) {
-            if (hitter.onCollide) {
-              hitter.onCollide();
-            }
-            if (receiver.onCollide) {
-              receiver.onCollide();
-            }
-          }
-        }
-      }
-    }
+    // for (let i = startIndex; i < this.dynamicBodies.length; i++) {
+    //   const receiver = this.dynamicBodies[i];
+    //   if (receiver !== hitter) {
+    //     if (receiver.receiveMask & hitter.hitMask) {
+    //       if (
+    //         checkCircleCircleColision(
+    //           hitter.pos,
+    //           hitter.radius,
+    //           receiver.pos,
+    //           receiver.radius,
+    //         )
+    //       ) {
+    //         if (hitter.onCollide) {
+    //           hitter.onCollide();
+    //         }
+    //         if (receiver.onCollide) {
+    //           receiver.onCollide();
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   }
 
   private checkNarrowColision(
@@ -173,26 +174,24 @@ export class PhysicsSystem {
     return null;
   }
 
-  private resolveColisions(colisions: IterableIterator<StaticBodyColision>) {
-    for (const colision of colisions) {
-      if (colision.receiver.isDeadly) {
-        if (colision.hitter.onCollide) {
-          colision.hitter.onCollide();
-        }
+  private resolveColision(colision: StaticBodyColision) {
+    if (colision.receiver.isDeadly) {
+      if (colision.hitter.onCollide) {
+        colision.hitter.onCollide();
       }
-
-      if (colision.hitter.pos.y - colision.point.y > -4) {
-        // colision.hitter.pos.sub_(colision.penetration);
-
-        const d = colision.hitter.pos.copy().sub_(colision.hitter.oldPos);
-        const v = colision.hitter.vel;
-
-        // colision.hitter.vel.x = Math.abs(v.x) < Math.abs(d.x) ? v.x : d.x;
-        // colision.hitter.vel.y = Math.abs(v.y) < Math.abs(d.y) ? v.y : d.y;
-      }
-
-      colision.hitter.contactPoints.push(colision.point);
     }
+
+    //   if (colision.hitter.pos.y - colision.point.y > -4) {
+    //     colision.hitter.pos.sub_(colision.penetration);
+
+    //     const d = colision.hitter.pos.copy().sub_(colision.hitter.oldPos);
+    //     const v = colision.hitter.vel;
+
+    //     colision.hitter.vel.x = Math.abs(v.x) < Math.abs(d.x) ? v.x : d.x;
+    //     colision.hitter.vel.y = Math.abs(v.y) < Math.abs(d.y) ? v.y : d.y;
+    //   }
+
+    colision.hitter.contactPoints.push(colision.point);
   }
 
   castRay(start_: Vector2, end_: Vector2) {

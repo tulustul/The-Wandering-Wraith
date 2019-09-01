@@ -74,7 +74,7 @@ export class Engine {
     this.time_ += timeStep;
     this.animations.update_(this.time_);
     this.player.update_();
-    this.physics.update_();
+    // this.physics.update_();
     this.particles.update_();
 
     const playerPos = this.player.body_.pos;

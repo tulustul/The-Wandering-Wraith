@@ -5,7 +5,7 @@ import { DynamicBody } from "./physics/physics.interface";
 import { SinusAnimation } from "../animations";
 import { playSound } from "../sound";
 import { assets } from "../assets";
-import { PlayerPhysics } from "./physics/player-physics";
+import { PlayerPhysics, MotionMode } from "./physics/player-physics";
 
 interface AgentAnimation {
   headOffset: number;
@@ -63,11 +63,13 @@ export class Player {
     if (control.keys_.get("Space")) {
       this.physics.jump();
     }
-    if (control.keys_.get("ArrowLeft")) {
-      this.physics.moveToDirection(Math.PI * 0.5);
-    }
-    if (control.keys_.get("ArrowRight")) {
-      this.physics.moveToDirection(Math.PI * 1.5);
+    if (this.physics.mode !== MotionMode.climbing) {
+      if (control.keys_.get("ArrowLeft")) {
+        this.physics.moveToDirection(Math.PI * 0.5);
+      }
+      if (control.keys_.get("ArrowRight")) {
+        this.physics.moveToDirection(Math.PI * 1.5);
+      }
     }
   }
 
