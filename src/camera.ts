@@ -13,7 +13,15 @@ export class Camera {
   }
 
   update_() {
-    this.pos.x = -this.target.x + this.engine.canvas_.width / 2;
-    this.pos.y = -this.target.y + this.engine.canvas_.height / 1.5;
+    const w = this.engine.canvas_.width;
+    const h = this.engine.canvas_.height;
+    const [maxX, maxY, x, y] = [
+      this.engine.level.size.x - w,
+      this.engine.level.size.y - h,
+      this.target.x - w / 2,
+      this.target.y - h / 1.5,
+    ];
+    this.pos.x = Math.min(Math.max(0, x), maxX);
+    this.pos.y = Math.min(Math.max(0, y), maxY);
   }
 }

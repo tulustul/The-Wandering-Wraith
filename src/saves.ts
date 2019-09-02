@@ -10,7 +10,7 @@ export function loadSave(): Save {
   return (
     JSON.parse(localStorage.getItem("tul_s")!) || {
       level: 0,
-      pos: new Vector2(800, 950),
+      pos: new Vector2(150, 200),
     }
   );
 }

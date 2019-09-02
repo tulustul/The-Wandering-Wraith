@@ -4,7 +4,6 @@ import { Manipulator } from "./manipulator";
 import { EditorUI } from "./editor-ui";
 import { Vector2 } from "../vector";
 import { EditorObjects } from "./objects";
-import { tick } from "../index";
 
 export type EditorMode = "edit" | "play";
 
@@ -18,6 +17,7 @@ export class Editor {
   mode: EditorMode = "edit";
 
   originalRenderFn: () => void;
+  originalCameraUpdateFn: () => void;
 
   editorRenderer = new EditorRenderer(this);
 
@@ -30,6 +30,8 @@ export class Editor {
   controlsInterval: number;
 
   constructor(public engine: Engine) {
+    this.originalCameraUpdateFn = this.engine.camera.update_;
+
     window.addEventListener("keydown", event => {
       if (event.key === "e" && !this.initialized) {
         this.init();
@@ -79,11 +81,16 @@ export class Editor {
     )! as HTMLInputElement;
     editInput.checked = true;
 
-    this.engine.camera.bindToTarget(this.engine.player.body_.pos.copy());
-
     switch (this.mode) {
       case "play":
         this.engine.camera.bindToTarget(this.engine.player.body_.pos);
+        this.engine.camera.update_ = () =>
+          this.originalCameraUpdateFn.bind(this.engine.camera)();
+        break;
+      case "edit":
+        this.engine.camera.bindToTarget(this.engine.player.body_.pos.copy());
+        this.engine.camera.update_ = () =>
+          cameraUpdate.bind(this.engine.camera)();
         break;
     }
   }
@@ -116,4 +123,10 @@ export class Editor {
       }
     }
   }
+}
+
+function cameraUpdate() {
+  this.pos = this.target.copy();
+  this.pos.x -= this.engine.canvas_.width / 2;
+  this.pos.y -= this.engine.canvas_.height / 1.5;
 }

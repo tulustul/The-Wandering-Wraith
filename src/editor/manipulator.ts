@@ -93,7 +93,7 @@ export class Manipulator {
 
       const diff = this.scalePosToWorld(
         new Vector2(event.movementX, event.movementY),
-      ).mul(0.8); // no idea why 0.8 is needed :(
+      );
 
       this.move(diff);
 
@@ -189,7 +189,7 @@ export class Manipulator {
 
   private mousePosToWorldPos(p: Vector2) {
     p = this.scalePosToWorld(p);
-    const pos = this.editor.engine.camera.pos.copy().mul(-1);
+    const pos = this.editor.engine.camera.pos;
     return new Vector2(pos.x + p.x, pos.y + p.y);
   }
 

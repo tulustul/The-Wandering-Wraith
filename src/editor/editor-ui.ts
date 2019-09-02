@@ -97,7 +97,7 @@ export class EditorUI {
       const level = parseInt((event.target! as HTMLSelectElement).value);
       this.editor.engine.load({
         level,
-        pos: new Vector2(800, 950),
+        pos: new Vector2(100, 200),
       });
     });
 

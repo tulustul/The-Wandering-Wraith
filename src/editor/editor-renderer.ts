@@ -21,7 +21,7 @@ export class EditorRenderer {
 
     const pos = this.engine.camera.pos;
     this.ctx.save();
-    this.ctx.translate(pos.x, pos.y);
+    this.ctx.translate(-pos.x, -pos.y);
 
     this.drawPaths();
 
@@ -36,6 +36,8 @@ export class EditorRenderer {
     this.drawObjects();
     this.drawControlPoints();
     this.drawAreaSelection();
+
+    this.renderLevelBoundaries();
 
     this.ctx.restore();
   }
@@ -222,5 +224,14 @@ export class EditorRenderer {
           break;
       }
     }
+  }
+
+  private renderLevelBoundaries() {
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeStyle = "blue";
+    this.ctx.beginPath();
+    this.ctx.rect(0, 0, this.engine.level.size.x, this.engine.level.size.y);
+    this.ctx.closePath();
+    this.ctx.stroke();
   }
 }

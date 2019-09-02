@@ -74,7 +74,6 @@ export class Engine {
     this.time_ += timeStep;
     this.animations.update_(this.time_);
     this.player.update_();
-    // this.physics.update_();
     this.particles.update_();
 
     const playerPos = this.player.body_.pos;
@@ -84,9 +83,9 @@ export class Engine {
       }
     }
 
-    if (playerPos.x > this.level.size.x - 500) {
+    if (playerPos.x > this.level.size.x + 10) {
       this.currentSave.level++;
-      this.currentSave.pos = new Vector2(800, 950);
+      this.currentSave.pos = new Vector2(150, 200);
       save(this.currentSave);
       this.load(this.currentSave);
     }

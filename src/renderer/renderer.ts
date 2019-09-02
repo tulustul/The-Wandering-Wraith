@@ -216,8 +216,8 @@ export class Renderer {
     while (x < canvas.width) {
       this.ctx.beginPath();
       this.ctx.save();
-      this.ctx.translate(x, canvas.height + size);
-      this.ctx.scale(1, amplitude + r.nextVariation() * amplitude * 0.1);
+      this.ctx.translate(x, canvas.height);
+      this.ctx.scale(1, amplitude + r.nextVariation() * amplitude * 0.5);
       this.ctx.arc(0, 0, size, Math.PI, Math.PI * 2);
       this.ctx.closePath();
       this.ctx.fill();
@@ -227,10 +227,8 @@ export class Renderer {
   }
 
   renderFoliage(isForeGround: boolean) {
-    const minX =
-      this.engine.player.body_.pos.x - this.engine.canvas_.width / 2 - 300;
-    const maxX =
-      this.engine.player.body_.pos.x + this.engine.canvas_.width / 2 + 300;
+    const minX = this.engine.camera.pos.x - 100;
+    const maxX = this.engine.camera.pos.x + this.engine.canvas_.width + 100;
 
     for (let x = minX; x < maxX; x += this.engine.foliage.GRID_SIZE) {
       const cell = Math.floor(x / this.engine.foliage.GRID_SIZE);
@@ -285,9 +283,9 @@ export class Renderer {
     this.renderTerrain();
 
     const hillsParams: [string, number, number, number, number][] = [
-      ["#1e1e1e", 700, 1.6, 1100, 1],
-      ["#1c1c1c", 350, 3, 800, 2],
-      ["#161616", 200, 5, 600, 3],
+      ["#1e1e1e", 500, 0.5, 1300, 3],
+      ["#1c1c1c", 400, 0.7, 1000, 7],
+      ["#161616", 200, 1.0, 800, 9],
     ];
     for (const [index, hillsLayer] of this.hillsLayers.entries()) {
       hillsLayer.activate();
@@ -318,13 +316,13 @@ export class Renderer {
       this.drawLayer(hillsLayer);
     }
 
-    this.ctx.translate(pos.x, pos.y);
-    this.renderFoliage(false);
     this.ctx.translate(-pos.x, -pos.y);
+    this.renderFoliage(false);
+    this.ctx.translate(pos.x, pos.y);
 
     this.drawLayer(this.terrainLayer);
 
-    this.ctx.translate(pos.x, pos.y);
+    this.ctx.translate(-pos.x, -pos.y);
 
     if (!this.engine.player.isDead) {
       this.renderPlayer();
@@ -339,7 +337,7 @@ export class Renderer {
       this.ctx.globalCompositeOperation = "source-over";
     }
 
-    this.ctx.translate(-pos.x, -pos.y);
+    this.ctx.translate(pos.x, pos.y);
   }
 
   updateSize() {
@@ -365,8 +363,8 @@ export class Renderer {
   drawLayerWithCameraOffset(layer: Layer) {
     this.ctx.drawImage(
       layer.canvas_,
-      -this.engine.camera.pos.x * layer.offsetScale,
-      -this.engine.camera.pos.y * layer.offsetScale,
+      this.engine.camera.pos.x * layer.offsetScale,
+      this.engine.camera.pos.y * (layer.offsetScale === 1 ? 1 : 0),
       this.activeLayer.canvas_.width,
       this.activeLayer.canvas_.height,
       0,
