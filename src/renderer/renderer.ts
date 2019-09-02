@@ -307,6 +307,29 @@ export class Renderer {
     }
   }
 
+  renderRain() {
+    const r = new Random(1);
+
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeStyle = "#fff8";
+    for (let i = 0; i < 50; i++) {
+      const velX = 1 + r.nextFloat() * 0.8;
+      const velY = 0.3 + r.nextFloat() * 0.2;
+      const posX =
+        (r.nextFloat() * this.activeLayer.canvas_.width +
+          (velX * this.engine.time_) / 5) %
+        this.activeLayer.canvas_.width;
+      const posY =
+        (r.nextFloat() * this.activeLayer.canvas_.height +
+          (velY * this.engine.time_) / 5) %
+        this.activeLayer.canvas_.height;
+      this.ctx.beginPath();
+      this.ctx.moveTo(posX, posY);
+      this.ctx.lineTo(posX + velX * 2, posY + velY * 2);
+      this.ctx.stroke();
+    }
+  }
+
   render() {
     const pos = this.engine.camera.pos;
 
@@ -338,6 +361,10 @@ export class Renderer {
     }
 
     this.ctx.translate(pos.x, pos.y);
+
+    this.ctx.globalCompositeOperation = "overlay";
+    this.renderRain();
+    this.ctx.globalCompositeOperation = "source-over";
   }
 
   updateSize() {
