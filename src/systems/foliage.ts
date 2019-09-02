@@ -5,6 +5,8 @@ import { Random } from "../random";
 import { PlantDefinition } from "../plants";
 import { assets } from "../assets";
 import { lineToPointColision, getLineCells } from "./physics/shapes";
+import { GROUND_MASK } from "../colisions-masks";
+import { StaticBody } from "./physics/physics.interface";
 
 interface Foliage {
   pos: Vector2;
@@ -56,11 +58,15 @@ export class FoliageSystem {
 
     const linesToCheck = new Set<[Vector2, Vector2]>();
     const grid = engine.physics.staticGrid;
+    const checked = new Set<StaticBody>();
     for (const cell of cells) {
       if (grid.has(cell)) {
         for (const body of grid.get(cell)!) {
-          if (body.receiveMask & hitMask) {
-            linesToCheck.add([body.start_, body.end_]);
+          if (!checked.has(body)) {
+            checked.add(body);
+            if (body.receiveMask & hitMask) {
+              linesToCheck.add([body.start_, body.end_]);
+            }
           }
         }
       }
@@ -78,13 +84,13 @@ export class FoliageSystem {
 
     narrowChecks.sort((checkA, checkB) => checkA[1].y - checkB[1].y);
 
-    let add = false;
+    let add = true;
     for (const [start_, end_, crossPoint, slope] of narrowChecks) {
       if (lineToPointColision(start_, end_, crossPoint)) {
-        add = !add;
-        if (Math.abs(slope) < 1.5 && add) {
+        if (crossPoint.y > 0 && Math.abs(slope) < 1.5 && add) {
           yield crossPoint;
         }
+        add = !add;
       }
     }
   }

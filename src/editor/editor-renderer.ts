@@ -83,8 +83,11 @@ export class EditorRenderer {
 
   private drawPlantsHelpers() {
     this.ctx.fillStyle = "green";
-    for (const cell of this.engine.foliage.entities_) {
-      for (const foliage of cell) {
+    const minX = this.engine.camera.pos.x;
+    const maxX = this.engine.camera.pos.x + this.engine.canvas_.width;
+    for (let x = minX; x < maxX; x += this.engine.foliage.GRID_SIZE) {
+      const cell = Math.floor(x / this.engine.foliage.GRID_SIZE);
+      for (const foliage of this.engine.foliage.entities_[cell] || []) {
         this.ctx.beginPath();
         this.ctx.arc(foliage.pos.x, foliage.pos.y, 2, 0, 2 * Math.PI);
         this.ctx.fill();

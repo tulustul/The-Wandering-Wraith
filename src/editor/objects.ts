@@ -45,26 +45,30 @@ export class EditorObjects {
     const commands = this.editor.engine.level.pathCommands;
 
     let to = pos.copy();
-    let command = { type: PathCommandType.move, points: [to] } as PathCommand;
+    let command: PathCommand = {
+      type: PathCommandType.move,
+      points: [to],
+      isDeadly: false,
+    };
     commands.push(command);
     this.pointsMap.set(to, command);
 
     to = new Vector2(50, 0).add_(pos);
-    command = { type: PathCommandType.line, points: [to] } as PathCommand;
+    command = { type: PathCommandType.line, points: [to], isDeadly: false };
     commands.push(command);
     this.pointsMap.set(to, command);
 
     to = new Vector2(50, 50).add_(pos);
-    command = { type: PathCommandType.line, points: [to] } as PathCommand;
+    command = { type: PathCommandType.line, points: [to], isDeadly: false };
     commands.push(command);
     this.pointsMap.set(to, command);
 
     to = new Vector2(0, 50).add_(pos);
-    command = { type: PathCommandType.line, points: [to] } as PathCommand;
+    command = { type: PathCommandType.line, points: [to], isDeadly: false };
     commands.push(command);
     this.pointsMap.set(to, command);
 
-    commands.push({ type: PathCommandType.close } as PathCommand);
+    commands.push({ type: PathCommandType.close, isDeadly: false });
   }
 
   get pointsMap() {
