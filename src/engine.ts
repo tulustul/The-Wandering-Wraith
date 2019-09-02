@@ -54,9 +54,15 @@ export class Engine {
   }
 
   load(save: Save) {
-    this.currentSave = save;
     this.physics.clear_();
     loadLevel(this, save.level);
+    const pos = this.physics.castRay(
+      new Vector2(150, save.pos.y - 50),
+      new Vector2(150, this.level.size.y),
+    );
+    save.pos.y = pos!.y - 10;
+    this.currentSave = save;
+
     this.player = new Player(this, new Vector2(save.pos.x, save.pos.y));
     this.renderer.init();
     this.foliage.spawnFoliage(this);

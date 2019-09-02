@@ -196,7 +196,7 @@ export class LevelParser {
       pos.copy().add_(new Vector2(-w, h)),
     ];
 
-    const mask = w > 50 ? GRASS_MASK : 0;
+    const mask = w > 30 ? GRASS_MASK : 0;
     this.addStatic(a, b, isDeadly, mask);
     this.addStatic(b, c, isDeadly, mask);
     this.addStatic(c, d, isDeadly, mask);

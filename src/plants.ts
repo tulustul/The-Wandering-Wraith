@@ -53,7 +53,7 @@ export function generateTree(
   const r = new Random(seed);
 
   var grd = ctx.createLinearGradient(0, 0, 0, size);
-  grd.addColorStop(0.5, "#111");
+  grd.addColorStop(0.5, "#151515");
   grd.addColorStop(1, "#000");
 
   ctx.strokeStyle = grd;

@@ -173,7 +173,7 @@ export class Renderer {
   renderSky() {
     const canvas = this.engine.renderer.activeLayer.canvas_;
     var grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grd.addColorStop(0, "#444");
+    grd.addColorStop(0, "#555");
     grd.addColorStop(1, "#111");
     this.ctx.fillStyle = grd;
     this.ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -188,7 +188,7 @@ export class Renderer {
     );
     gradient.addColorStop(0, "#ddd");
     gradient.addColorStop(0.03, "#ddd");
-    gradient.addColorStop(0.04, "#666");
+    gradient.addColorStop(0.04, "#777");
     gradient.addColorStop(1, "transparent");
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -203,7 +203,7 @@ export class Renderer {
   ) {
     const r = new Random(seed);
     const canvas = this.engine.renderer.activeLayer.canvas_;
-    const blur = 1.5 / this.engine.renderer.activeLayer.offsetScale;
+    const blur = 2 / this.engine.renderer.activeLayer.offsetScale;
 
     var grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
     grd.addColorStop(0, color);
@@ -283,9 +283,9 @@ export class Renderer {
     this.renderTerrain();
 
     const hillsParams: [string, number, number, number, number][] = [
-      ["#1e1e1e", 500, 0.5, 1300, 3],
-      ["#1c1c1c", 400, 0.7, 1000, 7],
-      ["#161616", 200, 1.0, 800, 9],
+      ["#282828", 500, 0.5, 1300, 3],
+      ["#222", 400, 0.7, 1000, 7],
+      ["#1d1d1d", 200, 1.0, 800, 9],
     ];
     for (const [index, hillsLayer] of this.hillsLayers.entries()) {
       hillsLayer.activate();
