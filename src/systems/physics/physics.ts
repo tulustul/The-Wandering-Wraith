@@ -111,10 +111,15 @@ export class PhysicsSystem {
     // startIndex: number,
   ): IterableIterator<StaticBodyColision> {
     hitter.contactPoints = [];
+    const checked = new Set<StaticBody>();
     for (const cell of getCircleCells(hitter.pos, hitter.radius)) {
       if (this.staticGrid.has(cell)) {
         for (const receiver of this.staticGrid.get(cell)!) {
-          if (receiver.receiveMask & hitter.hitMask) {
+          if (
+            !checked.has(receiver) &&
+            receiver.receiveMask & hitter.hitMask
+          ) {
+            checked.add(receiver);
             const colision = this.checkNarrowColision(hitter, receiver);
             if (colision) {
               this.resolveColision(colision);

@@ -133,19 +133,19 @@ export class LevelParser {
         case "p":
           this.index++;
           const pos = this.parseVector();
-          const sizes: { [key: string]: [number, number] } = {
-            P: [15, 5],
-            h: [40, 10],
-            H: [80, 10],
-            v: [10, 40],
-            V: [10, 80],
-          };
-          const [w, h] = sizes[c];
+          const sizes = new Map<string, [number, number]>([
+            ["P", [15, 5]],
+            ["h", [40, 10]],
+            ["H", [80, 10]],
+            ["v", [10, 40]],
+            ["V", [10, 80]],
+          ]);
+          const [w, h] = sizes.get(c)!;
           platforms.push({
             x: pos.x - w,
             y: pos.y - h,
-            w: sizes[c][0] * 2,
-            h: sizes[c][1] * 2,
+            w: w * 2,
+            h: h * 2,
             isDeadly,
           });
           this.generatePlatform(pos, w, h, isDeadly);

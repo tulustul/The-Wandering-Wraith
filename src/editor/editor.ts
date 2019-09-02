@@ -4,6 +4,7 @@ import { Manipulator } from "./manipulator";
 import { EditorUI } from "./editor-ui";
 import { Vector2 } from "../vector";
 import { EditorObjects } from "./objects";
+import { tick } from "../index";
 
 export type EditorMode = "edit" | "play";
 
@@ -32,6 +33,10 @@ export class Editor {
     window.addEventListener("keydown", event => {
       if (event.key === "e" && !this.initialized) {
         this.init();
+      }
+
+      if (event.key === "p") {
+        this.engine.game.paused_ = !this.engine.game.paused_;
       }
     });
   }

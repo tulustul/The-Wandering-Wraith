@@ -72,14 +72,9 @@ export class Renderer {
   }
 
   renderPlatforms() {
-    this.ctx.strokeStyle = "#000";
-    this.ctx.lineWidth = 1;
+    this.ctx.fillStyle = "#000";
     this.ctx.beginPath();
     for (const p of this.engine.level.platforms) {
-      var grd = this.ctx.createLinearGradient(0, p.y, 0, p.y + p.h);
-      grd.addColorStop(0, "#333");
-      grd.addColorStop(1, "#000");
-      this.ctx.fillStyle = grd;
       this.ctx.rect(p.x, p.y, p.w, p.h);
       this.ctx.fill();
       this.ctx.stroke();
@@ -88,7 +83,7 @@ export class Renderer {
 
   renderSpikes() {
     const r = new Random(1);
-    this.ctx.fillStyle = "#555";
+    this.ctx.fillStyle = "#000";
 
     const deadlyBodies = this.engine.physics.staticBodies.filter(
       b => b.isDeadly,
@@ -102,9 +97,9 @@ export class Renderer {
       let y = 0;
       while (y < length) {
         this.ctx.beginPath();
-        this.ctx.moveTo(0, y);
-        this.ctx.lineTo(0, y + 2);
-        this.ctx.lineTo(8 + 5 * r.nextFloat(), y + 1);
+        this.ctx.moveTo(-2, y);
+        this.ctx.lineTo(-2, y + 4);
+        this.ctx.lineTo(9 + 7 * r.nextFloat(), y + 2);
         this.ctx.closePath();
         this.ctx.fill();
         y += 5; // * r.nextFloat();
@@ -285,8 +280,8 @@ export class Renderer {
     this.renderSky();
 
     this.terrainLayer.activate();
-    this.renderPlatforms();
     this.renderSpikes();
+    this.renderPlatforms();
     this.renderTerrain();
 
     const hillsParams: [string, number, number, number, number][] = [

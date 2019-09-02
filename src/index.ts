@@ -23,7 +23,7 @@ async function init() {
   window.addEventListener("resize", () => game.engine.renderer.updateSize());
 }
 
-function tick(timestamp: number) {
+export function tick(timestamp: number) {
   const timeDiff = timestamp - cumulativeTime;
   const steps = Math.floor(timeDiff / timeStep);
   cumulativeTime += steps * timeStep;
