@@ -60,10 +60,10 @@ export class Engine {
     this.currentSave = save;
     loadLevel(this, save.level);
     const pos = this.physics.castRay(
-      new Vector2(150, save.pos.y - 100),
-      new Vector2(150, this.level.size.y),
+      new Vector2(save.pos.x, save.pos.y - 100),
+      new Vector2(save.pos.x, this.level.size.y),
     );
-    save.pos.y = pos ? pos.y - 50 : 0;
+    save.pos.y = pos!.y - 10;
 
     this.player = new Player(this, new Vector2(save.pos.x, save.pos.y));
     this.renderer.init();
@@ -90,7 +90,7 @@ export class Engine {
 
     if (playerPos.x > this.level.size.x + 10) {
       this.currentSave.level++;
-      this.currentSave.pos = new Vector2(150, 200);
+      this.currentSave.pos = new Vector2(150, 0);
       save(this.currentSave);
       this.load(this.currentSave);
     }
