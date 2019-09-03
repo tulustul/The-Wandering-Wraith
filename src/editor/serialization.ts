@@ -86,6 +86,11 @@ export class LevelSerializer {
         case "savepoint":
           tokens.push("s");
           tokens.push(this.serializeNumber(o.pos.x));
+          break;
+        case "crystal":
+          tokens.push("C");
+          tokens.push(this.serializeVector(o.pos));
+          break;
       }
     }
 

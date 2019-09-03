@@ -1,6 +1,6 @@
 import { Vector2 } from "../vector";
 import { Editor } from "./editor";
-import { PathCommand, PathCommandType } from "../level.interface";
+import { PathCommand, PathCommandType, LevelObject } from "../level.interface";
 
 export type ObjectType =
   | "polygon"
@@ -9,7 +9,8 @@ export type ObjectType =
   | "platformH2"
   | "platformV1"
   | "platformV2"
-  | "savepoint";
+  | "savepoint"
+  | "crystal";
 
 export class EditorObjects {
   constructor(private editor: Editor) {}
@@ -24,12 +25,12 @@ export class EditorObjects {
       case "platformH2":
       case "platformV1":
       case "platformV2":
-        const platform = { type, pos, isDeadly: false };
+        const platform: LevelObject = { type, pos, isDeadly: false };
         this.editor.engine.level.objects!.push(platform);
         this.pointsMap.set(pos, platform as any);
         break;
       case "savepoint":
-        const savepoint = {
+        const savepoint: LevelObject = {
           type,
           pos,
           isDeadly: false,
@@ -37,6 +38,16 @@ export class EditorObjects {
         this.editor.engine.level.savepoints.push(pos.x);
         this.editor.engine.level.objects!.push(savepoint);
         this.pointsMap.set(pos, savepoint as any);
+        break;
+      case "crystal":
+        const crystal: LevelObject = {
+          type: "crystal",
+          isDeadly: false,
+          pos,
+        };
+        this.editor.engine.level.crystals.push({ collected: false, pos });
+        this.editor.engine.level.objects!.push(crystal);
+        this.pointsMap.set(pos, crystal as any);
         break;
     }
   }

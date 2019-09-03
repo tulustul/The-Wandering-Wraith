@@ -139,9 +139,9 @@ export class PlayerPhysics {
     const acc = new Vector2(0, accScalar).rotate_(direction);
     this.updateVelocity(acc);
     if (direction < Math.PI) {
-      this.direction_ = "r";
-    } else {
       this.direction_ = "l";
+    } else {
+      this.direction_ = "r";
     }
     this.player.makeStep();
   }

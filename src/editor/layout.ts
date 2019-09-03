@@ -110,6 +110,7 @@ export const EDITOR_HTML = `
       <option value="platformV1">platformV1</option>
       <option value="platformV2">platformV2</option>
       <option value="savepoint">save point</option> 
+      <option value="crystal">crystal</option> 
     </select>
   </label>
 

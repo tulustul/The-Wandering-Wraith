@@ -98,6 +98,7 @@ export class EditorUI {
       this.editor.engine.load({
         level,
         pos: new Vector2(100, 200),
+        crystals: {},
       });
     });
 

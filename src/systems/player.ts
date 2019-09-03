@@ -6,6 +6,7 @@ import { SinusAnimation } from "../animations";
 import { playSound } from "../sound";
 import { assets } from "../assets";
 import { PlayerPhysics, MotionMode } from "./physics/player-physics";
+import { loadSave } from "../saves";
 
 interface AgentAnimation {
   headOffset: number;
@@ -139,7 +140,23 @@ export class Player {
     this.isRunning = false;
     this.updateControls();
     this.physics.update_();
+    this.checkCrystals();
     this.updateAnimation();
+  }
+
+  checkCrystals() {
+    const crystals = this.engine.level.crystals;
+    for (const [index, crystal] of crystals.entries()) {
+      if (!crystal.collected && crystal.pos.distanceTo(this.body_.pos) < 15) {
+        crystal.collected = true;
+        const save = this.engine.currentSave;
+        if (!save.crystals[save.level]) {
+          save.crystals[save.level] = [];
+        }
+        save.crystals[save.level].push(index);
+        playSound(assets.sounds.collect);
+      }
+    }
   }
 
   die() {
@@ -159,12 +176,7 @@ export class Player {
     playSound(assets.sounds.dead);
 
     setTimeout(() => {
-      this.createBody(
-        new Vector2(
-          this.engine.currentSave.pos.x,
-          this.engine.currentSave.pos.y,
-        ),
-      );
+      this.engine.load(loadSave());
     }, 1000);
   }
 

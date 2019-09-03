@@ -40,6 +40,7 @@ export class Engine {
     pathCommands: [],
     platforms: [],
     savepoints: [],
+    crystals: [],
   };
 
   currentSave: Save;
@@ -55,13 +56,14 @@ export class Engine {
 
   load(save: Save) {
     this.physics.clear_();
+
+    this.currentSave = save;
     loadLevel(this, save.level);
     const pos = this.physics.castRay(
-      new Vector2(150, save.pos.y - 50),
+      new Vector2(150, save.pos.y - 100),
       new Vector2(150, this.level.size.y),
     );
-    save.pos.y = pos!.y - 10;
-    this.currentSave = save;
+    save.pos.y = pos ? pos.y - 50 : 0;
 
     this.player = new Player(this, new Vector2(save.pos.x, save.pos.y));
     this.renderer.init();
@@ -69,10 +71,7 @@ export class Engine {
   }
 
   save() {
-    this.currentSave = {
-      level: this.currentSave.level,
-      pos: this.player.body_.pos.copy(),
-    };
+    this.currentSave.pos = this.player.body_.pos.copy();
     save(this.currentSave);
   }
 

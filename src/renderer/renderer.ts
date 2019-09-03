@@ -117,7 +117,7 @@ export class Renderer {
 
     ctx.translate(player.body_.pos.x, player.body_.pos.y - 3);
 
-    if (player.physics.direction_ === "r") {
+    if (player.physics.direction_ === "l") {
       ctx.scale(-1, 1);
     }
     ctx.rotate(player.body_.vel.angle_());
@@ -179,10 +179,10 @@ export class Renderer {
     this.ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const gradient = this.ctx.createRadialGradient(
-      100,
+      150,
       100,
       10,
-      100,
+      150,
       100,
       300,
     );
@@ -256,16 +256,14 @@ export class Renderer {
     }
   }
 
-  renderLights() {
-    const player = this.engine.player;
-
+  renderLight(pos: Vector2, color: string, size: number) {
     this.ctx.save();
-    this.ctx.translate(player.body_.pos.x, player.body_.pos.y - 1);
+    this.ctx.translate(pos.x, pos.y - 1);
 
-    const size = 50 + Math.sin(this.engine.time_ / 300) * 5;
+    size = size + Math.sin(this.engine.time_ / 300) * 5;
 
     var grd = this.ctx.createRadialGradient(0, 0, 10, 0, 0, size);
-    grd.addColorStop(0, "#333");
+    grd.addColorStop(0, color);
     grd.addColorStop(1, "transparent");
     this.ctx.fillStyle = grd;
     this.ctx.fillRect(-size, -size, size * 2, size * 2);
@@ -310,11 +308,11 @@ export class Renderer {
   renderRain() {
     const r = new Random(1);
 
-    this.ctx.lineWidth = 1;
-    this.ctx.strokeStyle = "#fff8";
+    this.ctx.lineWidth = 0.5;
+    this.ctx.strokeStyle = "#fff3";
     for (let i = 0; i < 50; i++) {
-      const velX = 1 + r.nextFloat() * 0.8;
-      const velY = 0.3 + r.nextFloat() * 0.2;
+      const velX = 0.6 + r.nextFloat() * 0.8;
+      const velY = 0.2 + r.nextFloat() * 0.2;
       const posX =
         (r.nextFloat() * this.activeLayer.canvas_.width +
           (velX * this.engine.time_) / 5) %
@@ -325,9 +323,60 @@ export class Renderer {
         this.activeLayer.canvas_.height;
       this.ctx.beginPath();
       this.ctx.moveTo(posX, posY);
-      this.ctx.lineTo(posX + velX * 2, posY + velY * 2);
+      this.ctx.lineTo(posX + velX * 4, posY + velY * 4);
       this.ctx.stroke();
     }
+  }
+
+  renderCrystals() {
+    for (const crystal of this.engine.level.crystals) {
+      if (!crystal.collected) {
+        this.ctx.save();
+        this.ctx.translate(
+          crystal.pos.x,
+          crystal.pos.y + Math.sin(this.engine.time_ / 800) * 5,
+        );
+        for (let i = 0; i < 4; i++) {
+          const time =
+            (this.engine.time_ + i * Math.PI * 125) % ((Math.PI / 2) * 1000);
+          const cos = Math.cos(time / 1000);
+          const sin = Math.sin(time / 1000);
+          this.ctx.scale(1, -1);
+          this.renderCrystalPart(i, sin, cos, 1);
+          this.ctx.scale(1, -1);
+          this.renderCrystalPart(i, sin, cos, 0.6);
+        }
+        this.ctx.globalCompositeOperation = "screen";
+        this.renderLight(new Vector2(0, 0), "#0e0000", 25);
+        this.ctx.globalCompositeOperation = "source-over";
+        this.ctx.restore();
+      }
+    }
+  }
+
+  renderCrystalPart(
+    i: number,
+    sin: number,
+    cos: number,
+    colorDarkening: number,
+  ) {
+    const color = this.toHexColor(30 + cos * 180 * colorDarkening);
+    const color2 = this.toHexColor(20 + cos * 140 * colorDarkening);
+    this.ctx.fillStyle = `#${color}${color2}${color2}`;
+    this.ctx.beginPath();
+    this.ctx.lineTo(8 - sin * 16, 0);
+    this.ctx.lineTo(0, 12);
+    this.ctx.lineTo(cos * 16 - 8, 0);
+    this.ctx.closePath();
+    this.ctx.fill();
+  }
+
+  toHexColor(color: number) {
+    const c = Math.round(color).toString(16);
+    if (c.length === 1) {
+      return "0" + c;
+    }
+    return c;
   }
 
   render() {
@@ -343,6 +392,7 @@ export class Renderer {
     this.renderFoliage(false);
     this.ctx.translate(pos.x, pos.y);
 
+    this.renderRain();
     this.drawLayer(this.terrainLayer);
 
     this.ctx.translate(-pos.x, -pos.y);
@@ -350,21 +400,18 @@ export class Renderer {
     if (!this.engine.player.isDead) {
       this.renderPlayer();
     }
+    this.renderCrystals();
 
     this.renderParticles();
     this.renderFoliage(true);
 
     if (!this.engine.player.isDead) {
       this.ctx.globalCompositeOperation = "screen";
-      this.renderLights();
+      this.renderLight(this.engine.player.body_.pos, "#333", 50);
       this.ctx.globalCompositeOperation = "source-over";
     }
 
     this.ctx.translate(pos.x, pos.y);
-
-    this.ctx.globalCompositeOperation = "overlay";
-    this.renderRain();
-    this.ctx.globalCompositeOperation = "source-over";
   }
 
   updateSize() {

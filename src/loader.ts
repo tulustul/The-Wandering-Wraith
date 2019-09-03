@@ -8,7 +8,9 @@ import {
   PathCommand,
   LevelObject,
   Platform,
+  Crystal,
 } from "./level.interface";
+import { ObjectType } from "./editor/objects";
 
 // m - move to, (x y)
 // l - line to, (x y)+
@@ -17,7 +19,8 @@ import {
 // p - platform (x, y)
 // d - toggling is deadly flag
 // s - savepoint (x)
-const commands = "mlczpds";
+// C - crystal (x,y)
+const commands = "mlczpdsC";
 
 export function loadLevel(engine: Engine, level: number) {
   const levelDef = LEVELS[level];
@@ -35,11 +38,13 @@ export class LevelParser {
     const pathCommands: PathCommand[] = [];
     const platforms: Platform[] = [];
     const savepoints: number[] = [];
+    const crystals: Crystal[] = [];
     this.engine.level = {
       size: this.parseVector(),
       pathCommands,
       platforms,
       savepoints,
+      crystals,
     };
 
     // #if process.env.NODE_ENV === 'development'
@@ -74,6 +79,7 @@ export class LevelParser {
         continue;
       }
       let points: Vector2[] = [];
+      let pos: Vector2;
       switch (command) {
         case "m":
           this.pos = this.parseVector();
@@ -132,7 +138,7 @@ export class LevelParser {
           break;
         case "p":
           this.index++;
-          const pos = this.parseVector();
+          pos = this.parseVector();
           const sizes = new Map<string, [number, number]>([
             ["P", [15, 5]],
             ["h", [40, 10]],
@@ -157,8 +163,13 @@ export class LevelParser {
             v: "platformV1",
             V: "platformV2",
           };
-          objects.push({ type: types[c], pos, isDeadly });
-          pointsMap.set(pos, objects[objects.length - 1] as any);
+          const platformObject: LevelObject = {
+            type: types[c] as ObjectType,
+            pos,
+            isDeadly,
+          };
+          objects.push(platformObject);
+          pointsMap.set(pos, platformObject as any);
           // #endif
           break;
         case "s":
@@ -169,13 +180,32 @@ export class LevelParser {
             savepoint,
             this.engine.level.size.y / 2,
           );
-          const save = {
+          const save: LevelObject = {
             type: "savepoint",
             pos: savepointPos,
             isDeadly: false,
           };
           objects.push(save);
           pointsMap.set(savepointPos, save as any);
+          // #endif
+          break;
+        case "C":
+          pos = this.parseVector();
+          const collectedCrystals =
+            this.engine.currentSave.crystals[this.engine.currentSave.level] ||
+            [];
+          crystals.push({
+            pos,
+            collected: collectedCrystals.includes(crystals.length),
+          });
+          // #if process.env.NODE_ENV === 'development'
+          const crystalObject: LevelObject = {
+            isDeadly: false,
+            type: "crystal",
+            pos,
+          };
+          objects.push(crystalObject);
+          pointsMap.set(pos, crystalObject as any);
           // #endif
           break;
       }

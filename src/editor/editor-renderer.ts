@@ -225,6 +225,10 @@ export class EditorRenderer {
           this.ctx.closePath();
           this.ctx.stroke();
           break;
+        case "crystal":
+          this.ctx.fillStyle = "#f005";
+          this.ctx.fillRect(o.pos.x - 10, o.pos.y - 10, 20, 20);
+          break;
       }
     }
   }
