@@ -24,6 +24,8 @@ export class PlayerPhysics {
 
   lastJumpTime = 0;
 
+  fallingTime = 0;
+
   dashed = false;
 
   climbContact: number | null;
@@ -127,7 +129,10 @@ export class PlayerPhysics {
       }
     }
 
-    this.mode = MotionMode.falling;
+    if (this.mode !== MotionMode.falling) {
+      this.fallingTime = this.player.engine.time_;
+      this.mode = MotionMode.falling;
+    }
   }
 
   moveToDirection(direction: number) {
@@ -156,9 +161,13 @@ export class PlayerPhysics {
   jump() {
     if (
       this.mode === MotionMode.running ||
-      this.mode === MotionMode.climbing
+      this.mode === MotionMode.climbing ||
+      // be more forgiving to players by allowing them to jump after slipping
+      // on platforms/slopes
+      (this.mode === MotionMode.falling &&
+        this.player.engine.time_ - this.fallingTime < 150)
     ) {
-      if (this.player.engine.time_ - this.lastJumpTime > 150) {
+      if (this.player.engine.time_ - this.lastJumpTime > 151) {
         this.body_.vel.y = -5;
         if (this.mode === MotionMode.climbing) {
           this.body_.vel.x = -this.climbContact! / 3;
