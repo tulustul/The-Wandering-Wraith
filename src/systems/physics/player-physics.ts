@@ -261,12 +261,12 @@ export class PlayerPhysics {
       this.endBubbling();
     } else {
       this.body_.vel = new Vector2(0, -7);
+      this.body_.pos.x = bubble.pos.x;
+      this.body_.pos.y = bubble.pos.y;
     }
     this.mode = MotionMode.bubbling;
     this.bubble = bubble;
     this.bubbleTime = this.player.engine.time_;
-    this.body_.pos.x = bubble.pos.x;
-    this.body_.pos.y = bubble.pos.y;
     this.lastJumpTime = this.player.engine.time_;
   }
 
