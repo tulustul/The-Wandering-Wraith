@@ -5,6 +5,7 @@ import { StaticBody } from "./physics.interface";
 import { Vector2 } from "../../vector";
 import { assets } from "../../assets";
 import { playSound } from "../../sound";
+import { Pickable } from "../../level.interface";
 
 export enum MotionMode {
   running,
@@ -31,6 +32,12 @@ export class PlayerPhysics {
   climbContact: number | null;
 
   mode: MotionMode = MotionMode.running;
+
+  bubble: Pickable | null;
+
+  bubbleTime = 0;
+
+  lastBubbleFlySoundTime = 0;
 
   constructor(private physics: PhysicsSystem, private player: Player) {}
 
@@ -71,6 +78,35 @@ export class PlayerPhysics {
       this.body_.vel.zero();
     }
 
+    if (this.mode === MotionMode.bubbling) {
+      this.body_.pos.add_(this.body_.vel);
+
+      playSound([
+        [
+          0.06,
+          0.1,
+          // 0,
+          Math.sin(this.body_.vel.y / 5) * 200 + 100,
+          0.15,
+          0.51,
+          5,
+          2,
+          0,
+          0.09,
+        ],
+      ]);
+
+      this.player.engine.particles.emit({
+        count: 2,
+        direction: new Vector2(3, 0),
+        lifetime: 50,
+        lifetimeSpread: 10,
+        pos: this.body_.pos,
+        speedSpread: 0.6,
+        spread: Math.PI,
+      });
+    }
+
     /*
       Limit the speed to the diameter of circle.
       This way we avoid tunelling through terrain in high speeds.
@@ -83,6 +119,10 @@ export class PlayerPhysics {
       const colisions = Array.from(
         this.physics.checkHitterColisions(this.body_),
       );
+
+      if (this.mode === MotionMode.bubbling && colisions.length) {
+        this.endBubbling();
+      }
 
       for (const colision of colisions) {
         const dy = colision.point.y - this.body_.pos.y;
@@ -103,6 +143,14 @@ export class PlayerPhysics {
 
   private updateMode() {
     this.climbContact = null;
+
+    if (this.mode === MotionMode.bubbling) {
+      if (this.player.engine.time_ - this.bubbleTime > 2000) {
+        this.endBubbling();
+      } else {
+        return;
+      }
+    }
 
     for (const point of this.body_.contactPoints) {
       const dy = point.y - this.body_.pos.y;
@@ -136,18 +184,19 @@ export class PlayerPhysics {
   }
 
   moveToDirection(direction: number) {
+    if (this.mode === MotionMode.bubbling) {
+      this.body_.vel.rotate_(direction / 13);
+      return;
+    }
+
     this.player.isRunning = this.mode === MotionMode.running;
     let accScalar = 0.3;
     if (this.mode === MotionMode.running) {
       accScalar = 0.3;
     }
-    const acc = new Vector2(0, accScalar).rotate_(direction);
+    const acc = new Vector2(direction * accScalar, 0);
     this.updateVelocity(acc);
-    if (direction < Math.PI) {
-      this.direction_ = "l";
-    } else {
-      this.direction_ = "r";
-    }
+    this.direction_ = direction < 0 ? "l" : "r";
     this.player.makeStep();
   }
 
@@ -190,6 +239,13 @@ export class PlayerPhysics {
       this.dashed = true;
       playSound(assets.sounds.dash);
     }
+
+    if (
+      this.mode === MotionMode.bubbling &&
+      this.player.engine.time_ - this.lastJumpTime > 150
+    ) {
+      this.endBubbling();
+    }
   }
 
   get haveGround() {
@@ -199,5 +255,39 @@ export class PlayerPhysics {
       }
     }
     return false;
+  }
+
+  enterBubble(bubble: Pickable) {
+    if (this.mode === MotionMode.bubbling) {
+      this.endBubbling();
+    } else {
+      this.body_.vel = new Vector2(0, -7);
+    }
+    this.mode = MotionMode.bubbling;
+    this.bubble = bubble;
+    this.bubbleTime = this.player.engine.time_;
+    this.body_.pos.x = bubble.pos.x;
+    this.body_.pos.y = bubble.pos.y;
+    this.lastJumpTime = this.player.engine.time_;
+    playSound(assets.sounds.bubbleStart);
+  }
+
+  endBubbling() {
+    this.mode = MotionMode.falling;
+    this.dashed = false;
+    this.lastJumpTime = this.player.engine.time_;
+    this.player.engine.particles.emit({
+      count: 250,
+      direction: new Vector2(8, 0),
+      lifetime: 150,
+      lifetimeSpread: 5,
+      pos: this.body_.pos,
+      speedSpread: 0.3,
+      spread: Math.PI * 2,
+    });
+    const bubble = this.bubble!;
+    this.bubble = null;
+    playSound(assets.sounds.bubbleEnd);
+    setTimeout(() => (bubble.collected = false), 1000);
   }
 }

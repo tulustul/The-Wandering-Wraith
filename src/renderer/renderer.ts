@@ -2,9 +2,10 @@ import { Layer } from "./layer";
 
 import { Engine } from "../engine";
 import { Vector2 } from "../vector";
-import { PathCommandType } from "../level.interface";
+import { PathCommandType, PickableType, Pickable } from "../level.interface";
 import { assets } from "../assets";
 import { Random } from "../random";
+import { MotionMode } from "../systems/physics/player-physics";
 
 const VIEWPORT_HEIGHT = 450;
 
@@ -102,7 +103,7 @@ export class Renderer {
         this.ctx.lineTo(9 + 7 * r.nextFloat(), y + 2);
         this.ctx.closePath();
         this.ctx.fill();
-        y += 5; // * r.nextFloat();
+        y += 5;
       }
       this.ctx.restore();
     }
@@ -117,12 +118,18 @@ export class Renderer {
 
     ctx.translate(player.body_.pos.x, player.body_.pos.y - 3);
 
+    if (player.physics.mode === MotionMode.bubbling) {
+      ctx.rotate(player.body_.vel.angle_() + Math.PI);
+      ctx.scale(0.9, 1.2);
+    } else {
+      ctx.rotate(player.body_.vel.angle_());
+      ctx.scale(1, 1 + Math.abs(player.body_.vel.y / 20));
+      ctx.rotate(-player.body_.vel.angle_());
+    }
+
     if (player.physics.direction_ === "l") {
       ctx.scale(-1, 1);
     }
-    ctx.rotate(player.body_.vel.angle_());
-    ctx.scale(1, 1 + Math.abs(player.body_.vel.y / 20));
-    ctx.rotate(-player.body_.vel.angle_());
 
     // legs
     ctx.save();
@@ -167,12 +174,16 @@ export class Renderer {
     ctx.drawImage(assets.eyes, -3, -10, 10, 10);
     ctx.restore();
 
+    if (player.physics.mode === MotionMode.bubbling) {
+      this.renderBubble(new Vector2(0, -4));
+    }
+
     ctx.restore();
   }
 
   renderSky() {
     const canvas = this.engine.renderer.activeLayer.canvas_;
-    var grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
+    const grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
     grd.addColorStop(0, "#555");
     grd.addColorStop(1, "#111");
     this.ctx.fillStyle = grd;
@@ -205,7 +216,7 @@ export class Renderer {
     const canvas = this.engine.renderer.activeLayer.canvas_;
     const blur = 2 / this.engine.renderer.activeLayer.offsetScale;
 
-    var grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
+    const grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
     grd.addColorStop(0, color);
     grd.addColorStop(1, "#111");
     this.ctx.filter = `blur(${blur}px)`;
@@ -262,7 +273,7 @@ export class Renderer {
 
     size = size + Math.sin(this.engine.time_ / 300) * 5;
 
-    var grd = this.ctx.createRadialGradient(0, 0, 10, 0, 0, size);
+    const grd = this.ctx.createRadialGradient(0, 0, 10, 0, 0, size);
     grd.addColorStop(0, color);
     grd.addColorStop(1, "transparent");
     this.ctx.fillStyle = grd;
@@ -293,7 +304,7 @@ export class Renderer {
 
   renderParticles() {
     this.ctx.strokeStyle = "#fff";
-    this.ctx.lineWidth = 1;
+    this.ctx.lineWidth = 0.5;
     for (const particle of this.engine.particles.particles) {
       const pos = particle.pos;
       const vel = particle.vel;
@@ -328,30 +339,69 @@ export class Renderer {
     }
   }
 
-  renderCrystals() {
-    for (const crystal of this.engine.level.crystals) {
-      if (!crystal.collected) {
-        this.ctx.save();
-        this.ctx.translate(
-          crystal.pos.x,
-          crystal.pos.y + Math.sin(this.engine.time_ / 800) * 5,
-        );
-        for (let i = 0; i < 4; i++) {
-          const time =
-            (this.engine.time_ + i * Math.PI * 125) % ((Math.PI / 2) * 1000);
-          const cos = Math.cos(time / 1000);
-          const sin = Math.sin(time / 1000);
-          this.ctx.scale(1, -1);
-          this.renderCrystalPart(i, sin, cos, 1);
-          this.ctx.scale(1, -1);
-          this.renderCrystalPart(i, sin, cos, 0.6);
+  renderPickables() {
+    for (const pickable of this.engine.level.pickables) {
+      if (!pickable.collected) {
+        switch (pickable.type) {
+          case PickableType.crystal:
+            this.renderCrystal(pickable);
+            break;
+          case PickableType.bubble:
+            this.renderBubble(pickable.pos);
+            break;
         }
-        this.ctx.globalCompositeOperation = "screen";
-        this.renderLight(new Vector2(0, 0), "#200", 25);
-        this.ctx.globalCompositeOperation = "source-over";
-        this.ctx.restore();
       }
     }
+  }
+
+  renderBubble(pos: Vector2) {
+    this.ctx.save();
+    this.ctx.translate(pos.x, pos.y + Math.sin(this.engine.time_ / 400) * 3);
+    this.ctx.scale(
+      1 + Math.sin(this.engine.time_ / 230) * 0.05,
+      1 + Math.sin(this.engine.time_ / 280) * 0.05,
+    );
+
+    const grd = this.ctx.createRadialGradient(0, 0, 0, 0, 0, 22);
+    grd.addColorStop(0, "#8883");
+    grd.addColorStop(0.65, "#8888");
+    grd.addColorStop(0.95, "#888a");
+    grd.addColorStop(1, "#8880");
+    this.ctx.fillStyle = grd;
+
+    this.ctx.beginPath();
+    this.ctx.fillRect(-22, -22, 44, 44);
+    this.ctx.closePath();
+
+    this.ctx.fillStyle = "#888c";
+    this.ctx.beginPath();
+    this.ctx.arc(8, -8, 5, 0, Math.PI * 2);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    this.ctx.restore();
+  }
+
+  renderCrystal(crystal: Pickable) {
+    this.ctx.save();
+    this.ctx.translate(
+      crystal.pos.x,
+      crystal.pos.y + Math.sin(this.engine.time_ / 800) * 5,
+    );
+    for (let i = 0; i < 4; i++) {
+      const time =
+        (this.engine.time_ + i * Math.PI * 125) % ((Math.PI / 2) * 1000);
+      const cos = Math.cos(time / 1000);
+      const sin = Math.sin(time / 1000);
+      this.ctx.scale(1, -1);
+      this.renderCrystalPart(i, sin, cos, 1);
+      this.ctx.scale(1, -1);
+      this.renderCrystalPart(i, sin, cos, 0.6);
+    }
+    this.ctx.globalCompositeOperation = "screen";
+    this.renderLight(new Vector2(0, 0), "#200", 25);
+    this.ctx.globalCompositeOperation = "source-over";
+    this.ctx.restore();
   }
 
   renderCrystalPart(
@@ -400,7 +450,7 @@ export class Renderer {
     if (!this.engine.player.isDead) {
       this.renderPlayer();
     }
-    this.renderCrystals();
+    this.renderPickables();
 
     this.renderParticles();
     this.renderFoliage(true);

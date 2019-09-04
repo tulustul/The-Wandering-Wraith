@@ -229,6 +229,10 @@ export class EditorRenderer {
           this.ctx.fillStyle = "#f005";
           this.ctx.fillRect(o.pos.x - 10, o.pos.y - 10, 20, 20);
           break;
+        case "bubble":
+          this.ctx.fillStyle = "#f0f5";
+          this.ctx.fillRect(o.pos.x - 22, o.pos.y - 22, 44, 44);
+          break;
       }
     }
   }

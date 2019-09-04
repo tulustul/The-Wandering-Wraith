@@ -17,6 +17,9 @@ interface Assets {
     walk: SoundDefinition;
     dead: SoundDefinition;
     collect: SoundDefinition;
+    bubbleStart: SoundDefinition;
+    bubbleEnd: SoundDefinition;
+    bubbleFly: SoundDefinition;
   };
 }
 
@@ -86,5 +89,8 @@ export async function prepareAssets() {
       [0.8, 0, 10, 0.2, 0.88, 1, 0.3, 10, 0.41],
       // [0.3, 0.1, 0, 0.2, 0.7, 1, 0.3, 22.7, 0.26],
     ],
+    bubbleFly: [[1, 0.1, 1311, 0.7, 0.98, 0, 0.8, 0, 0.3]],
+    bubbleEnd: [[1, 0.1, 428, 0.2, 0.31, 0, 0.2, 5.1, 0.42]],
+    bubbleStart: [[1, 0.1, 9, 0.4, 0.24, 1.1, 1.9, 0, 0.37]],
   };
 }

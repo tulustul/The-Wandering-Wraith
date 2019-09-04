@@ -1,6 +1,12 @@
 import { Vector2 } from "../vector";
 import { Editor } from "./editor";
-import { PathCommand, PathCommandType, LevelObject } from "../level.interface";
+import {
+  PathCommand,
+  PathCommandType,
+  LevelObject,
+  PickableType,
+} from "../level.interface";
+import { stringify } from "querystring";
 
 export type ObjectType =
   | "polygon"
@@ -10,7 +16,8 @@ export type ObjectType =
   | "platformV1"
   | "platformV2"
   | "savepoint"
-  | "crystal";
+  | "crystal"
+  | "bubble";
 
 export class EditorObjects {
   constructor(private editor: Editor) {}
@@ -40,12 +47,22 @@ export class EditorObjects {
         this.pointsMap.set(pos, savepoint as any);
         break;
       case "crystal":
+      case "bubble":
+        const typeMap = new Map<string, PickableType>([
+          ["crystal", PickableType.crystal],
+          ["bubble", PickableType.bubble],
+        ]);
         const crystal: LevelObject = {
-          type: "crystal",
-          isDeadly: false,
+          type,
           pos,
+          isDeadly: false,
         };
-        this.editor.engine.level.crystals.push({ collected: false, pos });
+        this.editor.engine.level.pickables.push({
+          type: typeMap.get(type)!,
+          collected: false,
+          pos,
+          radius: type === "bubble" ? 20 : 15,
+        });
         this.editor.engine.level.objects!.push(crystal);
         this.pointsMap.set(pos, crystal as any);
         break;

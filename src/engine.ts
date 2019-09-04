@@ -40,7 +40,7 @@ export class Engine {
     pathCommands: [],
     platforms: [],
     savepoints: [],
-    crystals: [],
+    pickables: [],
   };
 
   currentSave: Save;

@@ -1,6 +1,11 @@
 import { Vector2 } from "./vector";
 import { ObjectType } from "./editor/objects";
 
+export enum PickableType {
+  crystal,
+  bubble,
+}
+
 export enum PathCommandType {
   move,
   line,
@@ -10,6 +15,13 @@ export enum PathCommandType {
 
 export interface CanBeDeadly {
   isDeadly: boolean;
+}
+
+export interface Pickable {
+  type: PickableType;
+  pos: Vector2;
+  collected: boolean;
+  radius: number;
 }
 
 export interface PathCommand extends CanBeDeadly {
@@ -24,17 +36,12 @@ export interface Platform extends CanBeDeadly {
   h: number;
 }
 
-export interface Crystal {
-  collected: boolean;
-  pos: Vector2;
-}
-
 export interface Level {
   size: Vector2;
   pathCommands: PathCommand[];
   platforms: Platform[];
   savepoints: number[];
-  crystals: Crystal[];
+  pickables: Pickable[];
 
   // Below are properties present only in development build.
   // Needed for editor to work.

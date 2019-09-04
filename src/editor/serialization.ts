@@ -91,6 +91,10 @@ export class LevelSerializer {
           tokens.push("C");
           tokens.push(this.serializeVector(o.pos));
           break;
+        case "bubble":
+          tokens.push("B");
+          tokens.push(this.serializeVector(o.pos));
+          break;
       }
     }
 

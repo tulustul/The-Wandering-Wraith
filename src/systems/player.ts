@@ -6,7 +6,7 @@ import { SinusAnimation } from "../animations";
 import { playSound } from "../sound";
 import { assets } from "../assets";
 import { PlayerPhysics, MotionMode } from "./physics/player-physics";
-import { loadSave } from "../saves";
+import { PickableType } from "../level.interface";
 
 interface AgentAnimation {
   headOffset: number;
@@ -66,10 +66,10 @@ export class Player {
     }
     if (this.physics.mode !== MotionMode.climbing) {
       if (control.keys_.get("ArrowLeft")) {
-        this.physics.moveToDirection(Math.PI * 0.5);
+        this.physics.moveToDirection(-1);
       }
       if (control.keys_.get("ArrowRight")) {
-        this.physics.moveToDirection(Math.PI * 1.5);
+        this.physics.moveToDirection(1);
       }
     }
   }
@@ -140,21 +140,31 @@ export class Player {
     this.isRunning = false;
     this.updateControls();
     this.physics.update_();
-    this.checkCrystals();
+    this.checkPickables();
     this.updateAnimation();
   }
 
-  checkCrystals() {
-    const crystals = this.engine.level.crystals;
-    for (const [index, crystal] of crystals.entries()) {
-      if (!crystal.collected && crystal.pos.distanceTo(this.body_.pos) < 15) {
-        crystal.collected = true;
-        const save = this.engine.currentSave;
-        if (!save.crystals[save.level]) {
-          save.crystals[save.level] = [];
+  checkPickables() {
+    const pickables = this.engine.level.pickables;
+    for (const [index, pickable] of pickables.entries()) {
+      if (
+        !pickable.collected &&
+        pickable.pos.distanceTo(this.body_.pos) < 20
+      ) {
+        pickable.collected = true;
+        switch (pickable.type) {
+          case PickableType.crystal:
+            const save = this.engine.currentSave;
+            if (!save.crystals[save.level]) {
+              save.crystals[save.level] = [];
+            }
+            save.crystals[save.level].push(index);
+            playSound(assets.sounds.collect);
+            break;
+          case PickableType.bubble:
+            this.physics.enterBubble(pickable);
+            break;
         }
-        save.crystals[save.level].push(index);
-        playSound(assets.sounds.collect);
       }
     }
   }

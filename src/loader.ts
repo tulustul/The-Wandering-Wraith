@@ -8,7 +8,8 @@ import {
   PathCommand,
   LevelObject,
   Platform,
-  Crystal,
+  Pickable,
+  PickableType,
 } from "./level.interface";
 import { ObjectType } from "./editor/objects";
 
@@ -20,7 +21,8 @@ import { ObjectType } from "./editor/objects";
 // d - toggling is deadly flag
 // s - savepoint (x)
 // C - crystal (x,y)
-const commands = "mlczpdsC";
+// B - bubble (x,y)
+const commands = "mlczpdsCB";
 
 export function loadLevel(engine: Engine, level: number) {
   const levelDef = LEVELS[level];
@@ -38,13 +40,13 @@ export class LevelParser {
     const pathCommands: PathCommand[] = [];
     const platforms: Platform[] = [];
     const savepoints: number[] = [];
-    const crystals: Crystal[] = [];
+    const pickables: Pickable[] = [];
     this.engine.level = {
       size: this.parseVector(),
       pathCommands,
       platforms,
       savepoints,
-      crystals,
+      pickables: pickables,
     };
 
     // #if process.env.NODE_ENV === 'development'
@@ -194,9 +196,11 @@ export class LevelParser {
           const collectedCrystals =
             this.engine.currentSave.crystals[this.engine.currentSave.level] ||
             [];
-          crystals.push({
+          pickables.push({
             pos,
-            collected: collectedCrystals.includes(crystals.length),
+            type: PickableType.crystal,
+            collected: collectedCrystals.includes(pickables.length),
+            radius: 15,
           });
           // #if process.env.NODE_ENV === 'development'
           const crystalObject: LevelObject = {
@@ -206,6 +210,24 @@ export class LevelParser {
           };
           objects.push(crystalObject);
           pointsMap.set(pos, crystalObject as any);
+          // #endif
+          break;
+        case "B":
+          pos = this.parseVector();
+          pickables.push({
+            pos,
+            type: PickableType.bubble,
+            collected: false,
+            radius: 20,
+          });
+          // #if process.env.NODE_ENV === 'development'
+          const bubbleObject: LevelObject = {
+            isDeadly: false,
+            type: "bubble",
+            pos,
+          };
+          objects.push(bubbleObject);
+          pointsMap.set(pos, bubbleObject as any);
           // #endif
           break;
       }
