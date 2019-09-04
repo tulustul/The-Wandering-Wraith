@@ -7,6 +7,7 @@ import { playSound } from "../sound";
 import { assets } from "../assets";
 import { PlayerPhysics, MotionMode } from "./physics/player-physics";
 import { PickableType } from "../level.interface";
+import { loadSave } from "../saves";
 
 interface AgentAnimation {
   headOffset: number;
@@ -149,7 +150,7 @@ export class Player {
     for (const [index, pickable] of pickables.entries()) {
       if (
         !pickable.collected &&
-        pickable.pos.distanceTo(this.body_.pos) < 20
+        pickable.pos.distanceTo(this.body_.pos) < pickable.radius
       ) {
         pickable.collected = true;
         switch (pickable.type) {
@@ -186,7 +187,8 @@ export class Player {
     playSound(assets.sounds.dead);
 
     setTimeout(() => {
-      this.engine.respawnPlayer();
+      // this.engine.respawnPlayer();
+      this.engine.load(loadSave());
     }, 1000);
   }
 

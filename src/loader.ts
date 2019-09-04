@@ -218,7 +218,7 @@ export class LevelParser {
             pos,
             type: PickableType.bubble,
             collected: false,
-            radius: 20,
+            radius: 25,
           });
           // #if process.env.NODE_ENV === 'development'
           const bubbleObject: LevelObject = {

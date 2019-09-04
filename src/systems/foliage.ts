@@ -56,7 +56,7 @@ export class FoliageSystem {
       new Vector2(x, engine.level.size.y),
     );
 
-    const linesToCheck = new Set<[Vector2, Vector2]>();
+    const linesToCheck = new Set<[Vector2, Vector2, boolean]>();
     const grid = engine.physics.staticGrid;
     const checked = new Set<StaticBody>();
     for (const cell of cells) {
@@ -64,30 +64,43 @@ export class FoliageSystem {
         for (const body of grid.get(cell)!) {
           if (!checked.has(body)) {
             checked.add(body);
-            if (body.receiveMask & hitMask) {
-              linesToCheck.add([body.start_, body.end_]);
-            }
+            linesToCheck.add([
+              body.start_,
+              body.end_,
+              !!(body.receiveMask & hitMask),
+            ]);
           }
         }
       }
     }
 
-    let narrowChecks: [Vector2, Vector2, Vector2, number][] = [];
-    for (const [start_, end_] of linesToCheck) {
+    let narrowChecks: [Vector2, Vector2, Vector2, number, boolean][] = [];
+    for (const [start_, end_, shouldGenerate] of linesToCheck) {
       const d = end_.copy().sub_(start_);
       const slope = d.y / d.x;
 
       const b = start_.y - slope * start_.x;
       const crossPoint = new Vector2(x, slope * x + b);
-      narrowChecks.push([start_, end_, crossPoint, slope]);
+      narrowChecks.push([start_, end_, crossPoint, slope, shouldGenerate]);
     }
 
     narrowChecks.sort((checkA, checkB) => checkA[1].y - checkB[1].y);
 
     let add = true;
-    for (const [start_, end_, crossPoint, slope] of narrowChecks) {
+    for (const [
+      start_,
+      end_,
+      crossPoint,
+      slope,
+      shouldGenerate,
+    ] of narrowChecks) {
       if (lineToPointColision(start_, end_, crossPoint)) {
-        if (crossPoint.y > 0 && Math.abs(slope) < 1.5 && add) {
+        if (
+          shouldGenerate &&
+          crossPoint.y > 0 &&
+          Math.abs(slope) < 1.5 &&
+          add
+        ) {
           yield crossPoint;
         }
         add = !add;

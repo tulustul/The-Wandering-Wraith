@@ -17,9 +17,7 @@ interface Assets {
     walk: SoundDefinition;
     dead: SoundDefinition;
     collect: SoundDefinition;
-    bubbleStart: SoundDefinition;
     bubbleEnd: SoundDefinition;
-    bubbleFly: SoundDefinition;
   };
 }
 
@@ -77,20 +75,13 @@ export async function prepareAssets() {
 
   assets.sounds = {
     dash: [[0.6, 1, 200, 0.1, 0.47, 4.2, 1.4, 1, 0.15]],
-    // jump: [[0.5, 0.1, 599, 0.1, 0.58, 10, 1, 0, 0.12]],
     jump: [[0.6, 1, 150, 0.15, 0.47, 4.2, 1.4, 1, 0.25]],
     walk: [[0.4, 0.6, 50, 0.02, 0.54, 4, 0.9, 10.7, 0.37]],
     dead: [
       [0.8, 0.7, 450, 0.5, 0.21, 11.3, 0.8, 7, 0.56],
       [0.4, 0.1, 1379, 0.1, 0.82, 1.8, 1, 0.3, 0.5],
     ],
-    // collect: [[0.6, 0.1, 0, 0.2, 0.7, 1, 0.3, 22.7, 0.26]],
-    collect: [
-      [0.8, 0, 10, 0.2, 0.88, 1, 0.3, 10, 0.41],
-      // [0.3, 0.1, 0, 0.2, 0.7, 1, 0.3, 22.7, 0.26],
-    ],
-    bubbleFly: [[1, 0.1, 1311, 0.7, 0.98, 0, 0.8, 0, 0.3]],
+    collect: [[0.8, 0, 10, 0.2, 0.88, 1, 0.3, 10, 0.41]],
     bubbleEnd: [[1, 0.1, 428, 0.2, 0.31, 0, 0.2, 5.1, 0.42]],
-    bubbleStart: [[1, 0.1, 9, 0.4, 0.24, 1.1, 1.9, 0, 0.37]],
   };
 }

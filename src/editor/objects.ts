@@ -61,7 +61,7 @@ export class EditorObjects {
           type: typeMap.get(type)!,
           collected: false,
           pos,
-          radius: type === "bubble" ? 20 : 15,
+          radius: type === "bubble" ? 25 : 15,
         });
         this.editor.engine.level.objects!.push(crystal);
         this.pointsMap.set(pos, crystal as any);

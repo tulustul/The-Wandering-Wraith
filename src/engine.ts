@@ -9,7 +9,7 @@ import { Control } from "./control";
 import { Renderer } from "./renderer/renderer";
 import { Camera } from "./camera";
 import { Level } from "./level.interface";
-import { Save, save } from "./saves";
+import { Save, save, loadSave } from "./saves";
 import { loadLevel } from "./loader";
 
 // #if process.env.NODE_ENV === 'development'

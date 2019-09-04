@@ -231,7 +231,7 @@ export class EditorRenderer {
           break;
         case "bubble":
           this.ctx.fillStyle = "#f0f5";
-          this.ctx.fillRect(o.pos.x - 22, o.pos.y - 22, 44, 44);
+          this.ctx.fillRect(o.pos.x - 25, o.pos.y - 25, 50, 50);
           break;
       }
     }

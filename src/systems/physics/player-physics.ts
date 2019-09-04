@@ -85,7 +85,6 @@ export class PlayerPhysics {
         [
           0.06,
           0.1,
-          // 0,
           Math.sin(this.body_.vel.y / 5) * 200 + 100,
           0.15,
           0.51,
@@ -269,7 +268,6 @@ export class PlayerPhysics {
     this.body_.pos.x = bubble.pos.x;
     this.body_.pos.y = bubble.pos.y;
     this.lastJumpTime = this.player.engine.time_;
-    playSound(assets.sounds.bubbleStart);
   }
 
   endBubbling() {
