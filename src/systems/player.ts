@@ -176,7 +176,7 @@ export class Player {
     playSound(assets.sounds.dead);
 
     setTimeout(() => {
-      this.engine.load(loadSave());
+      this.engine.respawnPlayer();
     }, 1000);
   }
 

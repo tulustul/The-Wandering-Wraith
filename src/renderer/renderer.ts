@@ -347,7 +347,7 @@ export class Renderer {
           this.renderCrystalPart(i, sin, cos, 0.6);
         }
         this.ctx.globalCompositeOperation = "screen";
-        this.renderLight(new Vector2(0, 0), "#0e0000", 25);
+        this.renderLight(new Vector2(0, 0), "#200", 25);
         this.ctx.globalCompositeOperation = "source-over";
         this.ctx.restore();
       }
@@ -360,8 +360,8 @@ export class Renderer {
     cos: number,
     colorDarkening: number,
   ) {
-    const color = this.toHexColor(30 + cos * 180 * colorDarkening);
-    const color2 = this.toHexColor(20 + cos * 140 * colorDarkening);
+    const color = this.toHexColor(50 + cos * 180 * colorDarkening);
+    const color2 = this.toHexColor(cos * 120 * colorDarkening);
     this.ctx.fillStyle = `#${color}${color2}${color2}`;
     this.ctx.beginPath();
     this.ctx.lineTo(8 - sin * 16, 0);

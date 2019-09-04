@@ -100,6 +100,9 @@ export class EditorUI {
         pos: new Vector2(100, 200),
         crystals: {},
       });
+
+      // Resetting mode will rebind the camera to editor mode
+      this.editor.setMode(this.editor.mode);
     });
 
     this.listeners.listen("close-editor", "click", () => {

@@ -171,7 +171,12 @@ export class PlayerPhysics {
         return;
       }
     }
-    if (!this.dashed && this.player.engine.time_ - this.lastJumpTime > 300) {
+
+    if (
+      this.mode === MotionMode.falling &&
+      !this.dashed &&
+      this.player.engine.time_ - this.lastJumpTime > 300
+    ) {
       this.body_.vel.y = -6;
       this.dashed = true;
       playSound(assets.sounds.dash);
