@@ -192,6 +192,5 @@ export class Player {
       vel: new Vector2(),
       contactPoints: [],
     };
-    this.engine.camera.bindToTarget(this.body_.pos);
   }
 }

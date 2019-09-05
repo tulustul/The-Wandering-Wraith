@@ -83,12 +83,10 @@ export class Editor {
 
     switch (this.mode) {
       case "play":
-        this.engine.camera.bindToTarget(this.engine.player.body_.pos);
         this.engine.camera.update_ = () =>
           this.originalCameraUpdateFn.bind(this.engine.camera)();
         break;
       case "edit":
-        this.engine.camera.bindToTarget(this.engine.player.body_.pos.copy());
         this.engine.camera.update_ = () =>
           cameraUpdate.bind(this.engine.camera)();
         break;
@@ -97,7 +95,7 @@ export class Editor {
 
   updateControls() {
     if (this.initialized && this.mode !== "play") {
-      const pos = this.engine.camera.target;
+      const pos = this.engine.camera.pos;
       let speed = 10;
       if (this.engine.control_.keys_.get("ShiftLeft")) {
         speed = 30;
@@ -125,8 +123,4 @@ export class Editor {
   }
 }
 
-function cameraUpdate() {
-  this.pos = this.target.copy();
-  this.pos.x -= this.engine.canvas_.width / 2;
-  this.pos.y -= this.engine.canvas_.height / 1.5;
-}
+function cameraUpdate() {}
