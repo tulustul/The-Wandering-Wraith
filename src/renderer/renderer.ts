@@ -7,7 +7,7 @@ import { assets } from "../assets";
 import { Random } from "../random";
 import { MotionMode } from "../physics/player-physics";
 
-const VIEWPORT_HEIGHT = 450;
+const VIEWPORT_HEIGHT = 500;
 
 export class Renderer {
   ctx: CanvasRenderingContext2D;
