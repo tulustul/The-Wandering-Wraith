@@ -64,13 +64,13 @@ export class PlayerPhysics {
         body_.pos.y = rayResult.y - body_.radius + 1;
       }
       if (!this.player.isRunning) {
-        body_.vel.x *= 0.7;
+        body_.vel.x *= 0.5;
       }
       body_.vel.y = 0;
     }
 
     if (this.mode_ === MotionMode.falling) {
-      body_.vel.y += 0.3;
+      body_.vel.y += 0.25;
       body_.vel.x *= 0.94;
       body_.pos.add_(body_.vel);
     }
@@ -116,7 +116,7 @@ export class PlayerPhysics {
       if (colisions.length) {
         if (
           this.mode_ === MotionMode.falling &&
-          this.player.engine.time_ - this.fallingTime > 300
+          this.player.engine.time_ - this.fallingTime > 150
         ) {
           zzfx(...assets.sounds.hit);
         }
@@ -199,19 +199,17 @@ export class PlayerPhysics {
     this.player.isRunning = this.mode_ === MotionMode.running;
     let accScalar = 0.3;
     if (this.mode_ === MotionMode.running) {
-      accScalar = 0.3;
+      accScalar = 0.2;
     }
     const acc = new Vector2(direction * accScalar, 0);
-    this.updateVelocity(acc);
-    this.direction_ = direction < 0 ? "l" : "r";
-    this.player.makeStep();
-  }
 
-  private updateVelocity(acc: Vector2) {
     if (Math.abs(this.body_.vel.x + acc.x) < this.maxSpeed) {
       this.body_.vel.x += acc.x;
     }
     this.body_.vel.y += acc.y;
+
+    this.direction_ = direction < 0 ? "l" : "r";
+    this.player.makeStep();
   }
 
   jump() {
@@ -227,7 +225,7 @@ export class PlayerPhysics {
         this.body_.vel.y = -5;
         if (this.mode_ === MotionMode.climbing) {
           this.body_.vel.x = -this.climbContact! / 3;
-          this.body_.vel.y = -6;
+          this.body_.vel.y = -5;
         }
         this.body_.contactPoints = [];
         this.lastJumpTime = this.player.engine.time_;
@@ -242,7 +240,7 @@ export class PlayerPhysics {
       !this.dashed &&
       this.player.engine.time_ - this.lastJumpTime > 300
     ) {
-      this.body_.vel.y = -6;
+      this.body_.vel.y = -5;
       this.dashed = true;
       zzfx(...assets.sounds.dash);
     }
@@ -255,20 +253,11 @@ export class PlayerPhysics {
     }
   }
 
-  get haveGround() {
-    for (const point of this.body_.contactPoints) {
-      if (point.y - this.body_.pos.y > 4) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   enterBubble(bubble: Pickable) {
     if (this.mode_ === MotionMode.bubbling) {
       this.endBubbling();
     } else {
-      this.body_.vel = new Vector2(0, -7);
+      this.body_.vel = new Vector2(0, -6);
       this.body_.pos.x = bubble.pos.x;
       this.body_.pos.y = bubble.pos.y;
     }
