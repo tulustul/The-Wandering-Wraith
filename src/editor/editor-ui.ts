@@ -73,7 +73,7 @@ export class EditorUI {
 
     this.listeners.listen("regenerate-level", "click", () => {
       this.engine.physics.staticBodies = [];
-      this.engine.physics.staticGrid.clear();
+      this.engine.physics.grid.clear();
       const level = new LevelSerializer().serialize(this.engine.level_);
       new LevelParser(this.engine, level).parse_();
     });

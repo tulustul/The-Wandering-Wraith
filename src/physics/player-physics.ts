@@ -2,8 +2,11 @@ import { PhysicsSystem } from "./physics";
 import { Player } from "../player";
 import { Vector2 } from "../vector";
 import { assets } from "../assets";
-import { playSound } from "../sound";
 import { Pickable } from "../level.interface";
+
+import "../ZzFX.micro";
+
+export declare var zzfx: any;
 
 export const enum MotionMode {
   running,
@@ -79,28 +82,23 @@ export class PlayerPhysics {
     if (this.mode_ === MotionMode.bubbling) {
       body_.pos.add_(body_.vel);
 
-      playSound([
-        [
-          0.06,
-          0.1,
-          Math.sin(body_.vel.y / 5) * 200 + 100,
-          0.15,
-          0.51,
-          5,
-          2,
-          0,
-          0.09,
-        ],
-      ]);
+      zzfx(
+        0.06,
+        0.1,
+        Math.sin(body_.vel.y / 5) * 200 + 100,
+        0.15,
+        0.51,
+        5,
+        2,
+        0,
+        0.09,
+      );
 
       this.player.engine.particles.emit({
-        count: 2,
+        count: 3,
         direction_: new Vector2(3, 0),
-        lifetime: 50,
-        lifetimeSpread: 10,
+        lifetime: 120,
         pos: body_.pos,
-        speedSpread: 0.6,
-        spread: Math.PI,
       });
     }
 
@@ -115,8 +113,16 @@ export class PlayerPhysics {
     if (this.mode_ !== MotionMode.climbing) {
       const colisions = Array.from(this.physics.checkHitterColisions(body_));
 
-      if (this.mode_ === MotionMode.bubbling && colisions.length) {
-        this.endBubbling();
+      if (colisions.length) {
+        if (
+          this.mode_ === MotionMode.falling &&
+          this.player.engine.time_ - this.fallingTime > 300
+        ) {
+          zzfx(...assets.sounds.hit);
+        }
+        if (this.mode_ === MotionMode.bubbling) {
+          this.endBubbling();
+        }
       }
 
       for (const colision of colisions) {
@@ -226,7 +232,7 @@ export class PlayerPhysics {
         this.body_.contactPoints = [];
         this.lastJumpTime = this.player.engine.time_;
         this.dashed = false;
-        playSound(assets.sounds.jump);
+        zzfx(...assets.sounds.jump);
         return;
       }
     }
@@ -238,7 +244,7 @@ export class PlayerPhysics {
     ) {
       this.body_.vel.y = -6;
       this.dashed = true;
-      playSound(assets.sounds.dash);
+      zzfx(...assets.sounds.dash);
     }
 
     if (
@@ -279,15 +285,12 @@ export class PlayerPhysics {
     this.player.engine.particles.emit({
       count: 250,
       direction_: new Vector2(8, 0),
-      lifetime: 150,
-      lifetimeSpread: 5,
+      lifetime: 80,
       pos: this.body_.pos,
-      speedSpread: 0.3,
-      spread: Math.PI * 2,
     });
     const bubble = this.bubble!;
     this.bubble = null;
-    playSound(assets.sounds.bubbleEnd);
+    zzfx(...assets.sounds.bubbleEnd);
     setTimeout(() => (bubble.collected = false), 1000);
   }
 }

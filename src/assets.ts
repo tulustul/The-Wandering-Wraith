@@ -2,7 +2,18 @@ import { PlantDefinition, animateTree, animateGrass } from "./plants";
 import { SpriteRenderer } from "./renderer/sprite-renderer";
 import { TREE_GROUND_MASK, GRASS_MASK } from "./colisions-masks";
 import { Random } from "./random";
-import { SoundDefinition } from "./sound";
+
+export type SoundDefinition = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+];
 
 interface Assets {
   terrain: HTMLImageElement;
@@ -16,6 +27,7 @@ interface Assets {
     dash: SoundDefinition;
     walk: SoundDefinition;
     dead: SoundDefinition;
+    hit: SoundDefinition;
     collect: SoundDefinition;
     bubbleEnd: SoundDefinition;
   };
@@ -56,8 +68,8 @@ async function preparePlants(): Promise<PlantDefinition[]> {
 
   for (let i = 0; i < 4; i++) {
     plants.push({
-      frames: await animateGrass(sr, 0.8 + i * 0.5, i),
-      spread: 5,
+      frames: await animateGrass(sr, 1 + i * 0.5, i),
+      spread: 5 + i,
       mask: GRASS_MASK,
     });
   }
@@ -74,14 +86,12 @@ export async function prepareAssets() {
   assets.plants = await preparePlants();
 
   assets.sounds = {
-    dash: [[0.6, 1, 200, 0.1, 0.47, 4.2, 1.4, 1, 0.15]],
-    jump: [[0.6, 1, 150, 0.15, 0.47, 4.2, 1.4, 1, 0.25]],
-    walk: [[0.4, 0.6, 50, 0.02, 0.54, 4, 0.9, 10.7, 0.37]],
-    dead: [
-      [0.8, 0.7, 450, 0.5, 0.21, 11.3, 0.8, 7, 0.56],
-      [0.4, 0.1, 1379, 0.1, 0.82, 1.8, 1, 0.3, 0.5],
-    ],
-    collect: [[0.8, 0, 10, 0.2, 0.88, 1, 0.3, 10, 0.41]],
-    bubbleEnd: [[1, 0.1, 428, 0.2, 0.31, 0, 0.2, 5.1, 0.42]],
+    dash: [0.6, 1, 200, 0.1, 0.47, 4.2, 1.4, 1, 0.15],
+    jump: [0.6, 1, 150, 0.15, 0.47, 4.2, 1.4, 1, 0.25],
+    walk: [0.4, 0.6, 50, 0.02, 0.54, 4, 0.9, 10.7, 0.37],
+    dead: [0.8, 0.7, 450, 0.5, 0.21, 11.3, 0.8, 7, 0.56],
+    hit: [1, 0.1, 304, 0.2, 0.01, 0, 0.3, 0, 0.5],
+    collect: [0.8, 0, 10, 0.2, 0.88, 1, 0.3, 10, 0.41],
+    bubbleEnd: [1, 0.1, 428, 0.2, 0.31, 0, 0.2, 5.1, 0.42],
   };
 }

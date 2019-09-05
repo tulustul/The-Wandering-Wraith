@@ -1,12 +1,15 @@
 import { Engine } from "./engine";
 import { Vector2 } from "./vector";
 import { SinusAnimation } from "./animations";
-import { playSound } from "./sound";
 import { assets } from "./assets";
 import { PlayerPhysics, MotionMode } from "./physics/player-physics";
 import { PickableType } from "./level.interface";
 import { loadSave } from "./saves";
 import { DynamicBody } from "./physics/physics";
+
+import "./ZzFX.micro";
+
+export declare var zzfx: any;
 
 interface AgentAnimation {
   headOffset: number;
@@ -81,7 +84,6 @@ export class Player {
     if (this.isRunning) {
       this.animation_.lLegRot = Math.sin(this.engine.time_ / 30) / 2;
       this.animation_.rLegRot = Math.cos(this.engine.time_ / 30) / 2;
-      // this.animation_.lArmRot = -0.5;
     }
 
     if (this.physics.mode_ === MotionMode.climbing) {
@@ -124,11 +126,9 @@ export class Player {
 
   makeStep() {
     if (this.engine.time_ - this.lastStepTime > this.STEPS_RATE) {
-      if (this.body_.vel.length_() > 1) {
-        this.lastStepTime = this.engine.time_;
-        if (this.body_.contactPoints.length > 0) {
-          playSound(assets.sounds.walk);
-        }
+      this.lastStepTime = this.engine.time_;
+      if (this.body_.contactPoints.length > 0) {
+        zzfx(...assets.sounds.walk);
       }
     }
   }
@@ -156,7 +156,7 @@ export class Player {
               save.crystals[save.level] = [];
             }
             save.crystals[save.level].push(index);
-            playSound(assets.sounds.collect);
+            zzfx(...assets.sounds.collect);
             break;
           case PickableType.bubble:
             this.physics.enterBubble(pickable);
@@ -172,13 +172,10 @@ export class Player {
       count: 250,
       direction_: new Vector2(5, 0),
       lifetime: 150,
-      lifetimeSpread: 5,
       pos: this.body_.pos,
-      speedSpread: 0.3,
-      spread: Math.PI * 2,
     });
 
-    playSound(assets.sounds.dead);
+    zzfx(...assets.sounds.dead);
 
     setTimeout(() => {
       // this.engine.respawnPlayer();

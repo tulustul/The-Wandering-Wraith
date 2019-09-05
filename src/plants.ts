@@ -128,40 +128,37 @@ export async function animateTree(
   segmentLength: number,
   seed: number,
 ): Promise<HTMLImageElement[]> {
-  const frames: HTMLImageElement[] = [];
   const size = (depth * segmentLength) / 1.5;
   spritesRenderer.setSize(size, size);
-  const framesCount = 30;
-  const step = Math.PI / framesCount;
-  let time = Math.PI / 2;
-  for (let i = 0; i < framesCount; i++) {
-    time = time += step;
-    frames.push(
-      await spritesRenderer.render(ctx =>
-        generateTree(ctx, size, depth, angle, segmentLength, seed, time),
-      ),
-    );
-  }
-  return frames;
+
+  return renderFrames(spritesRenderer, 30, (ctx, time) =>
+    generateTree(ctx, size, depth, angle, segmentLength, seed, time),
+  );
 }
 
-export async function animateGrass(
+export function animateGrass(
   spritesRenderer: SpriteRenderer,
   size: number,
   seed: number,
 ): Promise<HTMLImageElement[]> {
-  const frames: HTMLImageElement[] = [];
   spritesRenderer.setSize(50, 50);
-  const framesCount = 30;
-  const step = (Math.PI * 2) / framesCount;
+
+  return renderFrames(spritesRenderer, 15, (ctx, time) =>
+    generateGrass(ctx, size, seed, time),
+  );
+}
+
+async function renderFrames(
+  spritesRenderer: SpriteRenderer,
+  framesCount: number,
+  renderFn: (ctx: CanvasRenderingContext2D, time: number) => void,
+) {
+  const frames: HTMLImageElement[] = [];
+  const step = Math.PI / framesCount;
   let time = Math.PI / 2;
   for (let i = 0; i < framesCount; i++) {
     time = time += step;
-    frames.push(
-      await spritesRenderer.render(ctx =>
-        generateGrass(ctx, size, seed, time),
-      ),
-    );
+    frames.push(await spritesRenderer.render(ctx => renderFn(ctx, time)));
   }
   return frames;
 }

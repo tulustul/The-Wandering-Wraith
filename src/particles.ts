@@ -12,10 +12,7 @@ interface EmitOptions {
   pos: Vector2;
   direction_: Vector2;
   count: number;
-  spread: number;
-  speedSpread: number;
   lifetime: number;
-  lifetimeSpread: number;
 }
 
 export class ParticlesSystem {
@@ -26,7 +23,7 @@ export class ParticlesSystem {
   update_() {
     for (const particle of this.particles) {
       particle.pos.add_(particle.vel);
-      particle.vel.y += 0.08;
+      particle.vel.y += 0.03;
       if (this.engine.time_ > particle.bornAt + particle.lifetime) {
         const index = this.particles.indexOf(particle);
         this.particles.splice(index, 1);
@@ -38,17 +35,14 @@ export class ParticlesSystem {
     for (let i = 0; i < emitOptions.count; i++) {
       const vel = emitOptions.direction_
         .copy()
-        .rotate_((Math.random() - 0.5) * emitOptions.spread)
-        .mul((Math.random() + 0.5) * emitOptions.speedSpread);
+        .rotate_((Math.random() - 0.5) * Math.PI * 2)
+        .mul((Math.random() + 0.5) * 0.3);
 
       const particle: Particle = {
         bornAt: this.engine.time_,
         pos: emitOptions.pos.copy(),
         vel,
-        lifetime:
-          emitOptions.lifetime *
-          (Math.random() + 0.5) *
-          emitOptions.lifetimeSpread,
+        lifetime: emitOptions.lifetime * (Math.random() + 0.5) * 5,
       };
 
       this.particles.push(particle);

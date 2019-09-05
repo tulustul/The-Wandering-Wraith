@@ -29,7 +29,6 @@ export class Random {
   }
 
   nextVariation() {
-    // We know that result of next() will be 1 to 2147483646 (inclusive).
     return this.nextFloat() - 0.5;
   }
 }

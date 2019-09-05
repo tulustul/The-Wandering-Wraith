@@ -56,7 +56,7 @@ export class FoliageSystem {
     );
 
     const linesToCheck = new Set<[Vector2, Vector2, boolean]>();
-    const grid = engine.physics.staticGrid;
+    const grid = engine.physics.grid;
     const checked = new Set<StaticBody>();
     for (const cell of cells) {
       if (grid.has(cell)) {

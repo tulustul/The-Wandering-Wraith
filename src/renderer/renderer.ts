@@ -48,7 +48,6 @@ export class Renderer {
 
   renderTerrain() {
     let to: Vector2;
-    this.ctx.fillStyle = "#000";
     for (const pathCommand of this.engine.level_.pathCommands) {
       switch (pathCommand.type) {
         case PathCommandType.move:
@@ -73,18 +72,14 @@ export class Renderer {
   }
 
   renderPlatforms() {
-    this.ctx.fillStyle = "#000";
     this.ctx.beginPath();
     for (const p of this.engine.level_.platforms) {
-      this.ctx.rect(p.x, p.y, p.w, p.h);
-      this.ctx.fill();
-      this.ctx.stroke();
+      this.ctx.fillRect(p.x, p.y, p.w, p.h);
     }
   }
 
   renderSpikes() {
     const r = new Random(1);
-    this.ctx.fillStyle = "#000";
 
     const deadlyBodies = this.engine.physics.staticBodies.filter(
       b => b.isDeadly,
@@ -282,26 +277,6 @@ export class Renderer {
     this.ctx.restore();
   }
 
-  prerender() {
-    this.skyLayer.activate();
-    this.renderSky();
-
-    this.terrainLayer.activate();
-    this.renderSpikes();
-    this.renderPlatforms();
-    this.renderTerrain();
-
-    const hillsParams: [string, number, number, number, number][] = [
-      ["#282828", 500, 0.5, 1300, 3],
-      ["#222", 400, 0.7, 1000, 7],
-      ["#1d1d1d", 200, 1.0, 800, 9],
-    ];
-    for (const [index, hillsLayer] of this.hillsLayers.entries()) {
-      hillsLayer.activate();
-      this.renderHills(...hillsParams[index]);
-    }
-  }
-
   renderParticles() {
     this.ctx.strokeStyle = "#fff";
     this.ctx.lineWidth = 0.5;
@@ -427,6 +402,27 @@ export class Renderer {
       return "0" + c;
     }
     return c;
+  }
+
+  prerender() {
+    this.skyLayer.activate();
+    this.renderSky();
+
+    this.terrainLayer.activate();
+    this.ctx.fillStyle = "#000";
+    this.renderSpikes();
+    this.renderPlatforms();
+    this.renderTerrain();
+
+    const hillsParams: [string, number, number, number, number][] = [
+      ["#282828", 500, 0.5, 1300, 3],
+      ["#222", 400, 0.7, 1000, 7],
+      ["#1d1d1d", 200, 1.0, 800, 9],
+    ];
+    for (const [index, hillsLayer] of this.hillsLayers.entries()) {
+      hillsLayer.activate();
+      this.renderHills(...hillsParams[index]);
+    }
   }
 
   render() {

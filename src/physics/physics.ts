@@ -29,17 +29,17 @@ export interface StaticBodyColision {
 }
 
 export class PhysicsSystem {
-  staticGrid: Map<number, StaticBody[]> = new Map();
+  grid: Map<number, StaticBody[]> = new Map();
 
   staticBodies: StaticBody[] = [];
 
   addStatic(body: StaticBody) {
     this.staticBodies.push(body);
     for (const cell of getLineCells(body.start_, body.end_)) {
-      if (!this.staticGrid.has(cell)) {
-        this.staticGrid.set(cell, [body]);
+      if (!this.grid.has(cell)) {
+        this.grid.set(cell, [body]);
       } else {
-        this.staticGrid.get(cell)!.push(body);
+        this.grid.get(cell)!.push(body);
       }
     }
     return body;
@@ -47,7 +47,7 @@ export class PhysicsSystem {
 
   clear_() {
     this.staticBodies = [];
-    this.staticGrid.clear();
+    this.grid.clear();
   }
 
   *checkHitterColisions(
@@ -56,7 +56,7 @@ export class PhysicsSystem {
     hitter.contactPoints = [];
     const checked = new Set<StaticBody>();
     for (const cell of getCircleCells(hitter.pos, hitter.radius)) {
-      for (const receiver of this.staticGrid.get(cell) || []) {
+      for (const receiver of this.grid.get(cell) || []) {
         if (!checked.has(receiver)) {
           checked.add(receiver);
           const result = checkCircleLineColision(
@@ -79,12 +79,13 @@ export class PhysicsSystem {
     }
   }
 
+  /** Casting rays supports only casting ray from top to bottom */
   castRay(start_: Vector2, end_: Vector2) {
     const cells = getLineCells(start_, end_);
 
     for (const cell of cells) {
-      if (this.staticGrid.has(cell)) {
-        for (const body of this.staticGrid.get(cell)!) {
+      if (this.grid.has(cell)) {
+        for (const body of this.grid.get(cell)!) {
           const intersection = lineToLineColision(
             start_,
             end_,

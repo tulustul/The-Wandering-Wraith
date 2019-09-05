@@ -33,11 +33,6 @@ export class Vector2 {
     return this;
   }
 
-  quantify() {
-    this.x = Math.round(this.x);
-    this.y = Math.round(this.y);
-  }
-
   normalize_() {
     const length = Math.sqrt(this.x * this.x + this.y * this.y);
     if (!length) {
