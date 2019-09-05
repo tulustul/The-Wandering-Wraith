@@ -1,10 +1,8 @@
 import { Vector2 } from "./vector";
 import { Engine } from "./engine";
-import { MotionMode } from "./physics/player-physics";
+import { lerp } from "./utils";
 
 export class Camera {
-  target: Vector2;
-
   pos = new Vector2();
 
   constructor(private engine: Engine) {}
@@ -18,7 +16,7 @@ export class Camera {
     const [maxX, maxY, x, y] = [
       this.engine.level_.size_.x - w,
       this.engine.level_.size_.y - h,
-      this.moveAtAxis(this.pos.x, target.x - w / 2, -30, 30),
+      target.x - w / 2,
       this.moveAtAxis(this.pos.y, target.y - h / 1.7, -5, 90),
     ];
     this.pos.x = Math.min(Math.max(0, x), maxX);
@@ -33,16 +31,12 @@ export class Camera {
   ) {
     const d = current - target;
     if (d < lowerLimit || d > upperLimit) {
-      return this.lerp(
+      return lerp(
         current,
         target + (d < lowerLimit ? lowerLimit : upperLimit),
         0.12,
       );
     }
     return current;
-  }
-
-  private lerp(p1: number, p2: number, t: number) {
-    return p1 + t * (p2 - p1);
   }
 }

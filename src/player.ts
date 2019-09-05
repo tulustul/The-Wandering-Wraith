@@ -8,6 +8,7 @@ import { loadSave } from "./saves";
 import { DynamicBody } from "./physics/physics";
 
 import "./ZzFX.micro";
+import { lerp } from "./utils";
 
 export declare var zzfx: any;
 
@@ -19,6 +20,7 @@ interface AgentAnimation {
   rLegRot: number;
   eyesScale: number;
   eyesOffset: number;
+  scale_: number;
 }
 
 export class Player {
@@ -42,11 +44,14 @@ export class Player {
     rLegRot: 0,
     eyesScale: 1,
     eyesOffset: 0,
+    scale_: 1,
   };
 
   physics: PlayerPhysics;
 
   isRunning = false;
+
+  targetScale = 1;
 
   constructor(public engine: Engine, pos: Vector2) {
     this.createBody(pos);
@@ -81,6 +86,15 @@ export class Player {
     this.animation_.lArmRot = -1;
     this.animation_.rArmRot = 1;
 
+    if (Math.abs(this.animation_.scale_ - this.targetScale) < 0.05) {
+      this.targetScale = 1;
+    }
+    this.animation_.scale_ = lerp(
+      this.animation_.scale_,
+      this.targetScale,
+      0.3,
+    );
+
     if (this.isRunning) {
       this.animation_.lLegRot = Math.sin(this.engine.time_ / 30) / 2;
       this.animation_.rLegRot = Math.cos(this.engine.time_ / 30) / 2;
@@ -105,6 +119,7 @@ export class Player {
     }
 
     if (this.physics.mode_ === MotionMode.falling) {
+      this.targetScale = 1 + Math.abs(this.body_.vel.y / 17);
       if (this.body_.vel.y > 0.3) {
         this.animation_.lArmRot = -1.5 + Math.sin(this.engine.time_ / 50) / 3;
         this.animation_.rArmRot = 1.5 + Math.cos(this.engine.time_ / 50) / 3;

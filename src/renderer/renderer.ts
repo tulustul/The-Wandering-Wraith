@@ -111,15 +111,13 @@ export class Renderer {
 
     ctx.save();
 
-    ctx.translate(player.body_.pos.x, player.body_.pos.y - 3);
+    ctx.translate(player.body_.pos.x, player.body_.pos.y + 10);
 
     if (player.physics.mode_ === MotionMode.bubbling) {
       ctx.rotate(player.body_.vel.angle_() + Math.PI);
       ctx.scale(0.9, 1.2);
     } else {
-      ctx.rotate(player.body_.vel.angle_());
-      ctx.scale(1, 1 + Math.abs(player.body_.vel.y / 20));
-      ctx.rotate(-player.body_.vel.angle_());
+      ctx.scale(1, player.animation_.scale_);
     }
 
     if (player.physics.direction_ === "l") {
@@ -128,32 +126,32 @@ export class Renderer {
 
     // legs
     ctx.save();
-    ctx.translate(-3, 3);
+    ctx.translate(-3, -10);
     ctx.rotate(player.animation_.lLegRot);
     ctx.drawImage(assets.limb, 0, 0, 5, 10);
     ctx.restore();
 
     ctx.save();
-    ctx.translate(1, 3);
+    ctx.translate(1, -10);
     ctx.rotate(player.animation_.rLegRot);
     ctx.drawImage(assets.limb, 0, 0, 5, 10);
     ctx.restore();
 
-    ctx.drawImage(assets.torso, -20, -23, 40, 40);
+    ctx.drawImage(assets.torso, -20, -36, 40, 40);
 
     ctx.save();
     ctx.translate(0, player.animation_.headOffset);
 
     // arms
     ctx.save();
-    ctx.translate(-3, 0);
+    ctx.translate(-3, -13);
     ctx.rotate(player.animation_.rArmRot);
     ctx.scale(0.8, 0.8);
     ctx.drawImage(assets.limb, 0, 0, 5, 10);
     ctx.restore();
 
     ctx.save();
-    ctx.translate(3, 3);
+    ctx.translate(3, -10);
     ctx.rotate(player.animation_.lArmRot);
     ctx.scale(0.8, 0.8);
     ctx.drawImage(assets.limb, 0, 0, 5, 10);
@@ -161,16 +159,16 @@ export class Renderer {
 
     //head
     ctx.scale(0.9, 0.9);
-    ctx.drawImage(assets.head_, -20, -20, 40, 40);
+    ctx.drawImage(assets.head_, -20, -33, 40, 40);
 
     // eyes
     ctx.translate(0, player.animation_.eyesOffset);
     ctx.scale(1, player.animation_.eyesScale);
-    ctx.drawImage(assets.eyes, -3, -10, 10, 10);
+    ctx.drawImage(assets.eyes, -3, -23, 10, 10);
     ctx.restore();
 
     if (player.physics.mode_ === MotionMode.bubbling) {
-      this.renderBubble(new Vector2(0, -4));
+      this.renderBubble(new Vector2(0, -14));
     }
 
     ctx.restore();

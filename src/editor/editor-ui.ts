@@ -54,8 +54,10 @@ export class EditorUI {
     });
 
     this.listeners.listen("move-player", "click", () => {
-      this.engine.player.body_.pos.x = this.engine.camera.target.x;
-      this.engine.player.body_.pos.y = this.engine.camera.target.y - 150;
+      this.engine.player.body_.pos.x =
+        this.engine.camera.pos.x + this.engine.canvas_.width / 2;
+      this.engine.player.body_.pos.y =
+        this.engine.camera.pos.y + this.engine.canvas_.height / 2 - 150;
     });
 
     this.listeners.listen("get-player-position", "click", () => {

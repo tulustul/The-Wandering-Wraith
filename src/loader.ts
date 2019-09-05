@@ -200,7 +200,7 @@ export class LevelParser {
             pos,
             type: PickableType.crystal,
             collected: collectedCrystals.includes(pickables.length),
-            radius: 15,
+            radius: 20,
           });
           // #if process.env.NODE_ENV === 'development'
           const crystalObject: LevelObject = {

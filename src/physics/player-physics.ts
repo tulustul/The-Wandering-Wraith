@@ -119,6 +119,8 @@ export class PlayerPhysics {
           this.player.engine.time_ - this.fallingTime > 150
         ) {
           zzfx(...assets.sounds.hit);
+          this.player.targetScale = Math.min(1, 1 / (body_.vel.y / 8 + 0.7));
+          this.mode_ = MotionMode.running;
         }
         if (this.mode_ === MotionMode.bubbling) {
           this.endBubbling();
@@ -192,7 +194,7 @@ export class PlayerPhysics {
 
   moveToDirection(direction: number) {
     if (this.mode_ === MotionMode.bubbling) {
-      this.body_.vel.rotate_(direction / 10);
+      this.body_.vel.rotate_(direction / 11);
       return;
     }
 
