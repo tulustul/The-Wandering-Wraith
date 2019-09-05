@@ -42,7 +42,7 @@ export class EditorUI {
     });
 
     this.listeners.listen("save-game", "click", () => {
-      this.engine.save();
+      this.engine.save_();
     });
 
     this.listeners.listen("clear-plants", "click", () => {
@@ -64,7 +64,7 @@ export class EditorUI {
 
     this.listeners.listen("deadly-input", "change", event => {
       for (const p of this.editor.manipulator.selectedPoints) {
-        const object = this.editor.engine.level.pointToCommandMap!.get(p);
+        const object = this.editor.engine.level_.pointToCommandMap!.get(p);
         if (object) {
           object.isDeadly = (event.target as HTMLInputElement).checked;
         }
@@ -74,13 +74,13 @@ export class EditorUI {
     this.listeners.listen("regenerate-level", "click", () => {
       this.engine.physics.staticBodies = [];
       this.engine.physics.staticGrid.clear();
-      const level = new LevelSerializer().serialize(this.engine.level);
+      const level = new LevelSerializer().serialize(this.engine.level_);
       new LevelParser(this.engine, level).parse_();
     });
 
     this.listeners.listen("generate-level-string", "click", () => {
       const levelString = new LevelSerializer().serialize(
-        this.editor.engine.level,
+        this.editor.engine.level_,
       );
       const textarea = document.getElementById(
         "level-string",
@@ -95,7 +95,7 @@ export class EditorUI {
 
     this.listeners.listen("level", "change", event => {
       const level = parseInt((event.target! as HTMLSelectElement).value);
-      this.editor.engine.load({
+      this.editor.engine.load_({
         level,
         pos: new Vector2(100, 200),
         crystals: {},

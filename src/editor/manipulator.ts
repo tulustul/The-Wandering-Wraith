@@ -81,7 +81,7 @@ export class Manipulator {
       }
       if (this.selectedPoints.size === 1) {
         const p = Array.from(this.selectedPoints)[0];
-        const object = this.editor.engine.level.pointToCommandMap!.get(p);
+        const object = this.editor.engine.level_.pointToCommandMap!.get(p);
         this.editor.ui.showDeadlyToggle(object as CanBeDeadly);
       } else {
         this.editor.ui.hideDeadlyToggle();
@@ -200,7 +200,7 @@ export class Manipulator {
   }
 
   get level() {
-    return this.editor.engine.level;
+    return this.editor.engine.level_;
   }
 
   get pointsMap() {

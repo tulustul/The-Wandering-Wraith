@@ -1,13 +1,12 @@
-import { Engine } from "../engine";
-import { Vector2 } from "../vector";
-import { GROUND_MASK, PLAYER_MASK } from "../colisions-masks";
-import { DynamicBody } from "./physics/physics.interface";
-import { SinusAnimation } from "../animations";
-import { playSound } from "../sound";
-import { assets } from "../assets";
+import { Engine } from "./engine";
+import { Vector2 } from "./vector";
+import { SinusAnimation } from "./animations";
+import { playSound } from "./sound";
+import { assets } from "./assets";
 import { PlayerPhysics, MotionMode } from "./physics/player-physics";
-import { PickableType } from "../level.interface";
-import { loadSave } from "../saves";
+import { PickableType } from "./level.interface";
+import { loadSave } from "./saves";
+import { DynamicBody } from "./physics/physics";
 
 interface AgentAnimation {
   headOffset: number;
@@ -21,8 +20,6 @@ interface AgentAnimation {
 
 export class Player {
   STEPS_RATE = 90;
-
-  currentStep = 0;
 
   lastStepTime = 0;
 
@@ -53,7 +50,7 @@ export class Player {
     this.physics = new PlayerPhysics(engine.physics, this);
   }
 
-  blink() {
+  blink_() {
     this.engine.animations.animate_(
       new SinusAnimation(Math.PI / 2, Math.PI * 2.5, 200),
       value => (this.animation_.eyesScale = (value + 1) / 2),
@@ -65,7 +62,7 @@ export class Player {
     if (control.keys_.get("Space")) {
       this.physics.jump();
     }
-    if (this.physics.mode !== MotionMode.climbing) {
+    if (this.physics.mode_ !== MotionMode.climbing) {
       if (control.keys_.get("ArrowLeft")) {
         this.physics.moveToDirection(-1);
       }
@@ -87,7 +84,7 @@ export class Player {
       // this.animation_.lArmRot = -0.5;
     }
 
-    if (this.physics.mode === MotionMode.climbing) {
+    if (this.physics.mode_ === MotionMode.climbing) {
       this.animation_.lLegRot = -0.6;
       this.animation_.rLegRot = -0.7;
       this.animation_.lArmRot = -1.3;
@@ -105,7 +102,7 @@ export class Player {
       }
     }
 
-    if (this.physics.mode === MotionMode.falling) {
+    if (this.physics.mode_ === MotionMode.falling) {
       if (this.body_.vel.y > 0.3) {
         this.animation_.lArmRot = -1.5 + Math.sin(this.engine.time_ / 50) / 3;
         this.animation_.rArmRot = 1.5 + Math.cos(this.engine.time_ / 50) / 3;
@@ -121,7 +118,7 @@ export class Player {
     this.animation_.headOffset = Math.sin(this.engine.time_ / 200) - 2;
 
     if (Math.random() > 0.99) {
-      this.blink();
+      this.blink_();
     }
   }
 
@@ -129,7 +126,6 @@ export class Player {
     if (this.engine.time_ - this.lastStepTime > this.STEPS_RATE) {
       if (this.body_.vel.length_() > 1) {
         this.lastStepTime = this.engine.time_;
-        this.currentStep = (this.currentStep + 1) % 2;
         if (this.body_.contactPoints.length > 0) {
           playSound(assets.sounds.walk);
         }
@@ -146,7 +142,7 @@ export class Player {
   }
 
   checkPickables() {
-    const pickables = this.engine.level.pickables;
+    const pickables = this.engine.level_.pickables;
     for (const [index, pickable] of pickables.entries()) {
       if (
         !pickable.collected &&
@@ -174,7 +170,7 @@ export class Player {
     this.isDead = true;
     this.engine.particles.emit({
       count: 250,
-      direction: new Vector2(5, 0),
+      direction_: new Vector2(5, 0),
       lifetime: 150,
       lifetimeSpread: 5,
       pos: this.body_.pos,
@@ -182,29 +178,23 @@ export class Player {
       spread: Math.PI * 2,
     });
 
-    this.engine.physics.remove_(this.body_);
-
     playSound(assets.sounds.dead);
 
     setTimeout(() => {
       // this.engine.respawnPlayer();
-      this.engine.load(loadSave());
+      this.engine.load_(loadSave());
     }, 1000);
   }
 
   createBody(pos: Vector2) {
     this.isDead = false;
-    this.body_ = this.engine.physics.addDynamic({
+    this.body_ = {
       radius: 10,
-      parent: this,
-      receiveMask: PLAYER_MASK,
-      hitMask: GROUND_MASK,
       pos: pos,
-      friction: 0.45,
-      vel: new Vector2(0, 0),
-      isDeadly: false,
-      onCollide: () => this.die(),
-    });
+      oldPos: pos.copy(),
+      vel: new Vector2(),
+      contactPoints: [],
+    };
     this.engine.camera.bindToTarget(this.body_.pos);
   }
 }

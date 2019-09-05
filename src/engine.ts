@@ -1,15 +1,15 @@
 import { Game } from "./game";
 import { AnimationsManager } from "./animations";
-import { PhysicsSystem } from "./systems/physics/physics";
-import { FoliageSystem } from "./systems/foliage";
+import { PhysicsSystem } from "./physics/physics";
+import { FoliageSystem } from "./foliage";
 import { ParticlesSystem } from "./particles";
-import { Player } from "./systems/player";
+import { Player } from "./player";
 import { Vector2 } from "./vector";
 import { Control } from "./control";
 import { Renderer } from "./renderer/renderer";
 import { Camera } from "./camera";
 import { Level } from "./level.interface";
-import { Save, save, loadSave } from "./saves";
+import { Save, save as save_, loadSave } from "./saves";
 import { loadLevel } from "./loader";
 
 // #if process.env.NODE_ENV === 'development'
@@ -35,8 +35,8 @@ export class Engine {
 
   player: Player;
 
-  level: Level = {
-    size: new Vector2(),
+  level_: Level = {
+    size_: new Vector2(),
     pathCommands: [],
     platforms: [],
     savepoints: [],
@@ -54,7 +54,7 @@ export class Engine {
     this.control_.init();
   }
 
-  load(save: Save) {
+  load_(save: Save) {
     this.physics.clear_();
 
     this.currentSave = save;
@@ -68,15 +68,15 @@ export class Engine {
     const save = this.currentSave;
     const pos = this.physics.castRay(
       new Vector2(save.pos.x, save.pos.y - 100),
-      new Vector2(save.pos.x, this.level.size.y),
+      new Vector2(save.pos.x, this.level_.size_.y),
     );
     save.pos.y = pos!.y - 10;
     this.player = new Player(this, new Vector2(save.pos.x, save.pos.y));
   }
 
-  save() {
+  save_() {
     this.currentSave.pos = this.player.body_.pos.copy();
-    save(this.currentSave);
+    save_(this.currentSave);
   }
 
   update_(timeStep: number) {
@@ -86,17 +86,17 @@ export class Engine {
     this.particles.update_();
 
     const playerPos = this.player.body_.pos;
-    for (const savepoint of this.level.savepoints) {
+    for (const savepoint of this.level_.savepoints) {
       if (savepoint > this.currentSave.pos.x && playerPos.x > savepoint) {
-        this.save();
+        this.save_();
       }
     }
 
-    if (playerPos.x > this.level.size.x + 10) {
+    if (playerPos.x > this.level_.size_.x + 10) {
       this.currentSave.level++;
       this.currentSave.pos = new Vector2(150, 0);
-      save(this.currentSave);
-      this.load(this.currentSave);
+      save_(this.currentSave);
+      this.load_(this.currentSave);
     }
   }
 }

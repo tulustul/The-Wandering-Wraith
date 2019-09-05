@@ -10,7 +10,7 @@ const COMMAND_MAP = {
 
 export class LevelSerializer {
   serialize(level: Level): string {
-    const tokens: string[] = [this.serializeVector(level.size)];
+    const tokens: string[] = [this.serializeVector(level.size_)];
 
     let localPos = new Vector2();
     let to: Vector2;

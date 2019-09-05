@@ -59,25 +59,22 @@ export class EditorRenderer {
 
     this.ctx.fillStyle = "#f00";
     this.ctx.strokeStyle = "#f00";
-    for (const entity of this.engine.physics.dynamicBodies) {
-      this.ctx.save();
-      this.ctx.beginPath();
-      this.ctx.moveTo(entity.pos.x, entity.pos.y);
-      this.ctx.lineTo(
-        entity.pos.x + entity.vel.x * 2,
-        entity.pos.y + entity.vel.y * 2,
-      );
-      this.ctx.closePath();
-      this.ctx.stroke();
 
-      for (const point of entity.contactPoints) {
-        this.ctx.beginPath();
-        this.ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-        this.ctx.fill();
-        this.ctx.closePath();
-      }
-      this.ctx.restore();
+    const body = this.engine.player.body_;
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.moveTo(body.pos.x, body.pos.y);
+    this.ctx.lineTo(body.pos.x + body.vel.x * 2, body.pos.y + body.vel.y * 2);
+    this.ctx.closePath();
+    this.ctx.stroke();
+
+    for (const point of body.contactPoints) {
+      this.ctx.beginPath();
+      this.ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+      this.ctx.fill();
+      this.ctx.closePath();
     }
+    this.ctx.restore();
     this.ctx.closePath();
   }
 
@@ -101,7 +98,7 @@ export class EditorRenderer {
     ctx.strokeStyle = "red";
     let to: Vector2;
     let lastPoint: Vector2;
-    for (const pathCommand of this.editor.engine.level.pathCommands!) {
+    for (const pathCommand of this.editor.engine.level_.pathCommands!) {
       switch (pathCommand.type) {
         case PathCommandType.move:
           to = pathCommand.points![0];
@@ -135,7 +132,7 @@ export class EditorRenderer {
       }
     }
 
-    for (const o of this.editor.engine.level.objects!) {
+    for (const o of this.editor.engine.level_.objects!) {
       this.drawPoint(ctx, o.pos, "blue");
     }
   }
@@ -144,7 +141,7 @@ export class EditorRenderer {
     let to: Vector2;
     this.ctx.strokeStyle = "yellow";
     this.ctx.fillStyle = "transparent";
-    for (const pathCommand of this.engine.level.pathCommands) {
+    for (const pathCommand of this.engine.level_.pathCommands) {
       switch (pathCommand.type) {
         case PathCommandType.move:
           to = pathCommand.points![0];
@@ -200,7 +197,7 @@ export class EditorRenderer {
       platformV2: [10, 80],
     };
 
-    for (const o of this.editor.engine.level.objects!) {
+    for (const o of this.editor.engine.level_.objects!) {
       const size = sizes[o.type];
       switch (o.type) {
         case "platform":
@@ -221,7 +218,7 @@ export class EditorRenderer {
           this.ctx.strokeStyle = "blue";
           this.ctx.beginPath();
           this.ctx.moveTo(o.pos.x, 0);
-          this.ctx.lineTo(o.pos.x, this.editor.engine.level.size.y);
+          this.ctx.lineTo(o.pos.x, this.editor.engine.level_.size_.y);
           this.ctx.closePath();
           this.ctx.stroke();
           break;
@@ -241,7 +238,12 @@ export class EditorRenderer {
     this.ctx.lineWidth = 2;
     this.ctx.strokeStyle = "blue";
     this.ctx.beginPath();
-    this.ctx.rect(0, 0, this.engine.level.size.x, this.engine.level.size.y);
+    this.ctx.rect(
+      0,
+      0,
+      this.engine.level_.size_.x,
+      this.engine.level_.size_.y,
+    );
     this.ctx.closePath();
     this.ctx.stroke();
   }

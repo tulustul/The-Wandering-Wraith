@@ -10,7 +10,7 @@ interface Particle {
 
 interface EmitOptions {
   pos: Vector2;
-  direction: Vector2;
+  direction_: Vector2;
   count: number;
   spread: number;
   speedSpread: number;
@@ -36,7 +36,7 @@ export class ParticlesSystem {
 
   emit(emitOptions: EmitOptions) {
     for (let i = 0; i < emitOptions.count; i++) {
-      const vel = emitOptions.direction
+      const vel = emitOptions.direction_
         .copy()
         .rotate_((Math.random() - 0.5) * emitOptions.spread)
         .mul((Math.random() + 0.5) * emitOptions.speedSpread);

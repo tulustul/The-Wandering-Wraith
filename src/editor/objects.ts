@@ -33,7 +33,7 @@ export class EditorObjects {
       case "platformV1":
       case "platformV2":
         const platform: LevelObject = { type, pos, isDeadly: false };
-        this.editor.engine.level.objects!.push(platform);
+        this.editor.engine.level_.objects!.push(platform);
         this.pointsMap.set(pos, platform as any);
         break;
       case "savepoint":
@@ -42,8 +42,8 @@ export class EditorObjects {
           pos,
           isDeadly: false,
         };
-        this.editor.engine.level.savepoints.push(pos.x);
-        this.editor.engine.level.objects!.push(savepoint);
+        this.editor.engine.level_.savepoints.push(pos.x);
+        this.editor.engine.level_.objects!.push(savepoint);
         this.pointsMap.set(pos, savepoint as any);
         break;
       case "crystal":
@@ -57,20 +57,20 @@ export class EditorObjects {
           pos,
           isDeadly: false,
         };
-        this.editor.engine.level.pickables.push({
+        this.editor.engine.level_.pickables.push({
           type: typeMap.get(type)!,
           collected: false,
           pos,
           radius: type === "bubble" ? 25 : 15,
         });
-        this.editor.engine.level.objects!.push(crystal);
+        this.editor.engine.level_.objects!.push(crystal);
         this.pointsMap.set(pos, crystal as any);
         break;
     }
   }
 
   private createPolygon(pos: Vector2) {
-    const commands = this.editor.engine.level.pathCommands;
+    const commands = this.editor.engine.level_.pathCommands;
 
     let to = pos.copy();
     let command: PathCommand = {
@@ -100,6 +100,6 @@ export class EditorObjects {
   }
 
   get pointsMap() {
-    return this.editor.engine.level.pointToCommandMap!;
+    return this.editor.engine.level_.pointToCommandMap!;
   }
 }

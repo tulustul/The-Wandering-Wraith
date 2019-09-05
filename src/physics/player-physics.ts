@@ -1,19 +1,15 @@
 import { PhysicsSystem } from "./physics";
 import { Player } from "../player";
-import { getCircleCells, checkCircleLineColision } from "./shapes";
-import { StaticBody } from "./physics.interface";
-import { Vector2 } from "../../vector";
-import { assets } from "../../assets";
-import { playSound } from "../../sound";
-import { Pickable } from "../../level.interface";
+import { Vector2 } from "../vector";
+import { assets } from "../assets";
+import { playSound } from "../sound";
+import { Pickable } from "../level.interface";
 
-export enum MotionMode {
+export const enum MotionMode {
   running,
   falling,
   climbing,
-  bubbling, // todo
-  rocketBubbling, // todo
-  jetpacking, // todo
+  bubbling,
 }
 
 export class PlayerPhysics {
@@ -31,7 +27,7 @@ export class PlayerPhysics {
 
   climbContact: number | null;
 
-  mode: MotionMode = MotionMode.running;
+  mode_: MotionMode = MotionMode.running;
 
   bubble: Pickable | null;
 
@@ -50,42 +46,44 @@ export class PlayerPhysics {
       return;
     }
 
+    const body_ = this.body_;
+
     this.updateMode();
 
-    this.body_.oldPos = this.body_.pos.copy();
-    if (this.mode === MotionMode.running) {
-      this.body_.pos.x += this.body_.vel.x;
+    body_.oldPos = body_.pos.copy();
+    if (this.mode_ === MotionMode.running) {
+      body_.pos.x += body_.vel.x;
       const rayResult = this.physics.castRay(
-        new Vector2(this.body_.pos.x, this.body_.pos.y - 20),
-        new Vector2(this.body_.pos.x, this.body_.pos.y + 20),
+        new Vector2(body_.pos.x, body_.pos.y - 20),
+        new Vector2(body_.pos.x, body_.pos.y + 20),
       );
       if (rayResult) {
-        this.body_.pos.y = rayResult.y - this.body_.radius + 1;
+        body_.pos.y = rayResult.y - body_.radius + 1;
       }
       if (!this.player.isRunning) {
-        this.body_.vel.x *= 0.7;
+        body_.vel.x *= 0.7;
       }
-      this.body_.vel.y = 0;
+      body_.vel.y = 0;
     }
 
-    if (this.mode === MotionMode.falling) {
-      this.body_.vel.y += 0.3;
-      this.body_.vel.x *= 0.94;
-      this.body_.pos.add_(this.body_.vel);
+    if (this.mode_ === MotionMode.falling) {
+      body_.vel.y += 0.3;
+      body_.vel.x *= 0.94;
+      body_.pos.add_(body_.vel);
     }
 
-    if (this.mode === MotionMode.climbing) {
-      this.body_.vel.zero();
+    if (this.mode_ === MotionMode.climbing) {
+      body_.vel.zero();
     }
 
-    if (this.mode === MotionMode.bubbling) {
-      this.body_.pos.add_(this.body_.vel);
+    if (this.mode_ === MotionMode.bubbling) {
+      body_.pos.add_(body_.vel);
 
       playSound([
         [
           0.06,
           0.1,
-          Math.sin(this.body_.vel.y / 5) * 200 + 100,
+          Math.sin(body_.vel.y / 5) * 200 + 100,
           0.15,
           0.51,
           5,
@@ -97,10 +95,10 @@ export class PlayerPhysics {
 
       this.player.engine.particles.emit({
         count: 2,
-        direction: new Vector2(3, 0),
+        direction_: new Vector2(3, 0),
         lifetime: 50,
         lifetimeSpread: 10,
-        pos: this.body_.pos,
+        pos: body_.pos,
         speedSpread: 0.6,
         spread: Math.PI,
       });
@@ -110,31 +108,35 @@ export class PlayerPhysics {
       Limit the speed to the diameter of circle.
       This way we avoid tunelling through terrain in high speeds.
     **/
-    const radius = this.body_.radius;
-    const speed = Math.min(this.body_.vel.length_(), radius);
-    this.body_.vel = this.body_.vel.normalize_().mul(speed);
+    const radius = body_.radius;
+    const speed = Math.min(body_.vel.length_(), radius);
+    body_.vel = body_.vel.normalize_().mul(speed);
 
-    if (this.mode !== MotionMode.climbing) {
-      const colisions = Array.from(
-        this.physics.checkHitterColisions(this.body_),
-      );
+    if (this.mode_ !== MotionMode.climbing) {
+      const colisions = Array.from(this.physics.checkHitterColisions(body_));
 
-      if (this.mode === MotionMode.bubbling && colisions.length) {
+      if (this.mode_ === MotionMode.bubbling && colisions.length) {
         this.endBubbling();
       }
 
       for (const colision of colisions) {
-        const dy = colision.point.y - this.body_.pos.y;
-        if (dy <= this.climbingThreshold) {
-          colision.hitter.pos.sub_(colision.penetration);
+        body_.contactPoints.push(colision.point);
+
+        if (colision.receiver_.isDeadly) {
+          this.player.die();
         }
 
-        if (this.mode === MotionMode.falling) {
-          const d = colision.hitter.pos.copy().sub_(colision.hitter.oldPos);
-          const v = colision.hitter.vel;
+        const dy = colision.point.y - body_.pos.y;
+        if (dy <= this.climbingThreshold) {
+          body_.pos.sub_(colision.penetration);
+        }
 
-          colision.hitter.vel.x = Math.abs(v.x) < Math.abs(d.x) ? v.x : d.x;
-          colision.hitter.vel.y = Math.abs(v.y) < Math.abs(d.y) ? v.y : d.y;
+        if (this.mode_ === MotionMode.falling) {
+          const d = body_.pos.copy().sub_(body_.oldPos);
+          const v = body_.vel;
+
+          body_.vel.x = Math.abs(v.x) < Math.abs(d.x) ? v.x : d.x;
+          body_.vel.y = Math.abs(v.y) < Math.abs(d.y) ? v.y : d.y;
         }
       }
     }
@@ -143,7 +145,7 @@ export class PlayerPhysics {
   private updateMode() {
     this.climbContact = null;
 
-    if (this.mode === MotionMode.bubbling) {
+    if (this.mode_ === MotionMode.bubbling) {
       if (this.player.engine.time_ - this.bubbleTime > 2000) {
         this.endBubbling();
       } else {
@@ -155,7 +157,7 @@ export class PlayerPhysics {
       const dy = point.y - this.body_.pos.y;
       const dx = point.x - this.body_.pos.x;
       if (dy > this.climbingThreshold) {
-        this.mode = MotionMode.running;
+        this.mode_ = MotionMode.running;
         return;
       } else if (Math.abs(dy) <= this.climbingThreshold) {
         this.climbContact = dx;
@@ -168,29 +170,29 @@ export class PlayerPhysics {
         (this.climbContact < 0 && keys_.get("ArrowLeft")) ||
         (this.climbContact > 0 && keys_.get("ArrowRight"))
       ) {
-        if (this.mode !== MotionMode.climbing) {
+        if (this.mode_ !== MotionMode.climbing) {
           this.lastJumpTime = this.player.engine.time_;
         }
-        this.mode = MotionMode.climbing;
+        this.mode_ = MotionMode.climbing;
         return;
       }
     }
 
-    if (this.mode !== MotionMode.falling) {
+    if (this.mode_ !== MotionMode.falling) {
       this.fallingTime = this.player.engine.time_;
-      this.mode = MotionMode.falling;
+      this.mode_ = MotionMode.falling;
     }
   }
 
   moveToDirection(direction: number) {
-    if (this.mode === MotionMode.bubbling) {
-      this.body_.vel.rotate_(direction / 13);
+    if (this.mode_ === MotionMode.bubbling) {
+      this.body_.vel.rotate_(direction / 10);
       return;
     }
 
-    this.player.isRunning = this.mode === MotionMode.running;
+    this.player.isRunning = this.mode_ === MotionMode.running;
     let accScalar = 0.3;
-    if (this.mode === MotionMode.running) {
+    if (this.mode_ === MotionMode.running) {
       accScalar = 0.3;
     }
     const acc = new Vector2(direction * accScalar, 0);
@@ -208,16 +210,16 @@ export class PlayerPhysics {
 
   jump() {
     if (
-      this.mode === MotionMode.running ||
-      this.mode === MotionMode.climbing ||
+      this.mode_ === MotionMode.running ||
+      this.mode_ === MotionMode.climbing ||
       // be more forgiving to players by allowing them to jump after slipping
       // on platforms/slopes
-      (this.mode === MotionMode.falling &&
+      (this.mode_ === MotionMode.falling &&
         this.player.engine.time_ - this.fallingTime < 150)
     ) {
       if (this.player.engine.time_ - this.lastJumpTime > 151) {
         this.body_.vel.y = -5;
-        if (this.mode === MotionMode.climbing) {
+        if (this.mode_ === MotionMode.climbing) {
           this.body_.vel.x = -this.climbContact! / 3;
           this.body_.vel.y = -6;
         }
@@ -230,7 +232,7 @@ export class PlayerPhysics {
     }
 
     if (
-      this.mode === MotionMode.falling &&
+      this.mode_ === MotionMode.falling &&
       !this.dashed &&
       this.player.engine.time_ - this.lastJumpTime > 300
     ) {
@@ -240,7 +242,7 @@ export class PlayerPhysics {
     }
 
     if (
-      this.mode === MotionMode.bubbling &&
+      this.mode_ === MotionMode.bubbling &&
       this.player.engine.time_ - this.lastJumpTime > 150
     ) {
       this.endBubbling();
@@ -257,26 +259,26 @@ export class PlayerPhysics {
   }
 
   enterBubble(bubble: Pickable) {
-    if (this.mode === MotionMode.bubbling) {
+    if (this.mode_ === MotionMode.bubbling) {
       this.endBubbling();
     } else {
       this.body_.vel = new Vector2(0, -7);
       this.body_.pos.x = bubble.pos.x;
       this.body_.pos.y = bubble.pos.y;
     }
-    this.mode = MotionMode.bubbling;
+    this.mode_ = MotionMode.bubbling;
     this.bubble = bubble;
     this.bubbleTime = this.player.engine.time_;
     this.lastJumpTime = this.player.engine.time_;
   }
 
   endBubbling() {
-    this.mode = MotionMode.falling;
+    this.mode_ = MotionMode.falling;
     this.dashed = false;
     this.lastJumpTime = this.player.engine.time_;
     this.player.engine.particles.emit({
       count: 250,
-      direction: new Vector2(8, 0),
+      direction_: new Vector2(8, 0),
       lifetime: 150,
       lifetimeSpread: 5,
       pos: this.body_.pos,

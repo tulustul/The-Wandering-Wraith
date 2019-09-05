@@ -9,13 +9,13 @@ export class Game {
 
   menu: Menu;
 
-  constructor(public canvas: HTMLCanvasElement) {
-    this.engine = new Engine(this, canvas);
+  constructor(canvas_: HTMLCanvasElement) {
+    this.engine = new Engine(this, canvas_);
     this.menu = new Menu(this);
   }
 
   start() {
-    this.engine.load(loadSave());
+    this.engine.load_(loadSave());
 
     setTimeout(() => {
       this.paused_ = false;

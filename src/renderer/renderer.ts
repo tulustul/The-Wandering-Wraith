@@ -5,7 +5,7 @@ import { Vector2 } from "../vector";
 import { PathCommandType, PickableType, Pickable } from "../level.interface";
 import { assets } from "../assets";
 import { Random } from "../random";
-import { MotionMode } from "../systems/physics/player-physics";
+import { MotionMode } from "../physics/player-physics";
 
 const VIEWPORT_HEIGHT = 450;
 
@@ -49,7 +49,7 @@ export class Renderer {
   renderTerrain() {
     let to: Vector2;
     this.ctx.fillStyle = "#000";
-    for (const pathCommand of this.engine.level.pathCommands) {
+    for (const pathCommand of this.engine.level_.pathCommands) {
       switch (pathCommand.type) {
         case PathCommandType.move:
           to = pathCommand.points![0];
@@ -75,7 +75,7 @@ export class Renderer {
   renderPlatforms() {
     this.ctx.fillStyle = "#000";
     this.ctx.beginPath();
-    for (const p of this.engine.level.platforms) {
+    for (const p of this.engine.level_.platforms) {
       this.ctx.rect(p.x, p.y, p.w, p.h);
       this.ctx.fill();
       this.ctx.stroke();
@@ -118,7 +118,7 @@ export class Renderer {
 
     ctx.translate(player.body_.pos.x, player.body_.pos.y - 3);
 
-    if (player.physics.mode === MotionMode.bubbling) {
+    if (player.physics.mode_ === MotionMode.bubbling) {
       ctx.rotate(player.body_.vel.angle_() + Math.PI);
       ctx.scale(0.9, 1.2);
     } else {
@@ -174,7 +174,7 @@ export class Renderer {
     ctx.drawImage(assets.eyes, -3, -10, 10, 10);
     ctx.restore();
 
-    if (player.physics.mode === MotionMode.bubbling) {
+    if (player.physics.mode_ === MotionMode.bubbling) {
       this.renderBubble(new Vector2(0, -4));
     }
 
@@ -340,7 +340,7 @@ export class Renderer {
   }
 
   renderPickables() {
-    for (const pickable of this.engine.level.pickables) {
+    for (const pickable of this.engine.level_.pickables) {
       if (!pickable.collected) {
         switch (pickable.type) {
           case PickableType.crystal:

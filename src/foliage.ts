@@ -1,12 +1,11 @@
-import { Engine } from "../engine";
+import { Engine } from "./engine";
 
-import { Vector2 } from "../vector";
-import { Random } from "../random";
-import { PlantDefinition } from "../plants";
-import { assets } from "../assets";
+import { Vector2 } from "./vector";
+import { Random } from "./random";
+import { PlantDefinition } from "./plants";
+import { assets } from "./assets";
 import { lineToPointColision, getLineCells } from "./physics/shapes";
-import { GROUND_MASK } from "../colisions-masks";
-import { StaticBody } from "./physics/physics.interface";
+import { StaticBody } from "./physics/physics";
 
 interface Foliage {
   pos: Vector2;
@@ -20,7 +19,7 @@ export class FoliageSystem {
 
   async spawnFoliage(engine: Engine) {
     this.entities_ = [];
-    for (let x = 0; x <= engine.level.size.x * 2; x += this.GRID_SIZE) {
+    for (let x = 0; x <= engine.level_.size_.x * 2; x += this.GRID_SIZE) {
       this.entities_.push([]);
     }
 
@@ -28,7 +27,7 @@ export class FoliageSystem {
 
     for (const treeDefinition of assets.plants) {
       let x = r.nextFloat() * treeDefinition.spread;
-      while (x < engine.level.size.x) {
+      while (x < engine.level_.size_.x) {
         x +=
           treeDefinition.spread +
           treeDefinition.spread * (r.nextFloat() - 0.5);
@@ -53,7 +52,7 @@ export class FoliageSystem {
   *findGround(engine: Engine, x: number, hitMask: number) {
     const cells = getLineCells(
       new Vector2(x, -1000),
-      new Vector2(x, engine.level.size.y),
+      new Vector2(x, engine.level_.size_.y),
     );
 
     const linesToCheck = new Set<[Vector2, Vector2, boolean]>();

@@ -1,4 +1,4 @@
-import { Vector2 } from "../../vector";
+import { Vector2 } from "../vector";
 import { GRID_SIZE } from "./constants";
 import { getIndexOfCell } from "./helpers";
 
@@ -12,14 +12,8 @@ export function lineToPointColision(
 
   const lineLen = lineStart.distanceTo(lineEnd);
 
-  // since floats are so minutely accurate, add
-  // a little buffer zone that will give collision
-  const buffer = 0.1; // higher # = less accurate
+  const buffer = 0.1;
 
-  // if the two distances are equal to the line's
-  // length, the point is on the line!
-  // note we use the buffer here to give a range,
-  // rather than one #
   return d1 + d2 >= lineLen - buffer && d1 + d2 <= lineLen + buffer;
 }
 
@@ -100,21 +94,11 @@ export function checkCircleLineColision(
     return null;
   }
 
-  // console.log("is-colision");
-
   const angle = cPos.directionTo(closestPoint);
   const penetrationVec = new Vector2(0, 1)
     .mul(penetrationDistance)
     .rotate_(angle);
 
-  // fix tunneling when circle center passed the line.
-  // console.log(
-  //   penetrationVec
-  //     .copy()
-  //     .normalize_()
-  //     .angleTo(vel.copy().normalize_()),
-  // );
-  // console.log(penetrationVec.copy().normalize_(), vel.copy().normalize_());
   if (
     Math.abs(
       penetrationVec
@@ -126,21 +110,7 @@ export function checkCircleLineColision(
   ) {
     penetrationVec.mul(-1);
     penetrationVec.normalize_().mul(penetrationDistance - r * 2);
-    // console.log("tunneling prevetion", penetrationVec);
   }
 
   return [penetrationVec, closestPoint];
 }
-
-export function checkCircleCircleColision(
-  pos1: Vector2,
-  r1: number,
-  pos2: Vector2,
-  r2: number,
-): boolean {
-  const d = pos1.distanceTo(pos2);
-  const radiusSum = r1 + r2;
-  return d > radiusSum;
-}
-
-export function getCirclePenetration(cPos: Vector2, r: number, p: Vector2) {}

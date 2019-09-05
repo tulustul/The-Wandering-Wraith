@@ -31,7 +31,7 @@ export function loadLevel(engine: Engine, level: number) {
 
 export class LevelParser {
   private pos: Vector2;
-  private index = 0;
+  private index_ = 0;
 
   constructor(private engine: Engine, private d: string) {}
 
@@ -41,8 +41,8 @@ export class LevelParser {
     const platforms: Platform[] = [];
     const savepoints: number[] = [];
     const pickables: Pickable[] = [];
-    this.engine.level = {
-      size: this.parseVector(),
+    this.engine.level_ = {
+      size_: this.parseVector(),
       pathCommands,
       platforms,
       savepoints,
@@ -51,15 +51,15 @@ export class LevelParser {
 
     // #if process.env.NODE_ENV === 'development'
     const pointsMap = new Map<Vector2, PathCommand>();
-    this.engine.level.pointToCommandMap = pointsMap;
+    this.engine.level_.pointToCommandMap = pointsMap;
 
     const objects: LevelObject[] = [];
-    this.engine.level.objects = objects;
+    this.engine.level_.objects = objects;
     // #endif
 
     let command = "m";
     let firstPoint: Vector2 | null = null;
-    let c = this.d[this.index - 1];
+    let c = this.d[this.index_ - 1];
     let isDeadly = false;
     while (c) {
       if (commands.includes(c)) {
@@ -139,7 +139,7 @@ export class LevelParser {
           // #endif
           break;
         case "p":
-          this.index++;
+          this.index_++;
           pos = this.parseVector();
           const sizes = new Map<string, [number, number]>([
             ["P", [15, 5]],
@@ -180,7 +180,7 @@ export class LevelParser {
           // #if process.env.NODE_ENV === 'development'
           const savepointPos = new Vector2(
             savepoint,
-            this.engine.level.size.y / 2,
+            this.engine.level_.size_.y / 2,
           );
           const save: LevelObject = {
             type: "savepoint",
@@ -231,7 +231,7 @@ export class LevelParser {
           // #endif
           break;
       }
-      c = this.d[this.index - 1];
+      c = this.d[this.index_ - 1];
     }
   }
 
@@ -260,7 +260,7 @@ export class LevelParser {
   }
 
   private parseNumber() {
-    let number = this.d[this.index - 1];
+    let number = this.d[this.index_ - 1];
     let c = this.next();
     while (c >= "0" && c <= "9") {
       number += c;
@@ -270,7 +270,7 @@ export class LevelParser {
   }
 
   private next() {
-    return this.d[this.index++];
+    return this.d[this.index_++];
   }
 
   private addStatic(

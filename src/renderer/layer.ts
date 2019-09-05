@@ -41,10 +41,10 @@ export class Layer {
 
   updateSize() {
     if (this.renderWholeWorld) {
-      this.canvas_.width = this.engine.level.size.x;
+      this.canvas_.width = this.engine.level_.size_.x;
       this.canvas_.height =
         this.offsetScale === 1
-          ? this.engine.level.size.y
+          ? this.engine.level_.size_.y
           : this.engine.canvas_.height;
     } else {
       this.canvas_.width = this.engine.canvas_.width;

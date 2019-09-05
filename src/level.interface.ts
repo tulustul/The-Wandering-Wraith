@@ -1,12 +1,12 @@
 import { Vector2 } from "./vector";
 import { ObjectType } from "./editor/objects";
 
-export enum PickableType {
+export const enum PickableType {
   crystal,
   bubble,
 }
 
-export enum PathCommandType {
+export const enum PathCommandType {
   move,
   line,
   bezier,
@@ -37,7 +37,7 @@ export interface Platform extends CanBeDeadly {
 }
 
 export interface Level {
-  size: Vector2;
+  size_: Vector2;
   pathCommands: PathCommand[];
   platforms: Platform[];
   savepoints: number[];

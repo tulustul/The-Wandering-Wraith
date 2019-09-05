@@ -16,8 +16,8 @@ export class Camera {
     const w = this.engine.canvas_.width;
     const h = this.engine.canvas_.height;
     const [maxX, maxY, x, y] = [
-      this.engine.level.size.x - w,
-      this.engine.level.size.y - h,
+      this.engine.level_.size_.x - w,
+      this.engine.level_.size_.y - h,
       this.target.x - w / 2,
       this.target.y - h / 1.5,
     ];
