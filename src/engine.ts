@@ -11,6 +11,7 @@ import { Camera } from "./camera";
 import { Level } from "./level.interface";
 import { Save, save as save_, loadSave } from "./saves";
 import { loadLevel } from "./loader";
+import { LEVELS } from "./levels";
 
 // #if process.env.NODE_ENV === 'development'
 import { Editor } from "./editor/editor";
@@ -58,7 +59,7 @@ export class Engine {
     this.physics.clear_();
 
     this.currentSave = save;
-    loadLevel(this, save.level);
+    loadLevel(this, save.level_);
     this.respawnPlayer();
     this.renderer.init();
     this.foliage.spawnFoliage(this);
@@ -93,7 +94,12 @@ export class Engine {
     }
 
     if (playerPos.x > this.level_.size_.x + 10) {
-      this.currentSave.level++;
+      this.currentSave.level_++;
+      if (this.currentSave.level_ === LEVELS.length) {
+        this.game.paused_ = true;
+        this.game.menu.finish(this.currentSave);
+        return;
+      }
       this.currentSave.pos = new Vector2(150, 0);
       save_(this.currentSave);
       this.load_(this.currentSave);

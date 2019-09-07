@@ -25,7 +25,7 @@ export class EditorUI {
 
     (document.getElementById(
       "level",
-    ) as HTMLSelectElement).value = this.engine.currentSave.level.toString();
+    ) as HTMLSelectElement).value = this.engine.currentSave.level_.toString();
 
     this.hideDeadlyToggle();
 
@@ -98,7 +98,7 @@ export class EditorUI {
     this.listeners.listen("level", "change", event => {
       const level = parseInt((event.target! as HTMLSelectElement).value);
       this.editor.engine.load_({
-        level,
+        level_: level,
         pos: new Vector2(100, 200),
         crystals: {},
       });

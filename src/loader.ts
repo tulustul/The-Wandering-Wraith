@@ -194,7 +194,7 @@ export class LevelParser {
         case "C":
           pos = this.parseVector();
           const collectedCrystals =
-            this.engine.currentSave.crystals[this.engine.currentSave.level] ||
+            this.engine.currentSave.crystals[this.engine.currentSave.level_] ||
             [];
           pickables.push({
             pos,

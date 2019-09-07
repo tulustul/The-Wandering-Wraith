@@ -1,6 +1,6 @@
 import { Engine } from "./engine";
 import { loadSave, clearSave } from "./saves";
-import { Menu } from "./menu";
+import { Menu, MenuMode } from "./menu";
 
 export class Game {
   paused_ = true;
@@ -17,10 +17,8 @@ export class Game {
   start() {
     this.engine.load_(loadSave());
 
-    setTimeout(() => {
-      this.paused_ = false;
-      this.menu.hide();
-    }, 100);
+    this.paused_ = false;
+    this.menu.hide();
   }
 
   togglePause() {
@@ -29,6 +27,8 @@ export class Game {
   }
 
   startNewGame() {
+    this.menu.mode = MenuMode.menu;
+    localStorage.removeItem("tul_d"); // clear deaths count
     clearSave();
     this.start();
   }

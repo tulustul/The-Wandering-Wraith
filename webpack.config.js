@@ -2,6 +2,7 @@ const path = require("path");
 
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlWebpackInlineSVGPlugin = require("html-webpack-inline-svg-plugin");
+const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
 const ExtraWatchWebpackPlugin = require("extra-watch-webpack-plugin");
 const ZipPlugin = require("zip-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
@@ -21,10 +22,14 @@ module.exports = env => {
         removeTagWhitespace: true,
         collapseWhitespace: true,
         minifyCSS: true,
+        inlineSource: ".(js|ts)$",
       },
     }),
     new HtmlWebpackInlineSVGPlugin({
       runPreEmit: true,
+    }),
+    new ScriptExtHtmlWebpackPlugin({
+      inline: "bundle",
     }),
     new ExtraWatchWebpackPlugin({
       files: ["levels/*.svg", "assets/*.svg"],

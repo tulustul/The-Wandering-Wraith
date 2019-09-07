@@ -1,4 +1,5 @@
 import { Game } from "./game";
+import { MenuMode } from "./menu";
 
 export class Control {
   keys_ = new Map<string, boolean>();
@@ -10,7 +11,13 @@ export class Control {
       this.keys_.set(event.code, true);
 
       if (event.key === "Escape") {
-        this.game.togglePause();
+        if (this.game.menu.mode === MenuMode.stats) {
+          this.game.menu.showCredits();
+        } else if (this.game.menu.mode === MenuMode.credits) {
+          this.game.startNewGame();
+        } else {
+          this.game.togglePause();
+        }
       }
     });
 

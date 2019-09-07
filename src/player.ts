@@ -167,10 +167,10 @@ export class Player {
         switch (pickable.type) {
           case PickableType.crystal:
             const save = this.engine.currentSave;
-            if (!save.crystals[save.level]) {
-              save.crystals[save.level] = [];
+            if (!save.crystals[save.level_]) {
+              save.crystals[save.level_] = [];
             }
-            save.crystals[save.level].push(index);
+            save.crystals[save.level_].push(index);
             zzfx(...assets.sounds.collect);
             break;
           case PickableType.bubble:
@@ -183,6 +183,12 @@ export class Player {
 
   die() {
     this.isDead = true;
+
+    localStorage.setItem(
+      "tul_d",
+      ((parseInt(localStorage.getItem("tul_d")!) || 0) + 1).toString(),
+    ); // increment deaths counter
+
     this.engine.particles.emit({
       count: 250,
       direction_: new Vector2(5, 0),
@@ -193,8 +199,8 @@ export class Player {
     zzfx(...assets.sounds.dead);
 
     setTimeout(() => {
-      // this.engine.respawnPlayer();
-      this.engine.load_(loadSave());
+      this.engine.respawnPlayer();
+      // this.engine.load_(loadSave());
     }, 1000);
   }
 

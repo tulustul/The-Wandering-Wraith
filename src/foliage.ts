@@ -23,7 +23,7 @@ export class FoliageSystem {
       this.entities_.push([]);
     }
 
-    const r = new Random(engine.currentSave.level);
+    const r = new Random(engine.currentSave.level_);
 
     for (const treeDefinition of assets.plants) {
       let x = r.nextFloat() * treeDefinition.spread;
