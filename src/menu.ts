@@ -41,7 +41,6 @@ export class Menu {
 
   hide() {
     this.tintEl.classList.add("r");
-    setTimeout(() => this.tintEl.classList.add("r"), 300);
   }
 
   finish(save: Save) {

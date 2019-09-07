@@ -16,9 +16,6 @@ export class Game {
 
   start() {
     this.engine.load_(loadSave());
-
-    this.paused_ = false;
-    this.menu.hide();
   }
 
   togglePause() {
@@ -31,5 +28,7 @@ export class Game {
     localStorage.removeItem("tul_d"); // clear deaths count
     clearSave();
     this.start();
+    this.paused_ = false;
+    this.menu.hide();
   }
 }

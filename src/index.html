@@ -20,6 +20,21 @@
         display: none;
       }
 
+      tt {
+        font-size: 80px;
+        margin-top: 100px;
+        margin-bottom: 10px;
+        background: -webkit-linear-gradient(#fff, #4376fd);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      ts {
+        font-size: 30px;
+        color: grey;
+        margin-bottom: 150px;
+      }
+
       t {
         position: absolute;
         background-color: black;
@@ -28,7 +43,6 @@
         color: antiquewhite;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
         opacity: 0.7;
         text-align: center;
@@ -68,8 +82,9 @@
 
   <body>
     <t>
-      <h1>GAME TITLE HERE</h1>
-      <div id="o" class="r">
+      <tt class="t">The Wandering Wraith</tt>
+      <ts class="t">...or the grand venture of going back to grave.</ts>
+      <div id="o">
         <button id="c">Continue</button>
         <button id="n">New game</button>
       </div>
