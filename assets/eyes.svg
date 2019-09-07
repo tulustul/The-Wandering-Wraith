@@ -1,15 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="eyes" width="6" height="5" version="1.1" viewBox="0 0 1.5874 1.3229" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
- <metadata>
-  <rdf:RDF>
-   <cc:Work rdf:about="">
-    <dc:format>image/svg+xml</dc:format>
-    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:title/>
-   </cc:Work>
-  </rdf:RDF>
- </metadata>
- <g transform="translate(-5.3252 -289.37)">
+<svg id="eyes" width="10" height="10" version="1.1" viewBox="0 0 2.6457 2.6458" xmlns="http://www.w3.org/2000/svg">
+ <g transform="matrix(1.7512 0 0 1.7512 -9.4006 -506.59)">
   <ellipse transform="rotate(-9.621)" cx="-42.854" cy="286.9" rx=".31002" ry=".52503" opacity=".476"/>
   <ellipse transform="rotate(11.84)" cx="65.914" cy="282.52" rx=".31002" ry=".52503" opacity=".476"/>
  </g>

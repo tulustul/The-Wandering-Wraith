@@ -24,6 +24,17 @@ module.exports = env => {
         minifyCSS: true,
         inlineSource: ".(js|ts)$",
       },
+      svgoConfig: {
+        removeViewBox: true,
+        removeDimensions: false,
+        convertTransform: true,
+        cleanupNumericValues: {
+          floatPrecision: 1,
+          leadingZero: true,
+          defaultPx: true,
+          convertToPx: true,
+        },
+      },
     }),
     new HtmlWebpackInlineSVGPlugin({
       runPreEmit: true,

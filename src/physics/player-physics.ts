@@ -148,6 +148,7 @@ export class PlayerPhysics {
         }
       }
     }
+    body_.pos.x = Math.max(0, body_.pos.x);
   }
 
   private updateMode() {

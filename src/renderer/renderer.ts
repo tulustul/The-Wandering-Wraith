@@ -7,7 +7,7 @@ import { assets } from "../assets";
 import { Random } from "../random";
 import { MotionMode } from "../physics/player-physics";
 
-const VIEWPORT_HEIGHT = 450;
+const SCALE = 0.4;
 
 export class Renderer {
   ctx: CanvasRenderingContext2D;
@@ -158,13 +158,12 @@ export class Renderer {
     ctx.restore();
 
     //head
-    ctx.scale(0.9, 0.9);
-    ctx.drawImage(assets.head_, -20, -33, 40, 40);
+    ctx.drawImage(assets.head_, -20, -33);
 
     // eyes
     ctx.translate(0, player.animation_.eyesOffset);
     ctx.scale(1, player.animation_.eyesScale);
-    ctx.drawImage(assets.eyes, -3, -23, 10, 10);
+    ctx.drawImage(assets.eyes, -3, -8);
     ctx.restore();
 
     if (player.physics.mode_ === MotionMode.bubbling) {
@@ -475,10 +474,10 @@ export class Renderer {
   }
 
   updateSize() {
-    const width = (window.innerWidth / window.innerHeight) * VIEWPORT_HEIGHT;
+    // const width = (window.innerWidth / window.innerHeight) * VIEWPORT_HEIGHT;
 
-    this.engine.canvas_.width = Math.floor(width);
-    this.engine.canvas_.height = VIEWPORT_HEIGHT;
+    this.engine.canvas_.width = window.innerWidth * SCALE;
+    this.engine.canvas_.height = window.innerHeight * SCALE;
 
     for (const layer of Layer.layers) {
       layer.updateSize();

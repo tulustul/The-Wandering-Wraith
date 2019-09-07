@@ -110,11 +110,11 @@ export class Player {
     if (this.engine.time_ - this.lastEyeLook > 100) {
       this.lastEyeLook = this.engine.time_;
       if (this.body_.vel.y > 1) {
-        this.animation_.eyesOffset = 4;
+        this.animation_.eyesOffset = -11;
       } else if (this.body_.vel.y < -1) {
-        this.animation_.eyesOffset = -6;
+        this.animation_.eyesOffset = -21;
       } else {
-        this.animation_.eyesOffset = 0;
+        this.animation_.eyesOffset = -15;
       }
     }
 
