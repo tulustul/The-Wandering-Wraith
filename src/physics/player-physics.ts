@@ -38,6 +38,8 @@ export class PlayerPhysics {
 
   lastBubbleFlySoundTime = 0;
 
+  gravity = 0.25;
+
   constructor(private physics: PhysicsSystem, private player: Player) {}
 
   get body_() {
@@ -57,11 +59,17 @@ export class PlayerPhysics {
     if (this.mode_ === MotionMode.running) {
       body_.pos.x += body_.vel.x;
       const rayResult = this.physics.castRay(
-        new Vector2(body_.pos.x, body_.pos.y - 20),
-        new Vector2(body_.pos.x, body_.pos.y + 20),
+        new Vector2(
+          body_.pos.x,
+          body_.pos.y - 20 * (this.gravity > 0 ? 1 : -1),
+        ),
+        new Vector2(
+          body_.pos.x,
+          body_.pos.y + 20 * (this.gravity > 0 ? 1 : -1),
+        ),
       );
       if (rayResult) {
-        body_.pos.y = rayResult.y - body_.radius + 1;
+        body_.pos.y = rayResult.y - body_.radius * (this.gravity > 0 ? 1 : -1);
       }
       if (!this.player.isRunning) {
         body_.vel.x *= 0.5;
@@ -70,7 +78,7 @@ export class PlayerPhysics {
     }
 
     if (this.mode_ === MotionMode.falling) {
-      body_.vel.y += 0.25;
+      body_.vel.y += this.gravity;
       body_.vel.x *= 0.94;
       body_.pos.add_(body_.vel);
     }
@@ -119,7 +127,10 @@ export class PlayerPhysics {
           this.player.engine.time_ - this.fallingTime > 150
         ) {
           zzfx(...assets.sounds.hit);
-          this.player.targetScale = Math.min(1, 1 / (body_.vel.y / 8 + 0.7));
+          this.player.targetScale = Math.min(
+            1,
+            1 / Math.abs(body_.vel.y) / 8 + 0.7,
+          );
           this.mode_ = MotionMode.running;
         }
         if (this.mode_ === MotionMode.bubbling) {
@@ -135,7 +146,11 @@ export class PlayerPhysics {
         }
 
         const dy = colision.point.y - body_.pos.y;
-        if (dy <= this.climbingThreshold) {
+        if (
+          this.gravity > 0
+            ? dy <= this.climbingThreshold
+            : dy >= -this.climbingThreshold
+        ) {
           body_.pos.sub_(colision.penetration);
         }
 
@@ -163,7 +178,7 @@ export class PlayerPhysics {
     }
 
     for (const point of this.body_.contactPoints) {
-      const dy = point.y - this.body_.pos.y;
+      const dy = (point.y - this.body_.pos.y) * (this.gravity > 0 ? 1 : -1);
       const dx = point.x - this.body_.pos.x;
       if (dy > this.climbingThreshold) {
         this.mode_ = MotionMode.running;
@@ -204,12 +219,12 @@ export class PlayerPhysics {
     if (this.mode_ === MotionMode.running) {
       accScalar = 0.2;
     }
-    const acc = new Vector2(direction * accScalar, 0);
 
-    if (Math.abs(this.body_.vel.x + acc.x) < this.maxSpeed) {
-      this.body_.vel.x += acc.x;
+    const acc = direction * accScalar;
+
+    if (Math.abs(this.body_.vel.x + acc) < this.maxSpeed) {
+      this.body_.vel.x += acc;
     }
-    this.body_.vel.y += acc.y;
 
     this.direction_ = direction < 0 ? "l" : "r";
     this.player.makeStep();
@@ -225,11 +240,12 @@ export class PlayerPhysics {
         this.player.engine.time_ - this.fallingTime < 150)
     ) {
       if (this.player.engine.time_ - this.lastJumpTime > 151) {
-        this.body_.vel.y = -5;
+        this.body_.vel.y = 5;
         if (this.mode_ === MotionMode.climbing) {
           this.body_.vel.x = -this.climbContact! / 3;
-          this.body_.vel.y = -5;
+          this.body_.vel.y = 5;
         }
+        this.body_.vel.y *= this.gravity > 0 ? -1 : 1;
         this.body_.contactPoints = [];
         this.lastJumpTime = this.player.engine.time_;
         this.dashed = false;
@@ -243,7 +259,7 @@ export class PlayerPhysics {
       !this.dashed &&
       this.player.engine.time_ - this.lastJumpTime > 300
     ) {
-      this.body_.vel.y = -5;
+      this.body_.vel.y = 5 * (this.gravity > 0 ? -1 : 1);
       this.dashed = true;
       zzfx(...assets.sounds.dash);
     }

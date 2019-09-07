@@ -74,6 +74,13 @@ export class EditorRenderer {
       this.ctx.fill();
       this.ctx.closePath();
     }
+
+    this.ctx.fillStyle = "#f005";
+    this.ctx.beginPath();
+    this.ctx.arc(body.pos.x, body.pos.y, 10, 0, Math.PI * 2);
+    this.ctx.closePath();
+    this.ctx.fill();
+
     this.ctx.restore();
     this.ctx.closePath();
   }
@@ -224,6 +231,10 @@ export class EditorRenderer {
           break;
         case "crystal":
           this.ctx.fillStyle = "#f005";
+          this.ctx.fillRect(o.pos.x - 10, o.pos.y - 10, 20, 20);
+          break;
+        case "gravityCrystal":
+          this.ctx.fillStyle = "#f055";
           this.ctx.fillRect(o.pos.x - 10, o.pos.y - 10, 20, 20);
           break;
         case "bubble":

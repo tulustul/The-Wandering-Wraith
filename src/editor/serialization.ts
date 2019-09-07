@@ -10,7 +10,10 @@ const COMMAND_MAP = {
 
 export class LevelSerializer {
   serialize(level: Level): string {
-    const tokens: string[] = [this.serializeVector(level.size_)];
+    const tokens: string[] = [
+      this.serializeVector(level.size_),
+      this.serializeNumber(level.startingPos),
+    ];
 
     let localPos = new Vector2();
     let to: Vector2;
@@ -89,6 +92,10 @@ export class LevelSerializer {
           break;
         case "crystal":
           tokens.push("C");
+          tokens.push(this.serializeVector(o.pos));
+          break;
+        case "gravityCrystal":
+          tokens.push("G");
           tokens.push(this.serializeVector(o.pos));
           break;
         case "bubble":

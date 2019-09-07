@@ -3,6 +3,7 @@ import { ObjectType } from "./editor/objects";
 
 export const enum PickableType {
   crystal,
+  gravityCrystal,
   bubble,
 }
 

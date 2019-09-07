@@ -173,6 +173,12 @@ export class Player {
             save.crystals[save.level_].push(index);
             zzfx(...assets.sounds.collect);
             break;
+          case PickableType.gravityCrystal:
+            this.physics.gravity = -this.physics.gravity;
+            this.body_.pos.y += this.physics.gravity > 0 ? 20 : -20;
+            zzfx(...assets.sounds.collect);
+            setTimeout(() => (pickable.collected = false), 2000);
+            break;
           case PickableType.bubble:
             this.physics.enterBubble(pickable);
             break;

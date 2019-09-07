@@ -21,8 +21,9 @@ import { ObjectType } from "./editor/objects";
 // d - toggling is deadly flag
 // s - savepoint (x)
 // C - crystal (x,y)
+// G - gravity crystal (x,y)
 // B - bubble (x,y)
-const commands = "mlczpdsCB";
+const commands = "mlczpdsCGB";
 
 export function loadLevel(engine: Engine, level: number) {
   const levelDef = LEVELS[level];
@@ -211,6 +212,24 @@ export class LevelParser {
           };
           objects.push(crystalObject);
           pointsMap.set(pos, crystalObject as any);
+          // #endif
+          break;
+        case "G":
+          pos = this.parseVector();
+          pickables.push({
+            pos,
+            type: PickableType.gravityCrystal,
+            collected: false,
+            radius: 25,
+          });
+          // #if process.env.NODE_ENV === 'development'
+          const gravityCrystalObject: LevelObject = {
+            isDeadly: false,
+            type: "gravityCrystal",
+            pos,
+          };
+          objects.push(gravityCrystalObject);
+          pointsMap.set(pos, gravityCrystalObject as any);
           // #endif
           break;
         case "B":

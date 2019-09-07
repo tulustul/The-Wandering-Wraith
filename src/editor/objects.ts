@@ -17,6 +17,7 @@ export type ObjectType =
   | "platformV2"
   | "savepoint"
   | "crystal"
+  | "gravityCrystal"
   | "bubble";
 
 export class EditorObjects {
@@ -47,12 +48,14 @@ export class EditorObjects {
         this.pointsMap.set(pos, savepoint as any);
         break;
       case "crystal":
+      case "gravityCrystal":
       case "bubble":
         const typeMap = new Map<string, PickableType>([
           ["crystal", PickableType.crystal],
+          ["gravityCrystal", PickableType.gravityCrystal],
           ["bubble", PickableType.bubble],
         ]);
-        const crystal: LevelObject = {
+        const pickable: LevelObject = {
           type,
           pos,
           isDeadly: false,
@@ -61,10 +64,10 @@ export class EditorObjects {
           type: typeMap.get(type)!,
           collected: false,
           pos,
-          radius: type === "bubble" ? 25 : 20,
+          radius: 25,
         });
-        this.editor.engine.level_.objects!.push(crystal);
-        this.pointsMap.set(pos, crystal as any);
+        this.editor.engine.level_.objects!.push(pickable);
+        this.pointsMap.set(pos, pickable as any);
         break;
     }
   }

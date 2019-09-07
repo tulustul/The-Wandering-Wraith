@@ -112,13 +112,19 @@ export class Renderer {
 
     ctx.save();
 
-    ctx.translate(player.body_.pos.x, player.body_.pos.y + 10);
+    ctx.translate(
+      player.body_.pos.x,
+      player.body_.pos.y + 10 * (player.physics.gravity > 0 ? 1 : -1),
+    );
 
     if (player.physics.mode_ === MotionMode.bubbling) {
       ctx.rotate(player.body_.vel.angle_() + Math.PI);
       ctx.scale(0.9, 1.2);
     } else {
-      ctx.scale(1, player.animation_.scale_);
+      ctx.scale(
+        1,
+        player.animation_.scale_ * (player.physics.gravity > 0 ? 1 : -1),
+      );
     }
 
     if (player.physics.direction_ === "l") {
@@ -317,7 +323,10 @@ export class Renderer {
       if (!pickable.collected) {
         switch (pickable.type) {
           case PickableType.crystal:
-            this.renderCrystal(pickable);
+            this.renderCrystal(pickable, 12, false);
+            break;
+          case PickableType.gravityCrystal:
+            this.renderCrystal(pickable, 8, true);
             break;
           case PickableType.bubble:
             this.renderBubble(pickable.pos);
@@ -355,7 +364,7 @@ export class Renderer {
     this.ctx.restore();
   }
 
-  renderCrystal(crystal: Pickable) {
+  renderCrystal(crystal: Pickable, height: number, isGreen: boolean) {
     this.ctx.save();
     this.ctx.translate(
       crystal.pos.x,
@@ -367,28 +376,31 @@ export class Renderer {
       const cos = Math.cos(time / 1000);
       const sin = Math.sin(time / 1000);
       this.ctx.scale(1, -1);
-      this.renderCrystalPart(i, sin, cos, 1);
+      this.renderCrystalPart(sin, cos, 1, height, isGreen);
       this.ctx.scale(1, -1);
-      this.renderCrystalPart(i, sin, cos, 0.6);
+      this.renderCrystalPart(sin, cos, 0.6, height, isGreen);
     }
     this.ctx.globalCompositeOperation = "screen";
-    this.renderLight(new Vector2(0, 0), "#200", 25);
+    this.renderLight(new Vector2(0, 0), isGreen ? "#020" : "#200", 25);
     this.ctx.globalCompositeOperation = "source-over";
     this.ctx.restore();
   }
 
   renderCrystalPart(
-    i: number,
     sin: number,
     cos: number,
     colorDarkening: number,
+    height: number,
+    isGreen: boolean,
   ) {
     const color = this.toHexColor(50 + cos * 180 * colorDarkening);
     const color2 = this.toHexColor(cos * 120 * colorDarkening);
-    this.ctx.fillStyle = `#${color}${color2}${color2}`;
+    this.ctx.fillStyle = isGreen
+      ? `#${color2}${color}${color2}`
+      : `#${color}${color2}${color2}`;
     this.ctx.beginPath();
     this.ctx.lineTo(8 - sin * 16, 0);
-    this.ctx.lineTo(0, 12);
+    this.ctx.lineTo(0, height);
     this.ctx.lineTo(cos * 16 - 8, 0);
     this.ctx.closePath();
     this.ctx.fill();
