@@ -116,7 +116,7 @@ export const EDITOR_HTML = `
   </label>
 
   <label id="deadly-input-label">
-    Is deadly
+    Spikes
     <input id="deadly-input" type="checkbox">
   </label>
 </div>

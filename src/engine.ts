@@ -36,13 +36,7 @@ export class Engine {
 
   player: Player;
 
-  level_: Level = {
-    size_: new Vector2(),
-    pathCommands: [],
-    platforms: [],
-    savepoints: [],
-    pickables: [],
-  };
+  level_: Level;
 
   currentSave: Save;
 
@@ -51,7 +45,6 @@ export class Engine {
   // #endif
 
   constructor(public game: Game, public canvas_: HTMLCanvasElement) {
-    this.renderer.updateSize();
     this.control_.init();
   }
 
@@ -60,6 +53,9 @@ export class Engine {
 
     this.currentSave = save;
     loadLevel(this, save.level_);
+    if (!save.pos) {
+      save.pos = new Vector2(150, this.level_.startingPos);
+    }
     this.respawnPlayer();
     this.renderer.init();
     this.foliage.spawnFoliage(this);
@@ -68,11 +64,11 @@ export class Engine {
   respawnPlayer() {
     const save = this.currentSave;
     const pos = this.physics.castRay(
-      new Vector2(save.pos.x, save.pos.y - 100),
-      new Vector2(save.pos.x, this.level_.size_.y),
+      new Vector2(save.pos!.x, save.pos!.y - 100),
+      new Vector2(save.pos!.x, this.level_.size_.y),
     );
-    save.pos.y = pos!.y - 10;
-    this.player = new Player(this, new Vector2(save.pos.x, save.pos.y));
+    save.pos!.y = pos!.y - 10;
+    this.player = new Player(this, new Vector2(save.pos!.x, save.pos!.y));
   }
 
   save_() {
@@ -88,7 +84,7 @@ export class Engine {
 
     const playerPos = this.player.body_.pos;
     for (const savepoint of this.level_.savepoints) {
-      if (savepoint > this.currentSave.pos.x && playerPos.x > savepoint) {
+      if (savepoint > this.currentSave.pos!.x && playerPos.x > savepoint) {
         this.save_();
       }
     }
@@ -100,7 +96,7 @@ export class Engine {
         this.game.menu.finish(this.currentSave);
         return;
       }
-      this.currentSave.pos = new Vector2(150, 0);
+      this.currentSave.pos = null;
       save_(this.currentSave);
       this.load_(this.currentSave);
     }

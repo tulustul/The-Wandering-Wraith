@@ -99,7 +99,7 @@ export class EditorUI {
       const level = parseInt((event.target! as HTMLSelectElement).value);
       this.editor.engine.load_({
         level_: level,
-        pos: new Vector2(100, 200),
+        pos: null,
         crystals: {},
       });
 

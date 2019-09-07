@@ -2,7 +2,7 @@ import { Vector2 } from "./vector";
 
 export interface Save {
   level_: number;
-  pos: { x: number; y: number };
+  pos: { x: number; y: number } | null;
 
   // maps a level id to an array of collected crystals ids
   crystals: { [key: number]: number[] };
@@ -13,7 +13,7 @@ export function loadSave(): Save {
   return (
     JSON.parse(localStorage.getItem("tul_s")!) || {
       level_: 0,
-      pos: new Vector2(150, 200),
+      pos: null,
       crystals: {},
     }
   );

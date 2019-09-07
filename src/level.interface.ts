@@ -38,6 +38,7 @@ export interface Platform extends CanBeDeadly {
 
 export interface Level {
   size_: Vector2;
+  startingPos: number; // y coordinate
   pathCommands: PathCommand[];
   platforms: Platform[];
   savepoints: number[];

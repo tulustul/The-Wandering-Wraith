@@ -43,6 +43,7 @@ export class LevelParser {
     const pickables: Pickable[] = [];
     this.engine.level_ = {
       size_: this.parseVector(),
+      startingPos: this.parseNumber(),
       pathCommands,
       platforms,
       savepoints,

@@ -39,15 +39,17 @@ module.exports = env => {
     new HtmlWebpackInlineSVGPlugin({
       runPreEmit: true,
     }),
-    new ScriptExtHtmlWebpackPlugin({
-      inline: "bundle",
-    }),
     new ExtraWatchWebpackPlugin({
       files: ["levels/*.svg", "assets/*.svg"],
     }),
   ];
 
   if (isProd) {
+    plugins.push(
+      new ScriptExtHtmlWebpackPlugin({
+        inline: "bundle",
+      }),
+    );
     plugins.push(new ZipPlugin({ filename: "bundle.zip" }));
   }
 

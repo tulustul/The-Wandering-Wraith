@@ -41,8 +41,9 @@ export class Renderer {
 
   init() {
     for (const layer of Layer.layers) {
-      layer.init();
+      layer.clearCanvas();
     }
+    this.updateSize();
     this.prerender();
   }
 

@@ -34,11 +34,6 @@ export class Layer {
     this.ctx = this.canvas_.getContext("2d") as CanvasRenderingContext2D;
   }
 
-  init() {
-    this.updateSize();
-    this.clearCanvas();
-  }
-
   updateSize() {
     if (this.renderWholeWorld) {
       this.canvas_.width = this.engine.level_.size_.x;
