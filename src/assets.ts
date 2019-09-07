@@ -21,6 +21,8 @@ interface Assets {
   torso: HTMLImageElement;
   eyes: HTMLImageElement;
   limb: HTMLImageElement;
+  scaffold: HTMLImageElement;
+  hangman: HTMLImageElement;
   plants: PlantDefinition[];
   sounds: {
     jump: SoundDefinition;
@@ -83,6 +85,8 @@ export async function prepareAssets() {
   assets.eyes = await svgToImg("eyes");
   assets.torso = await svgToImg("torso");
   assets.limb = await svgToImg("limb");
+  assets.scaffold = await svgToImg("scaffold");
+  assets.hangman = await svgToImg("hangman");
   assets.plants = await preparePlants();
 
   assets.sounds = {

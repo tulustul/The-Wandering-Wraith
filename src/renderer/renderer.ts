@@ -423,6 +423,16 @@ export class Renderer {
     }
   }
 
+  renderScaffold() {
+    this.ctx.drawImage(assets.scaffold, 80, 170, 80, 160);
+
+    this.ctx.save();
+    this.ctx.translate(130, 175);
+    this.ctx.rotate(Math.sin(this.engine.time_ / 450) / 25 - 0.1);
+    this.ctx.drawImage(assets.hangman, -15, 0, 80, 120);
+    this.ctx.restore();
+  }
+
   render() {
     const pos = this.engine.camera.pos;
 
@@ -434,9 +444,15 @@ export class Renderer {
 
     this.ctx.translate(-pos.x, -pos.y);
     this.renderFoliage(false);
+
+    if (this.engine.currentSave.level_ === 0) {
+      this.renderScaffold();
+    }
+
     this.ctx.translate(pos.x, pos.y);
 
     this.renderRain();
+
     this.drawLayer(this.terrainLayer);
 
     this.ctx.translate(-pos.x, -pos.y);
