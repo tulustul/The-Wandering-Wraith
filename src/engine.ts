@@ -90,12 +90,12 @@ export class Engine {
     }
 
     if (playerPos.x > this.level_.size_.x + 10) {
-      this.currentSave.level_++;
-      if (this.currentSave.level_ === LEVELS.length) {
+      if (this.currentSave.level_ === LEVELS.length - 1) {
         this.game.paused_ = true;
         this.game.menu.finish(this.currentSave);
         return;
       }
+      this.currentSave.level_++;
       this.currentSave.pos = null;
       save_(this.currentSave);
       this.load_(this.currentSave);
