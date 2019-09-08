@@ -497,8 +497,8 @@ export class Renderer {
   }
 
   updateSize() {
-    this.engine.canvas_.width = window.innerWidth * SCALE;
-    this.engine.canvas_.height = window.innerHeight * SCALE;
+    this.engine.canvas_.width = window.outerWidth * SCALE;
+    this.engine.canvas_.height = window.outerHeight * SCALE;
 
     for (const layer of Layer.layers) {
       layer.updateSize();

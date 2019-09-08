@@ -175,7 +175,7 @@ export class Player {
             break;
           case PickableType.gravityCrystal:
             this.physics.enterAntigravity();
-            setTimeout(() => (pickable.collected = false), 2000);
+            setTimeout(() => (pickable.collected = false), 5000);
             zzfx(...assets.sounds.collect);
             break;
           case PickableType.bubble:

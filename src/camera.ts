@@ -17,7 +17,7 @@ export class Camera {
       this.engine.level_.size_.x - w,
       this.engine.level_.size_.y - h,
       target.x - w / 2,
-      this.moveAtAxis(this.pos.y, target.y - h / 1.7, -5, 90),
+      this.moveAtAxis(this.pos.y, target.y - h / 1.7, -5, 50),
     ];
     this.pos.x = Math.min(Math.max(0, x), maxX);
     this.pos.y = Math.min(Math.max(0, y), maxY);
