@@ -249,7 +249,7 @@ export class Renderer {
 
         const framesCount = foliage.definition.frames.length;
         let frame = Math.abs(
-          (Math.round(this.engine.time_ / 50 + foliage.pos.x) %
+          (Math.round(this.engine.time_ / 40 + foliage.pos.x) %
             (framesCount * 2)) -
             framesCount,
         );

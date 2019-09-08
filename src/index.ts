@@ -1,5 +1,6 @@
 import { prepareAssets } from "./assets";
 import { Game } from "./game";
+import { playMusic } from "./music";
 
 let cumulativeTime = 0;
 const timeStep = 1000 / 60;
@@ -15,10 +16,6 @@ async function init() {
   game.start();
 
   requestAnimationFrame(tick);
-
-  // window.addEventListener("visibilitychange", () => {
-  //   game.paused = true;
-  // });
 
   window.addEventListener("resize", () => game.engine.renderer.updateSize());
 }
@@ -36,6 +33,7 @@ export function tick(timestamp: number) {
   game.engine.camera.update_();
   game.engine.renderer.render();
   requestAnimationFrame(tick);
+  playMusic(cumulativeTime);
 }
 
 init();
