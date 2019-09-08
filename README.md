@@ -1,6 +1,11 @@
-A 13kB html5 game challenge.
+# [The Wandering Wraith](https://tulustul.github.io/The-Wandering-Wraith/)
 
-Made for [Js13kGames](https://js13kgames.com/)
+A 2d platformer for [js13kGames](https://js13kgames.com/) 2019 edition challenge.
+
+## Controls
+
+- left and rigth arrows for movement
+- space for jumping
 
 ## Getting started
 
