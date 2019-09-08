@@ -6,6 +6,7 @@ import { PathCommandType, PickableType, Pickable } from "../level.interface";
 import { assets } from "../assets";
 import { Random } from "../random";
 import { MotionMode } from "../physics/player-physics";
+import { LEVELS } from "../levels";
 
 const SCALE = 0.4;
 
@@ -435,7 +436,7 @@ export class Renderer {
     }
   }
 
-  renderScaffold() {
+  renderhangman() {
     this.ctx.drawImage(assets.scaffold, 80, 170, 80, 160);
 
     this.ctx.save();
@@ -443,6 +444,35 @@ export class Renderer {
     this.ctx.rotate(Math.sin(this.engine.time_ / 450) / 25 - 0.1);
     this.ctx.drawImage(assets.hangman, -15, 0, 80, 120);
     this.ctx.restore();
+  }
+
+  renderGraves() {
+    this.ctx.lineWidth = 5;
+    this.ctx.strokeStyle = "#000";
+    let x = 600;
+    while (x < this.engine.level_.size_.x) {
+      this.ctx.save();
+      this.ctx.translate(x, 310);
+
+      this.ctx.beginPath();
+      this.ctx.arc(0, 0, 25, Math.PI, Math.PI * 2);
+      this.ctx.closePath();
+      this.ctx.fill();
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, 0);
+      this.ctx.lineTo(0, -80);
+      this.ctx.stroke();
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(-15, -65);
+      this.ctx.lineTo(15, -65);
+      this.ctx.stroke();
+
+      this.ctx.restore();
+
+      x += 80;
+    }
   }
 
   render() {
@@ -458,7 +488,11 @@ export class Renderer {
     this.renderFoliage(false);
 
     if (this.engine.currentSave.level_ === 0) {
-      this.renderScaffold();
+      this.renderhangman();
+    }
+
+    if (this.engine.currentSave.level_ === LEVELS.length - 1) {
+      this.renderGraves();
     }
 
     this.ctx.translate(pos.x, pos.y);
