@@ -11,6 +11,6 @@ export function playMusic(time: number) {
       Math.sin(time / 631) * 40 +
       Math.cos(time / 487) * 60 +
       Math.sin(time / 227) * 30;
-    zzfx(0.015, 2, freq, 1.5, 0, 0, 5, 0.1, 0);
+    zzfx(0.015, 2, freq, 1.5, 0.5, 0, 5, 0.1, 0);
   }
 }

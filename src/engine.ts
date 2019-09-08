@@ -64,7 +64,7 @@ export class Engine {
   respawnPlayer() {
     const save = this.currentSave;
     const pos = this.physics.castRay(
-      new Vector2(save.pos!.x, save.pos!.y - 100),
+      new Vector2(save.pos!.x, save.pos!.y),
       new Vector2(save.pos!.x, this.level_.size_.y),
     );
     save.pos!.y = pos!.y - 10;

@@ -94,8 +94,8 @@ export class Renderer {
       let y = 0;
       while (y < length) {
         this.ctx.beginPath();
-        this.ctx.moveTo(-2, y);
-        this.ctx.lineTo(-2, y + 4);
+        this.ctx.moveTo(-4, y);
+        this.ctx.lineTo(-4, y + 4);
         this.ctx.lineTo(9 + 7 * r.nextFloat(), y + 2);
         this.ctx.closePath();
         this.ctx.fill();

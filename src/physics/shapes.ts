@@ -19,10 +19,10 @@ export function lineToPointColision(
 
 export function* getCircleCells(pos: Vector2, r: number) {
   const minX = Math.floor((pos.x - r) / GRID_SIZE);
-  const maxX = Math.floor((pos.x + r - 1) / GRID_SIZE);
+  const maxX = Math.ceil((pos.x + r) / GRID_SIZE);
 
   const minY = Math.floor((pos.y - r) / GRID_SIZE);
-  const maxY = Math.floor((pos.y + r - 1) / GRID_SIZE);
+  const maxY = Math.ceil((pos.y + r) / GRID_SIZE);
 
   for (let x = minX; x <= maxX; x++) {
     for (let y = minY; y <= maxY; y++) {
@@ -54,10 +54,10 @@ export function lineToLineColision(
 
 export function* getLineCells(start_: Vector2, end_: Vector2) {
   const minX = Math.floor(Math.min(start_.x, end_.x) / GRID_SIZE);
-  const maxX = Math.floor(Math.max(start_.x, end_.x - 1) / GRID_SIZE);
+  const maxX = Math.ceil(Math.max(start_.x, end_.x) / GRID_SIZE);
 
   const minY = Math.floor(Math.min(start_.y, end_.y) / GRID_SIZE);
-  const maxY = Math.floor(Math.max(start_.y, end_.y - 1) / GRID_SIZE);
+  const maxY = Math.ceil(Math.max(start_.y, end_.y) / GRID_SIZE);
 
   for (let x = minX; x <= maxX; x++) {
     for (let y = minY; y <= maxY; y++) {

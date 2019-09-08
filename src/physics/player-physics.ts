@@ -184,7 +184,7 @@ export class PlayerPhysics {
     this.climbContact = null;
 
     if (this.mode_ === MotionMode.bubbling) {
-      if (this.player.engine.time_ - this.bubbleTime > 2000) {
+      if (this.player.engine.time_ - this.bubbleTime > 1700) {
         this.endBubbling();
       } else {
         return;
@@ -224,7 +224,7 @@ export class PlayerPhysics {
 
   moveToDirection(direction: number) {
     if (this.mode_ === MotionMode.bubbling) {
-      this.body_.vel.rotate_(direction / 11);
+      this.body_.vel.rotate_(direction / 12);
       return;
     }
 

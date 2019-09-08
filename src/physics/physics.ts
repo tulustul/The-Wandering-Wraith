@@ -80,9 +80,10 @@ export class PhysicsSystem {
   }
 
   /** Casting rays supports only casting ray from top to bottom */
-  castRay(start_: Vector2, end_: Vector2) {
+  castRay(start_: Vector2, end_: Vector2): Vector2 | null {
     const cells = getLineCells(start_, end_);
 
+    const intersections: Vector2[] = [];
     for (const cell of cells) {
       if (this.grid.has(cell)) {
         for (const body of this.grid.get(cell)!) {
@@ -93,11 +94,16 @@ export class PhysicsSystem {
             body.end_,
           );
           if (intersection) {
-            return intersection;
+            intersections.push(intersection);
           }
         }
       }
     }
+
+    if (intersections.length) {
+      return intersections.sort((p1, p2) => p1.y - p2.y)[0];
+    }
+
     return null;
   }
 }
