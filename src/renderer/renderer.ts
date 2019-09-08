@@ -381,7 +381,7 @@ export class Renderer {
       this.renderCrystalPart(sin, cos, 0.6, height, isGreen);
     }
     this.ctx.globalCompositeOperation = "screen";
-    this.renderLight(new Vector2(0, 0), isGreen ? "#020" : "#200", 25);
+    this.renderLight(new Vector2(0, 0), isGreen ? "#001" : "#200", 25);
     this.ctx.globalCompositeOperation = "source-over";
     this.ctx.restore();
   }
@@ -396,7 +396,7 @@ export class Renderer {
     const color = this.toHexColor(50 + cos * 180 * colorDarkening);
     const color2 = this.toHexColor(cos * 120 * colorDarkening);
     this.ctx.fillStyle = isGreen
-      ? `#${color2}${color}${color2}`
+      ? `#${color2}${color2}${color}`
       : `#${color}${color2}${color2}`;
     this.ctx.beginPath();
     this.ctx.lineTo(8 - sin * 16, 0);
@@ -479,7 +479,17 @@ export class Renderer {
 
     if (!this.engine.player.isDead) {
       this.ctx.globalCompositeOperation = "screen";
-      this.renderLight(this.engine.player.body_.pos, "#333", 50);
+      let color = "#333";
+      const antigravityTime = this.engine.player.physics.antigravityTime;
+      const diff = this.engine.time_ - antigravityTime;
+      if (antigravityTime) {
+        if (diff > 2500) {
+          color = Math.sin(diff / 50) > 0 ? "#005" : color;
+        } else {
+          color = "#005";
+        }
+      }
+      this.renderLight(this.engine.player.body_.pos, color, 50);
       this.ctx.globalCompositeOperation = "source-over";
     }
 
@@ -487,8 +497,6 @@ export class Renderer {
   }
 
   updateSize() {
-    // const width = (window.innerWidth / window.innerHeight) * VIEWPORT_HEIGHT;
-
     this.engine.canvas_.width = window.innerWidth * SCALE;
     this.engine.canvas_.height = window.innerHeight * SCALE;
 

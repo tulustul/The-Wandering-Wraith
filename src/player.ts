@@ -38,12 +38,12 @@ export class Player {
 
   animation_: AgentAnimation = {
     headOffset: 0,
-    lArmRot: 0,
-    rArmRot: 0,
+    lArmRot: -1,
+    rArmRot: 1,
     lLegRot: 0,
     rLegRot: 0,
     eyesScale: 1,
-    eyesOffset: 0,
+    eyesOffset: -15,
     scale_: 1,
   };
 
@@ -174,10 +174,9 @@ export class Player {
             zzfx(...assets.sounds.collect);
             break;
           case PickableType.gravityCrystal:
-            this.physics.gravity = -this.physics.gravity;
-            this.body_.pos.y += this.physics.gravity > 0 ? 20 : -20;
-            zzfx(...assets.sounds.collect);
+            this.physics.enterAntigravity();
             setTimeout(() => (pickable.collected = false), 2000);
+            zzfx(...assets.sounds.collect);
             break;
           case PickableType.bubble:
             this.physics.enterBubble(pickable);

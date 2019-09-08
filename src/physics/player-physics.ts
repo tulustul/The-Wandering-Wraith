@@ -40,6 +40,8 @@ export class PlayerPhysics {
 
   gravity = 0.25;
 
+  antigravityTime = 0;
+
   constructor(private physics: PhysicsSystem, private player: Player) {}
 
   get body_() {
@@ -54,6 +56,15 @@ export class PlayerPhysics {
     const body_ = this.body_;
 
     this.updateMode();
+
+    if (
+      this.antigravityTime &&
+      this.player.engine.time_ - this.antigravityTime > 3500
+    ) {
+      this.gravity = 0.25;
+      this.body_.pos.y += 20;
+      this.antigravityTime = 0;
+    }
 
     body_.oldPos = body_.pos.copy();
     if (this.mode_ === MotionMode.running) {
@@ -71,7 +82,10 @@ export class PlayerPhysics {
       if (rayResult) {
         body_.pos.y = rayResult.y - body_.radius * (this.gravity > 0 ? 1 : -1);
       }
-      if (!this.player.isRunning) {
+      if (
+        !this.player.isRunning ||
+        (this.body_.vel.x > 0 ? "r" : "l") !== this.direction_
+      ) {
         body_.vel.x *= 0.5;
       }
       body_.vel.y = 0;
@@ -300,5 +314,12 @@ export class PlayerPhysics {
     this.bubble = null;
     zzfx(...assets.sounds.bubbleEnd);
     setTimeout(() => (bubble.collected = false), 1000);
+  }
+
+  enterAntigravity() {
+    this.gravity = -0.25;
+    this.dashed = false;
+    // this.body_.pos.y -= 20;
+    this.antigravityTime = this.player.engine.time_;
   }
 }
