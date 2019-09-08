@@ -475,6 +475,39 @@ export class Renderer {
     }
   }
 
+  renderLevelTransitions() {
+    if (this.engine.levelTransitionEnter || this.engine.levelTransitionLeave) {
+      const d =
+        this.engine.time_ -
+        Math.max(
+          this.engine.levelTransitionEnter,
+          this.engine.levelTransitionLeave,
+        );
+
+      const diagonal = Math.sqrt(
+        this.ctx.canvas.width * this.ctx.canvas.width +
+          this.ctx.canvas.height * this.ctx.canvas.height,
+      );
+
+      let r = diagonal * (d / 700);
+      if (this.engine.levelTransitionLeave) {
+        r = diagonal - r;
+      }
+      this.ctx.globalCompositeOperation = "destination-in";
+      this.ctx.beginPath();
+      this.ctx.arc(
+        this.engine.player.body_.pos.x,
+        this.engine.player.body_.pos.y,
+        Math.max(0, r),
+        0,
+        Math.PI * 2,
+      );
+      this.ctx.closePath();
+      this.ctx.fill();
+      this.ctx.globalCompositeOperation = "source-over";
+    }
+  }
+
   render() {
     const pos = this.engine.camera.pos;
 
@@ -526,6 +559,8 @@ export class Renderer {
       this.renderLight(this.engine.player.body_.pos, color, 50);
       this.ctx.globalCompositeOperation = "source-over";
     }
+
+    this.renderLevelTransitions();
 
     this.ctx.translate(pos.x, pos.y);
   }

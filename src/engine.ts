@@ -40,6 +40,10 @@ export class Engine {
 
   currentSave: Save;
 
+  levelTransitionEnter = 0;
+
+  levelTransitionLeave = 0;
+
   // #if process.env.NODE_ENV === 'development'
   editor = new Editor(this);
   // #endif
@@ -78,9 +82,14 @@ export class Engine {
 
   update_(timeStep: number) {
     this.time_ += timeStep;
-    this.animations.update_(this.time_);
-    this.player.update_();
     this.particles.update_();
+
+    if (this.levelTransitionLeave) {
+      return;
+    }
+
+    this.player.update_();
+    this.animations.update_(this.time_);
 
     const playerPos = this.player.body_.pos;
     for (const savepoint of this.level_.savepoints) {
@@ -91,14 +100,23 @@ export class Engine {
 
     if (playerPos.x > this.level_.size_.x + 10) {
       if (this.currentSave.level_ === LEVELS.length - 1) {
-        this.game.paused_ = true;
         this.game.menu.finish(this.currentSave);
         return;
       }
-      this.currentSave.level_++;
-      this.currentSave.pos = null;
-      save_(this.currentSave);
-      this.load_(this.currentSave);
+      this.levelTransitionLeave = this.time_;
+      setTimeout(() => {
+        this.levelTransitionLeave = 0;
+
+        this.currentSave.level_++;
+        this.currentSave.pos = null;
+        save_(this.currentSave);
+        this.load_(this.currentSave);
+
+        this.levelTransitionEnter = this.time_;
+        setTimeout(() => {
+          this.levelTransitionEnter = 0;
+        }, 700);
+      }, 700);
     }
   }
 }

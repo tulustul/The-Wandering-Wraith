@@ -66,6 +66,9 @@ export class Player {
   }
 
   updateControls() {
+    if (this.isDead) {
+      return;
+    }
     const control = this.engine.control_;
     if (control.keys_.get("Space")) {
       this.physics.jump();
