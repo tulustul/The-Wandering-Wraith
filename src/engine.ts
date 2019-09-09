@@ -115,8 +115,8 @@ export class Engine {
         this.levelTransitionEnter = this.time_;
         setTimeout(() => {
           this.levelTransitionEnter = 0;
-        }, 700);
-      }, 700);
+        }, 1100);
+      }, 1100);
     }
   }
 }

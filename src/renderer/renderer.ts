@@ -489,7 +489,7 @@ export class Renderer {
           this.ctx.canvas.height * this.ctx.canvas.height,
       );
 
-      let r = diagonal * (d / 700);
+      let r = diagonal * (d / 1100);
       if (this.engine.levelTransitionLeave) {
         r = diagonal - r;
       }

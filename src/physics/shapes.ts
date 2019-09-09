@@ -79,14 +79,20 @@ export function checkCircleLineColision(
       (cPos.y - lineStart.y) * (lineEnd.y - lineStart.y)) /
     Math.pow(length, 2);
 
-  const closestPoint = new Vector2(
+  let closestPoint = new Vector2(
     lineStart.x + dot * (lineEnd.x - lineStart.x),
     lineStart.y + dot * (lineEnd.y - lineStart.y),
   );
 
   const onSegment = lineToPointColision(lineStart, lineEnd, closestPoint);
   if (!onSegment) {
-    return null;
+    if (cPos.distanceTo(lineStart) <= r) {
+      closestPoint = lineStart;
+    } else if (cPos.distanceTo(lineEnd) <= r) {
+      closestPoint = lineEnd;
+    } else {
+      return null;
+    }
   }
 
   const penetrationDistance = r - cPos.distanceTo(closestPoint);
@@ -94,23 +100,24 @@ export function checkCircleLineColision(
     return null;
   }
 
-  const angle = cPos.directionTo(closestPoint);
-  const penetrationVec = new Vector2(0, 1)
-    .mul(penetrationDistance)
-    .rotate_(angle);
+  const penetrationVec = closestPoint
+    .copy()
+    .sub_(cPos)
+    .normalize_()
+    .mul(penetrationDistance);
 
-  if (
-    Math.abs(
-      penetrationVec
-        .copy()
-        .normalize_()
-        .angleTo(vel.copy().normalize_()),
-    ) >
-    Math.PI / 2
-  ) {
-    penetrationVec.mul(-1);
-    penetrationVec.normalize_().mul(penetrationDistance - r * 2);
-  }
+  // if (
+  //   Math.abs(
+  //     penetrationVec
+  //       .copy()
+  //       .normalize_()
+  //       .angleTo(vel.copy().normalize_()),
+  //   ) >
+  //   Math.PI / 2
+  // ) {
+  //   penetrationVec.mul(-1);
+  //   penetrationVec.normalize_().mul(penetrationDistance - r * 2);
+  // }
 
   return [penetrationVec, closestPoint];
 }
