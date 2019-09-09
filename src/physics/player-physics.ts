@@ -212,6 +212,7 @@ export class PlayerPhysics {
           this.lastJumpTime = this.player.engine.time_;
         }
         this.mode_ = MotionMode.climbing;
+        this.dashed = false;
         return;
       }
     }
@@ -224,7 +225,7 @@ export class PlayerPhysics {
 
   moveToDirection(direction: number) {
     if (this.mode_ === MotionMode.bubbling) {
-      this.body_.vel.rotate_(direction / 12);
+      this.body_.vel.rotate_(direction / 13);
       return;
     }
 
@@ -290,7 +291,7 @@ export class PlayerPhysics {
     if (this.mode_ === MotionMode.bubbling) {
       this.endBubbling();
     } else {
-      this.body_.vel = new Vector2(0, -6);
+      this.body_.vel = new Vector2(0, -5);
       this.body_.pos.x = bubble.pos.x;
       this.body_.pos.y = bubble.pos.y;
     }
