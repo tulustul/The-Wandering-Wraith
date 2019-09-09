@@ -415,27 +415,6 @@ export class Renderer {
     return c;
   }
 
-  prerender() {
-    this.skyLayer.activate();
-    this.renderSky();
-
-    this.terrainLayer.activate();
-    this.ctx.fillStyle = "#000";
-    this.renderSpikes();
-    this.renderPlatforms();
-    this.renderTerrain();
-
-    const hillsParams: [string, number, number, number, number][] = [
-      ["#282828", 500, 0.5, 1300, 3],
-      ["#222", 400, 0.7, 1000, 7],
-      ["#1d1d1d", 200, 1.0, 800, 9],
-    ];
-    for (const [index, hillsLayer] of this.hillsLayers.entries()) {
-      hillsLayer.activate();
-      this.renderHills(...hillsParams[index]);
-    }
-  }
-
   renderhangman() {
     this.ctx.drawImage(assets.scaffold, 80, 170, 80, 160);
 
@@ -449,7 +428,7 @@ export class Renderer {
   renderGraves() {
     this.ctx.lineWidth = 5;
     this.ctx.strokeStyle = "#000";
-    let x = 600;
+    let x = 1090;
     while (x < this.engine.level_.size_.x) {
       this.ctx.save();
       this.ctx.translate(x, 310);
@@ -505,6 +484,27 @@ export class Renderer {
       this.ctx.closePath();
       this.ctx.fill();
       this.ctx.globalCompositeOperation = "source-over";
+    }
+  }
+
+  prerender() {
+    this.skyLayer.activate();
+    this.renderSky();
+
+    this.terrainLayer.activate();
+    this.ctx.fillStyle = "#000";
+    this.renderSpikes();
+    this.renderPlatforms();
+    this.renderTerrain();
+
+    const hillsParams: [string, number, number, number, number][] = [
+      ["#282828", 500, 0.5, 1300, 3],
+      ["#222", 400, 0.7, 1000, 7],
+      ["#1d1d1d", 200, 1.0, 800, 9],
+    ];
+    for (const [index, hillsLayer] of this.hillsLayers.entries()) {
+      hillsLayer.activate();
+      this.renderHills(...hillsParams[index]);
     }
   }
 

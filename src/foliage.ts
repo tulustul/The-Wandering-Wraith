@@ -83,7 +83,7 @@ export class FoliageSystem {
       narrowChecks.push([start_, end_, crossPoint, slope, shouldGenerate]);
     }
 
-    narrowChecks.sort((checkA, checkB) => checkA[1].y - checkB[1].y);
+    narrowChecks.sort((checkA, checkB) => checkA[2].y - checkB[2].y);
 
     let add = true;
     for (const [
