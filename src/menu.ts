@@ -9,6 +9,7 @@ export const enum MenuMode {
 
 export class Menu {
   tintEl = document.getElementsByTagName("t")[0];
+  loadingEl = document.getElementsByTagName("w")[0];
   optionsEl = document.getElementById("o")!;
 
   continueEl = document.getElementById("c")!;
@@ -25,6 +26,8 @@ export class Menu {
   constructor(game: Game) {
     this.continueEl.addEventListener("click", () => game.togglePause());
     this.newGameEl.addEventListener("click", () => game.startNewGame());
+    this.optionsEl.classList.remove("r");
+    this.loadingEl.classList.add("r");
   }
 
   private showTint() {

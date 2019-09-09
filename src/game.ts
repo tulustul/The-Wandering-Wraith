@@ -3,7 +3,7 @@ import { loadSave, clearSave } from "./saves";
 import { Menu, MenuMode } from "./menu";
 
 export class Game {
-  paused_ = true;
+  stopped_ = true;
 
   engine!: Engine;
 
@@ -19,8 +19,8 @@ export class Game {
   }
 
   togglePause() {
-    this.paused_ = !this.paused_;
-    this.paused_ ? this.menu.show() : this.menu.hide();
+    this.stopped_ = !this.stopped_;
+    this.stopped_ ? this.menu.show() : this.menu.hide();
   }
 
   startNewGame() {
@@ -28,7 +28,7 @@ export class Game {
     localStorage.removeItem("tul_d"); // clear deaths count
     clearSave();
     this.start();
-    this.paused_ = false;
+    this.stopped_ = false;
     this.menu.hide();
   }
 }

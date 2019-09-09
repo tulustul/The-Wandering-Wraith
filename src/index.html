@@ -22,17 +22,21 @@
 
       tt {
         font-size: 80px;
+        font-weight: 800;
         margin-top: 100px;
         margin-bottom: 10px;
         background: -webkit-linear-gradient(#fff, #4376fd);
+        text-shadow: 0 0 5px white;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
 
       ts {
-        font-size: 30px;
+        font-size: 35px;
         color: grey;
         margin-bottom: 150px;
+        font-weight: 400;
+        text-shadow: 0 0 3px grey;
       }
 
       t {
@@ -54,7 +58,8 @@
         font-size: 30px;
       }
 
-      h1 {
+      h1,
+      w {
         font-size: 50px;
       }
 
@@ -68,6 +73,7 @@
         font-size: 40px;
         transition: 0.3s ease-in-out;
         cursor: pointer;
+        width: 100%;
       }
 
       button:hover {
@@ -77,14 +83,20 @@
       .r {
         display: none !important;
       }
+
+      h {
+        font-size: 20px;
+        color: grey;
+      }
     </style>
   </head>
 
   <body>
     <t>
       <tt class="t">The Wandering Wraith</tt>
-      <ts class="t">...or the grand venture of going back to grave.</ts>
-      <div id="o">
+      <ts class="t">...or the grand venture of going back to the grave.</ts>
+      <w>Loading...</w>
+      <div id="o" class="r">
         <button id="c">Continue</button>
         <button id="n">New game</button>
       </div>
@@ -94,12 +106,14 @@
         <l>The wraith found his peace back in the grave.</l>
         <l>Collected <span id="p"></span>/49 crystals</l>
         <l>Died <span id="d"></span> times</l>
+        <h>Press ESC to continue</h>
       </div>
 
       <div id="r" class="r">
         <h1>A js13k challenge by</h1>
         <h2>Mateusz Tomczyk</h2>
         <h3>Thanks to Frank Force for ZzFX</h3>
+        <h>Press ESC to continue</h>
       </div>
     </t>
 

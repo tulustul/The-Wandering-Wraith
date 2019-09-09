@@ -25,10 +25,8 @@ export function tick(timestamp: number) {
   const steps = Math.floor(timeDiff / timeStep);
   cumulativeTime += steps * timeStep;
 
-  if (!game.paused_) {
-    for (let i = 0; i < steps; i++) {
-      game.engine.update_(timeStep);
-    }
+  for (let i = 0; i < steps; i++) {
+    game.engine.update_(timeStep);
   }
   game.engine.camera.update_();
   game.engine.renderer.render();

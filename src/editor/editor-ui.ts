@@ -38,7 +38,7 @@ export class EditorUI {
     });
 
     this.listeners.listen("toggle-pause", "click", () => {
-      this.engine.game.paused_ = !this.engine.game.paused_;
+      this.engine.game.stopped_ = !this.engine.game.stopped_;
     });
 
     this.listeners.listen("save-game", "click", () => {

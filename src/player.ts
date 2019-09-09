@@ -66,7 +66,7 @@ export class Player {
   }
 
   updateControls() {
-    if (this.isDead) {
+    if (this.isDead || this.engine.game.stopped_) {
       return;
     }
     const control = this.engine.control_;

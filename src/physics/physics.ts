@@ -64,7 +64,6 @@ export class PhysicsSystem {
             hitter.radius,
             receiver.start_,
             receiver.end_,
-            hitter.vel,
           );
           if (result) {
             yield {

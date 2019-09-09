@@ -91,6 +91,10 @@ export class Engine {
     this.player.update_();
     this.animations.update_(this.time_);
 
+    if (this.game.stopped_) {
+      return;
+    }
+
     const playerPos = this.player.body_.pos;
     for (const savepoint of this.level_.savepoints) {
       if (savepoint > this.currentSave.pos!.x && playerPos.x > savepoint) {
@@ -101,6 +105,7 @@ export class Engine {
     if (playerPos.x > this.level_.size_.x + 10) {
       if (this.currentSave.level_ === LEVELS.length - 1) {
         this.game.menu.finish(this.currentSave);
+        this.game.stopped_ = true;
         return;
       }
       this.levelTransitionLeave = this.time_;

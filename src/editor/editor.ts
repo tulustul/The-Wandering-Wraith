@@ -38,7 +38,7 @@ export class Editor {
       }
 
       if (event.key === "p") {
-        this.engine.game.paused_ = !this.engine.game.paused_;
+        this.engine.game.stopped_ = !this.engine.game.stopped_;
       }
     });
   }

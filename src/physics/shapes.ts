@@ -71,7 +71,6 @@ export function checkCircleLineColision(
   r: number,
   lineStart: Vector2,
   lineEnd: Vector2,
-  vel: Vector2,
 ): [Vector2, Vector2] | null {
   const length = lineStart.distanceTo(lineEnd);
   const dot =
@@ -105,19 +104,6 @@ export function checkCircleLineColision(
     .sub_(cPos)
     .normalize_()
     .mul(penetrationDistance);
-
-  // if (
-  //   Math.abs(
-  //     penetrationVec
-  //       .copy()
-  //       .normalize_()
-  //       .angleTo(vel.copy().normalize_()),
-  //   ) >
-  //   Math.PI / 2
-  // ) {
-  //   penetrationVec.mul(-1);
-  //   penetrationVec.normalize_().mul(penetrationDistance - r * 2);
-  // }
 
   return [penetrationVec, closestPoint];
 }
