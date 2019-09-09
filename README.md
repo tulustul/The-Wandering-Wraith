@@ -1,4 +1,4 @@
-# The Wandering Wraith]()
+# The Wandering Wraith
 
 A 2d platformer for [js13kGames](https://js13kgames.com/) 2019 edition challenge.
 
