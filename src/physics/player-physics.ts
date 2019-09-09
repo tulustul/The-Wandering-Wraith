@@ -145,7 +145,6 @@ export class PlayerPhysics {
             1,
             1 / Math.abs(body_.vel.y) / 8 + 0.7,
           );
-          this.mode_ = MotionMode.running;
         }
         if (this.mode_ === MotionMode.bubbling) {
           this.endBubbling();
