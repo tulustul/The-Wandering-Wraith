@@ -149,6 +149,8 @@ export class LevelParser {
             ["H", [80, 10]],
             ["v", [10, 40]],
             ["V", [10, 80]],
+            ["b", [40, 40]],
+            ["M", [60, 60]],
           ]);
           const [w, h] = sizes.get(c)!;
           platforms.push({
@@ -166,6 +168,8 @@ export class LevelParser {
             H: "platformH2",
             v: "platformV1",
             V: "platformV2",
+            b: "platformB1",
+            M: "platformB2",
           };
           const platformObject: LevelObject = {
             type: types[c] as ObjectType,

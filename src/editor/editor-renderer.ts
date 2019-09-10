@@ -199,6 +199,8 @@ export class EditorRenderer {
       platformH2: [80, 10],
       platformV1: [10, 40],
       platformV2: [10, 80],
+      platformB1: [40, 40],
+      platformB2: [60, 60],
     };
 
     for (const o of this.editor.engine.level_.objects!) {
@@ -209,6 +211,8 @@ export class EditorRenderer {
         case "platformH2":
         case "platformV1":
         case "platformV2":
+        case "platformB1":
+        case "platformB2":
           this.ctx.fillStyle = "#ff02";
           this.ctx.fillRect(
             o.pos.x - size[0],

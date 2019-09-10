@@ -86,6 +86,14 @@ export class LevelSerializer {
           tokens.push("V");
           tokens.push(this.serializeVector(o.pos));
           break;
+        case "platformB1":
+          tokens.push("b");
+          tokens.push(this.serializeVector(o.pos));
+          break;
+        case "platformB2":
+          tokens.push("M");
+          tokens.push(this.serializeVector(o.pos));
+          break;
         case "savepoint":
           tokens.push("s");
           tokens.push(this.serializeNumber(o.pos.x));

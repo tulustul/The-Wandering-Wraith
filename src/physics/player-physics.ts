@@ -179,6 +179,10 @@ export class PlayerPhysics {
       }
     }
     body_.pos.x = Math.max(0, body_.pos.x);
+
+    if (body_.pos.y > this.player.engine.level_.size_.y) {
+      this.player.die();
+    }
   }
 
   private updateMode() {
@@ -221,6 +225,7 @@ export class PlayerPhysics {
     if (this.mode_ !== MotionMode.falling) {
       this.fallingTime = this.player.engine.time_;
       this.mode_ = MotionMode.falling;
+      this.dashed = false;
     }
   }
 

@@ -15,6 +15,8 @@ export type ObjectType =
   | "platformH2"
   | "platformV1"
   | "platformV2"
+  | "platformB1"
+  | "platformB2"
   | "savepoint"
   | "crystal"
   | "gravityCrystal"
@@ -33,6 +35,8 @@ export class EditorObjects {
       case "platformH2":
       case "platformV1":
       case "platformV2":
+      case "platformB1":
+      case "platformB2":
         const platform: LevelObject = { type, pos, isDeadly: false };
         this.editor.engine.level_.objects!.push(platform);
         this.pointsMap.set(pos, platform as any);
