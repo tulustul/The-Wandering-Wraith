@@ -6,6 +6,7 @@ import { PlantDefinition } from "./plants";
 import { assets } from "./assets";
 import { lineToPointColision, getLineCells } from "./physics/shapes";
 import { StaticBody } from "./physics/physics";
+import { TREE_GROUND_MASK } from "./colisions-masks";
 
 interface Foliage {
   pos: Vector2;
@@ -50,6 +51,8 @@ export class FoliageSystem {
   }
 
   *findGround(engine: Engine, x: number, hitMask: number) {
+    let requiredSpace = hitMask === TREE_GROUND_MASK ? 200 : 30;
+
     const cells = getLineCells(
       new Vector2(x, -1000),
       new Vector2(x, engine.level_.size_.y),
@@ -76,6 +79,9 @@ export class FoliageSystem {
     let narrowChecks: [Vector2, Vector2, Vector2, number, boolean][] = [];
     for (const [start_, end_, shouldGenerate] of linesToCheck) {
       const d = end_.copy().sub_(start_);
+      if (!d.x) {
+        continue;
+      }
       const slope = d.y / d.x;
 
       const b = start_.y - slope * start_.x;
@@ -86,6 +92,7 @@ export class FoliageSystem {
     narrowChecks.sort((checkA, checkB) => checkA[2].y - checkB[2].y);
 
     let add = true;
+    let previousY = 0;
     for (const [
       start_,
       end_,
@@ -96,12 +103,13 @@ export class FoliageSystem {
       if (lineToPointColision(start_, end_, crossPoint)) {
         if (
           shouldGenerate &&
-          crossPoint.y > 0 &&
+          crossPoint.y - previousY > requiredSpace &&
           Math.abs(slope) < 1.5 &&
           add
         ) {
           yield crossPoint;
         }
+        previousY = crossPoint.y;
         add = !add;
       }
     }

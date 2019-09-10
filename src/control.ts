@@ -1,5 +1,6 @@
 import { Game } from "./game";
 import { MenuMode } from "./menu";
+import { GRASS_MASK } from "./colisions-masks";
 
 export class Control {
   keys_ = new Map<string, boolean>();

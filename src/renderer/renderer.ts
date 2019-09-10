@@ -7,6 +7,7 @@ import { assets } from "../assets";
 import { Random } from "../random";
 import { MotionMode } from "../physics/player-physics";
 import { LEVELS } from "../levels";
+import { GRASS_MASK } from "../colisions-masks";
 
 const SCALE = 0.4;
 
@@ -512,9 +513,9 @@ export class Renderer {
     const pos = this.engine.camera.pos;
 
     this.baseLayer.activate();
-    this.drawLayer(this.skyLayer);
+    this.renderLayer(this.skyLayer);
     for (const hillsLayer of this.hillsLayers) {
-      this.drawLayer(hillsLayer);
+      this.renderLayer(hillsLayer);
     }
 
     this.ctx.translate(-pos.x, -pos.y);
@@ -532,7 +533,7 @@ export class Renderer {
 
     this.renderRain();
 
-    this.drawLayer(this.terrainLayer);
+    this.renderLayer(this.terrainLayer);
 
     this.ctx.translate(-pos.x, -pos.y);
 
@@ -540,6 +541,15 @@ export class Renderer {
       this.renderPlayer();
     }
     this.renderPickables();
+
+    const points = this.engine.foliage.findGround(
+      this.engine,
+      this.engine.player.body_.pos.x,
+      GRASS_MASK,
+    );
+    for (const p of points) {
+      this.ctx.fillRect(p.x - 1, p.y - 1, 2, 2);
+    }
 
     this.renderParticles();
     this.renderFoliage(true);
@@ -575,7 +585,7 @@ export class Renderer {
     this.prerender();
   }
 
-  drawLayer(layer: Layer) {
+  renderLayer(layer: Layer) {
     if (layer.offset_) {
       this.drawLayerWithCameraOffset(layer);
     } else {
