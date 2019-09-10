@@ -53,7 +53,7 @@ export class Menu {
     this.crystalsEl.innerText = Object.values(save.crystals)
       .reduce<number>((acc, c) => acc + c.length, 0)
       .toString();
-    this.deathsEl.innerText = localStorage.getItem("tul_d") || "0";
+    this.deathsEl.innerText = localStorage.getItem("tww_d") || "0";
   }
 
   showCredits() {

@@ -25,7 +25,7 @@ export class Game {
 
   startNewGame() {
     this.menu.mode = MenuMode.menu;
-    localStorage.removeItem("tul_d"); // clear deaths count
+    localStorage.removeItem("tww_d"); // clear deaths count
     clearSave();
     this.start();
     this.stopped_ = false;

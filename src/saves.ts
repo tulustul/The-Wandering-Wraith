@@ -11,7 +11,7 @@ export interface Save {
 export function loadSave(): Save {
   // JSON.parse returns null when provided with null
   return (
-    JSON.parse(localStorage.getItem("tul_s")!) || {
+    JSON.parse(localStorage.getItem("tww_s")!) || {
       level_: 0,
       pos: null,
       crystals: {},
@@ -19,10 +19,10 @@ export function loadSave(): Save {
   );
 }
 
-export function save(save: Save) {
-  localStorage.setItem("tul_s", JSON.stringify(save));
+export function save_(save: Save) {
+  localStorage.setItem("tww_s", JSON.stringify(save));
 }
 
 export function clearSave() {
-  localStorage.removeItem("tul_s");
+  localStorage.removeItem("tww_s");
 }

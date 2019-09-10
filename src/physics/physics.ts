@@ -22,7 +22,6 @@ export interface DynamicBody {
 }
 
 export interface StaticBodyColision {
-  hitter: DynamicBody;
   receiver_: StaticBody;
   point: Vector2;
   penetration: Vector2;
@@ -68,7 +67,6 @@ export class PhysicsSystem {
           if (result) {
             yield {
               receiver_: receiver,
-              hitter,
               penetration: result[0],
               point: result[1],
             };

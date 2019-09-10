@@ -56,7 +56,7 @@ async function preparePlants(): Promise<PlantDefinition[]> {
   const plants: PlantDefinition[] = [];
   for (let depth = 4; depth < 11; depth++) {
     plants.push({
-      frames: await animateTree(
+      frames_: await animateTree(
         sr,
         depth,
         r.nextFloat() / 4 + 0.3,
@@ -64,15 +64,15 @@ async function preparePlants(): Promise<PlantDefinition[]> {
         depth,
       ),
       spread: 25 * Math.pow(depth, 1.3),
-      mask: TREE_GROUND_MASK,
+      mask_: TREE_GROUND_MASK,
     });
   }
 
   for (let i = 0; i < 4; i++) {
     plants.push({
-      frames: await animateGrass(sr, 1 + i * 0.5, i),
+      frames_: await animateGrass(sr, 1 + i * 0.5, i),
       spread: 5 + i,
-      mask: GRASS_MASK,
+      mask_: GRASS_MASK,
     });
   }
   return plants;
@@ -81,12 +81,12 @@ async function preparePlants(): Promise<PlantDefinition[]> {
 export const assets: Assets = {} as any;
 
 export async function prepareAssets() {
-  assets.head_ = await svgToImg("head");
-  assets.eyes = await svgToImg("eyes");
-  assets.torso = await svgToImg("torso");
-  assets.limb = await svgToImg("limb");
-  assets.scaffold = await svgToImg("scaffold");
-  assets.hangman = await svgToImg("hangman");
+  assets.head_ = await svgToImg("h");
+  assets.eyes = await svgToImg("e");
+  assets.torso = await svgToImg("t");
+  assets.limb = await svgToImg("l");
+  assets.scaffold = await svgToImg("s");
+  assets.hangman = await svgToImg("m");
   assets.plants = await preparePlants();
 
   assets.sounds = {

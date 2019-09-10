@@ -1,5 +1,4 @@
 import { Game } from "./game";
-import { AnimationsManager } from "./animations";
 import { PhysicsSystem } from "./physics/physics";
 import { FoliageSystem } from "./foliage";
 import { ParticlesSystem } from "./particles";
@@ -9,7 +8,7 @@ import { Control } from "./control";
 import { Renderer } from "./renderer/renderer";
 import { Camera } from "./camera";
 import { Level } from "./level.interface";
-import { Save, save as save_, loadSave } from "./saves";
+import { Save, save_ } from "./saves";
 import { loadLevel } from "./loader";
 import { LEVELS } from "./levels";
 
@@ -19,8 +18,6 @@ import { Editor } from "./editor/editor";
 
 export class Engine {
   time_ = 0;
-
-  animations = new AnimationsManager();
 
   physics = new PhysicsSystem();
 
@@ -89,7 +86,6 @@ export class Engine {
     }
 
     this.player.update_();
-    this.animations.update_(this.time_);
 
     if (this.game.stopped_) {
       return;

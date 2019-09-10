@@ -3,9 +3,9 @@ import { Random } from "./random";
 import { SpriteRenderer } from "./renderer/sprite-renderer";
 
 export interface PlantDefinition {
-  frames: HTMLImageElement[];
+  frames_: HTMLImageElement[];
   spread: number;
-  mask: number;
+  mask_: number;
 }
 
 export function generateGrass(

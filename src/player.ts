@@ -1,6 +1,5 @@
 import { Engine } from "./engine";
 import { Vector2 } from "./vector";
-import { SinusAnimation } from "./animations";
 import { assets } from "./assets";
 import { PlayerPhysics, MotionMode } from "./physics/player-physics";
 import { PickableType } from "./level.interface";
@@ -21,6 +20,7 @@ interface AgentAnimation {
   eyesScale: number;
   eyesOffset: number;
   scale_: number;
+  blinkTime: number;
 }
 
 export class Player {
@@ -45,6 +45,7 @@ export class Player {
     eyesScale: 1,
     eyesOffset: -15,
     scale_: 1,
+    blinkTime: 0,
   };
 
   physics: PlayerPhysics;
@@ -56,13 +57,6 @@ export class Player {
   constructor(public engine: Engine, pos: Vector2) {
     this.createBody(pos);
     this.physics = new PlayerPhysics(engine.physics, this);
-  }
-
-  blink_() {
-    this.engine.animations.animate_(
-      new SinusAnimation(Math.PI / 2, Math.PI * 2.5, 200),
-      value => (this.animation_.eyesScale = (value + 1) / 2),
-    );
   }
 
   updateControls() {
@@ -138,7 +132,17 @@ export class Player {
     this.animation_.headOffset = Math.sin(this.engine.time_ / 200) - 2;
 
     if (Math.random() > 0.99) {
-      this.blink_();
+      this.animation_.blinkTime = this.engine.time_;
+    }
+
+    const blink = this.engine.time_ - this.animation_.blinkTime;
+    if (blink < 200) {
+      const step = Math.PI / 100;
+
+      const radians = blink * step;
+      this.animation_.eyesScale = (Math.cos(radians) + 1) / 2;
+    } else {
+      this.animation_.eyesScale = 1;
     }
   }
 
@@ -193,8 +197,8 @@ export class Player {
     this.isDead = true;
 
     localStorage.setItem(
-      "tul_d",
-      ((parseInt(localStorage.getItem("tul_d")!) || 0) + 1).toString(),
+      "tww_d",
+      ((parseInt(localStorage.getItem("tww_d")!) || 0) + 1).toString(),
     ); // increment deaths counter
 
     this.engine.particles.emit({

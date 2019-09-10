@@ -32,7 +32,7 @@ export class FoliageSystem {
           treeDefinition.spread +
           treeDefinition.spread * (r.nextFloat() - 0.5);
         const cell = this.entities_[Math.floor(x / this.GRID_SIZE)];
-        const positions = this.findGround(engine, x, treeDefinition.mask);
+        const positions = this.findGround(engine, x, treeDefinition.mask_);
         for (const pos of positions) {
           if (pos) {
             const isForeground = r.nextFloat() > 0.8;

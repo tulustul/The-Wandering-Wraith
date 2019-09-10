@@ -248,7 +248,7 @@ export class Renderer {
           continue;
         }
 
-        const framesCount = foliage.definition.frames.length;
+        const framesCount = foliage.definition.frames_.length;
         let frame = Math.abs(
           (Math.round(this.engine.time_ / 40 + foliage.pos.x) %
             (framesCount * 2)) -
@@ -257,7 +257,7 @@ export class Renderer {
         if (frame === framesCount) {
           frame = framesCount - 1;
         }
-        const image = foliage.definition.frames[frame];
+        const image = foliage.definition.frames_[frame];
         this.ctx.drawImage(
           image,
           foliage.pos.x - image.width / 2,
