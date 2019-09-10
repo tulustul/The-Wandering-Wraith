@@ -147,7 +147,7 @@ export class PlayerPhysics {
           );
         }
         if (this.mode_ === MotionMode.bubbling) {
-          this.endBubbling();
+          this.leaveBubbling();
         }
       }
 
@@ -184,7 +184,7 @@ export class PlayerPhysics {
 
     if (this.mode_ === MotionMode.bubbling) {
       if (this.player.engine.time_ - this.bubbleTime > 1700) {
-        this.endBubbling();
+        this.leaveBubbling();
       } else {
         return;
       }
@@ -282,13 +282,13 @@ export class PlayerPhysics {
       this.mode_ === MotionMode.bubbling &&
       this.player.engine.time_ - this.lastJumpTime > 150
     ) {
-      this.endBubbling();
+      this.leaveBubbling();
     }
   }
 
   enterBubble(bubble: Pickable) {
     if (this.mode_ === MotionMode.bubbling) {
-      this.endBubbling();
+      this.leaveBubbling();
     } else {
       this.body_.vel = new Vector2(0, -5);
       this.body_.pos.x = bubble.pos.x;
@@ -300,7 +300,7 @@ export class PlayerPhysics {
     this.lastJumpTime = this.player.engine.time_;
   }
 
-  endBubbling() {
+  leaveBubbling() {
     this.mode_ = MotionMode.falling;
     this.dashed = false;
     this.lastJumpTime = this.player.engine.time_;
@@ -308,7 +308,7 @@ export class PlayerPhysics {
       count: 250,
       direction_: new Vector2(8, 0),
       lifetime: 80,
-      pos: this.body_.pos,
+      pos: this.body_.pos.copy().add_(this.body_.vel.copy().mul(9)),
     });
     const bubble = this.bubble!;
     this.bubble = null;
@@ -319,7 +319,6 @@ export class PlayerPhysics {
   enterAntigravity() {
     this.gravity = -0.25;
     this.dashed = false;
-    // this.body_.pos.y -= 20;
     this.antigravityTime = this.player.engine.time_;
   }
 }

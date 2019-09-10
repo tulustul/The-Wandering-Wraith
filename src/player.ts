@@ -211,7 +211,6 @@ export class Player {
     zzfx(...assets.sounds.dead);
 
     setTimeout(() => {
-      // this.engine.respawnPlayer();
       this.engine.load_(loadSave());
     }, 1000);
   }

@@ -120,8 +120,9 @@ export class Renderer {
     );
 
     if (player.physics.mode_ === MotionMode.bubbling) {
+      ctx.translate(0, -10);
       ctx.rotate(player.body_.vel.angle_() + Math.PI);
-      ctx.scale(0.9, 1.2);
+      ctx.scale(0.9, 1.1);
     } else {
       ctx.scale(
         1,
@@ -176,7 +177,11 @@ export class Renderer {
     ctx.restore();
 
     if (player.physics.mode_ === MotionMode.bubbling) {
-      this.renderBubble(new Vector2(0, -14));
+      ctx.rotate(-player.body_.vel.angle_() - Math.PI);
+      this.renderBubble(
+        new Vector2(0, -18).rotate_(player.body_.vel.angle_() + Math.PI),
+        false,
+      );
     }
 
     ctx.restore();
@@ -338,13 +343,18 @@ export class Renderer {
     }
   }
 
-  renderBubble(pos: Vector2) {
+  renderBubble(pos: Vector2, shouldAnimate = true) {
     this.ctx.save();
-    this.ctx.translate(pos.x, pos.y + Math.sin(this.engine.time_ / 400) * 3);
-    this.ctx.scale(
-      1 + Math.sin(this.engine.time_ / 230) * 0.05,
-      1 + Math.sin(this.engine.time_ / 280) * 0.05,
+    this.ctx.translate(
+      pos.x,
+      pos.y + (shouldAnimate ? Math.sin(this.engine.time_ / 400) * 3 : 0),
     );
+    if (shouldAnimate) {
+      this.ctx.scale(
+        1 + Math.sin(this.engine.time_ / 230) * 0.05,
+        1 + Math.sin(this.engine.time_ / 280) * 0.05,
+      );
+    }
 
     const grd = this.ctx.createRadialGradient(0, 0, 0, 0, 0, 22);
     grd.addColorStop(0, "#8883");
@@ -357,7 +367,7 @@ export class Renderer {
     this.ctx.fillRect(-22, -22, 44, 44);
     this.ctx.closePath();
 
-    this.ctx.fillStyle = "#888c";
+    this.ctx.fillStyle = "#ccc8";
     this.ctx.beginPath();
     this.ctx.arc(8, -8, 5, 0, Math.PI * 2);
     this.ctx.closePath();
