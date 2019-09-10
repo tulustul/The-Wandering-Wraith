@@ -54,22 +54,36 @@ export class Engine {
 
     this.currentSave = save;
     loadLevel(this, save.level_);
-    if (!save.pos) {
-      save.pos = new Vector2(150, this.level_.startingPos);
-    }
     this.respawnPlayer();
     this.renderer.init();
     this.foliage.spawnFoliage(this);
   }
 
   respawnPlayer() {
-    const save = this.currentSave;
-    const pos = this.physics.castRay(
-      new Vector2(save.pos!.x, save.pos!.y),
-      new Vector2(save.pos!.x, this.level_.size_.y),
+    this.fixupPlayerPosition();
+    this.player = new Player(
+      this,
+      new Vector2(this.currentSave.pos!.x, this.currentSave.pos!.y),
     );
-    save.pos!.y = pos!.y - 10;
-    this.player = new Player(this, new Vector2(save.pos!.x, save.pos!.y));
+  }
+
+  fixupPlayerPosition() {
+    const startingPos = new Vector2(150, this.level_.startingPos);
+    if (!this.currentSave.pos) {
+      this.currentSave.pos = startingPos;
+    }
+
+    const pos = this.physics.castRay(
+      new Vector2(this.currentSave.pos.x, this.currentSave.pos.y),
+      new Vector2(this.currentSave.pos.x, this.level_.size_.y),
+    );
+
+    if (pos) {
+      this.currentSave.pos.y = pos.y - 10;
+      return;
+    }
+
+    this.currentSave.pos = startingPos;
   }
 
   save_() {

@@ -89,7 +89,7 @@ export class Player {
     this.animation_.scale_ = lerp(
       this.animation_.scale_,
       this.targetScale,
-      0.3,
+      0.25,
     );
 
     if (this.isRunning) {
@@ -116,7 +116,6 @@ export class Player {
     }
 
     if (this.physics.mode_ === MotionMode.falling) {
-      this.targetScale = 1 + Math.abs(this.body_.vel.y / 17);
       if (this.body_.vel.y > 0.3) {
         this.animation_.lArmRot = -1.5 + Math.sin(this.engine.time_ / 50) / 3;
         this.animation_.rArmRot = 1.5 + Math.cos(this.engine.time_ / 50) / 3;

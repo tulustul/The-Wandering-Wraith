@@ -95,6 +95,8 @@ export class PlayerPhysics {
       body_.vel.y += this.gravity;
       body_.vel.x *= 0.94;
       body_.pos.add_(body_.vel);
+
+      this.player.targetScale = 1 + Math.abs(body_.vel.y / 17);
     }
 
     if (this.mode_ === MotionMode.climbing) {
