@@ -16,6 +16,7 @@ export class Menu {
   newGameEl = document.getElementById("n")!;
 
   finishScreenEl = document.getElementById("f")!;
+  timeEl = document.getElementById("tm")!;
   crystalsEl = document.getElementById("p")!;
   deathsEl = document.getElementById("d")!;
 
@@ -50,9 +51,17 @@ export class Menu {
     this.showTint();
     this.mode = MenuMode.stats;
     this.finishScreenEl.classList.remove("r");
+
+    let seconds = parseInt(localStorage.getItem("tww_t")!) / 1000;
+    let minutes = Math.floor(seconds / 60);
+    this.timeEl.innerText = `${minutes}m ${(seconds - minutes * 60).toFixed(
+      1,
+    )}s`;
+
     this.crystalsEl.innerText = Object.values(save.crystals)
       .reduce<number>((acc, c) => acc + c.length, 0)
       .toString();
+
     this.deathsEl.innerText = localStorage.getItem("tww_d") || "0";
   }
 

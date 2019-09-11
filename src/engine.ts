@@ -19,6 +19,9 @@ import { Editor } from "./editor/editor";
 export class Engine {
   time_ = 0;
 
+  // used to calculate how much time it took the player to beat the game
+  gameTime = parseInt(localStorage.getItem("tww_t")!) || 0;
+
   physics = new PhysicsSystem();
 
   foliage = new FoliageSystem();
@@ -89,6 +92,11 @@ export class Engine {
   save_() {
     this.currentSave.pos = this.player.body_.pos.copy();
     save_(this.currentSave);
+    this.saveGameTime();
+  }
+
+  saveGameTime() {
+    localStorage.setItem("tww_t", this.gameTime.toString());
   }
 
   update_(timeStep: number) {
@@ -105,6 +113,8 @@ export class Engine {
       return;
     }
 
+    this.gameTime += timeStep;
+
     const playerPos = this.player.body_.pos;
     for (const savepoint of this.level_.savepoints) {
       if (savepoint > this.currentSave.pos!.x && playerPos.x > savepoint) {
@@ -114,6 +124,7 @@ export class Engine {
 
     if (playerPos.x > this.level_.size_.x + 10) {
       if (this.currentSave.level_ === LEVELS.length - 1) {
+        this.saveGameTime();
         this.game.menu.finish(this.currentSave);
         this.game.stopped_ = true;
         return;

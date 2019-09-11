@@ -26,6 +26,8 @@ export class Game {
   startNewGame() {
     this.menu.mode = MenuMode.menu;
     localStorage.removeItem("tww_d"); // clear deaths count
+    localStorage.removeItem("tww_t"); // clear stopwatch
+    this.engine.gameTime = 0;
     clearSave();
     this.start();
     this.stopped_ = false;

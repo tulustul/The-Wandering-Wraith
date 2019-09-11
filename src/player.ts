@@ -199,6 +199,7 @@ export class Player {
       "tww_d",
       ((parseInt(localStorage.getItem("tww_d")!) || 0) + 1).toString(),
     ); // increment deaths counter
+    this.engine.saveGameTime();
 
     this.engine.particles.emit({
       count: 250,
