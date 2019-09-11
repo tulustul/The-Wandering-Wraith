@@ -30,9 +30,9 @@ module.exports = env => {
         convertTransform: true,
         cleanupNumericValues: {
           floatPrecision: 1,
-          leadingZero: false,
-          defaultPx: true,
-          convertToPx: true,
+        },
+        convertPathData: {
+          floatPrecision: 1,
         },
       },
     }),
