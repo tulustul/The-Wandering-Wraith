@@ -17,6 +17,10 @@ canvas.with-cursor {
   background-color: #333;
 }
 
+#editor * {
+  text-shadow: none;
+}
+
 .line {
   display: flex;
   flex-direction: row;

@@ -3,6 +3,8 @@ import "./ZzFX.micro";
 export declare var zzfx: any;
 
 let lastTime = 0;
+
+// wind actually
 export function playMusic(time: number) {
   if (time - lastTime > 100) {
     lastTime = time;
