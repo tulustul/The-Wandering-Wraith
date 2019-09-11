@@ -149,7 +149,7 @@ export class Player {
     if (this.engine.time_ - this.lastStepTime > this.STEPS_RATE) {
       this.lastStepTime = this.engine.time_;
       if (this.body_.contactPoints.length > 0) {
-        zzfx(...assets.sounds.walk);
+        zzfx(0.4, 0.6, 50, 0.02, 0.54, 4, 0.9, 10.7, 0.37);
       }
     }
   }
@@ -177,12 +177,12 @@ export class Player {
               save.crystals[save.level_] = [];
             }
             save.crystals[save.level_].push(index);
-            zzfx(...assets.sounds.collect);
+            zzfx(0.8, 0, 10, 0.2, 0.88, 1, 0.3, 10, 0.41);
             break;
           case PickableType.gravityCrystal:
             this.physics.enterAntigravity();
             setTimeout(() => (pickable.collected = false), 5000);
-            zzfx(...assets.sounds.collect);
+            zzfx(0.8, 0, 10, 0.2, 0.88, 1, 0.3, 10, 0.41);
             break;
           case PickableType.bubble:
             this.physics.enterBubble(pickable);
@@ -207,7 +207,7 @@ export class Player {
       pos: this.body_.pos,
     });
 
-    zzfx(...assets.sounds.dead);
+    zzfx(0.8, 0.7, 450, 0.5, 0.21, 11.3, 0.8, 7, 0.56);
 
     setTimeout(() => {
       this.engine.load_(loadSave());

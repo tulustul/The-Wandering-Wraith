@@ -142,7 +142,7 @@ export class PlayerPhysics {
           this.mode_ === MotionMode.falling &&
           this.player.engine.time_ - this.fallingTime > 150
         ) {
-          zzfx(...assets.sounds.hit);
+          zzfx(1, 0.1, 304, 0.2, 0.01, 0, 0.3, 0, 0.5);
           this.player.targetScale = Math.min(
             1,
             1 / Math.abs(body_.vel.y) / 8 + 0.7,
@@ -270,7 +270,7 @@ export class PlayerPhysics {
         this.body_.contactPoints = [];
         this.lastJumpTime = this.player.engine.time_;
         this.dashed = false;
-        zzfx(...assets.sounds.jump);
+        zzfx(0.6, 1, 150, 0.15, 0.47, 4.2, 1.4, 1, 0.25);
         return;
       }
     }
@@ -282,7 +282,7 @@ export class PlayerPhysics {
     ) {
       this.body_.vel.y = 5 * (this.gravity > 0 ? -1 : 1);
       this.dashed = true;
-      zzfx(...assets.sounds.dash);
+      zzfx(0.6, 1, 200, 0.1, 0.47, 4.2, 1.4, 1, 0.15);
     }
 
     if (
@@ -319,7 +319,7 @@ export class PlayerPhysics {
     });
     const bubble = this.bubble!;
     this.bubble = null;
-    zzfx(...assets.sounds.bubbleEnd);
+    zzfx(1, 0.1, 428, 0.2, 0.31, 0, 0.2, 5.1, 0.42);
     setTimeout(() => (bubble.collected = false), 1000);
   }
 
