@@ -11,6 +11,18 @@ You can play it [here](https://tulustul.github.io/The-Wandering-Wraith/)
 - left and rigth arrows for movement
 - space for jumping
 
+## Editor
+
+The game comes with a built-in editor available in development build only.
+![Game screenshot](/screens/editor.png)
+
+Some non-obvious things about editor:
+
+- You can delete objects with "delete" key
+- when path point is select you can:
+  - cut it using "c"
+  - toggle between straight lines and bezier curves using "v"
+
 ## Getting started
 
 - `npm install`
@@ -26,3 +38,5 @@ A dev server is started at `http://localhost:8080`
 - `npm run build`
 
 Ready to use bundle is located in `/dist` directory.
+
+Thanks for Frank Force for his awesome [ZzFX](https://zzfx.3d2k.com/).
