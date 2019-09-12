@@ -42,6 +42,8 @@ export class PlayerPhysics {
 
   antigravityTime = 0;
 
+  hitTime = 0;
+
   constructor(private physics: PhysicsSystem, private player: Player) {}
 
   get body_() {
@@ -142,7 +144,11 @@ export class PlayerPhysics {
           this.mode_ === MotionMode.falling &&
           this.player.engine.time_ - this.fallingTime > 150
         ) {
-          zzfx(1, 0.1, 304, 0.2, 0.01, 0, 0.3, 0, 0.5);
+          if (this.player.engine.time_ - this.hitTime > 150) {
+            zzfx(1, 0.1, 304, 0.2, 0.01, 0, 0.3, 0, 0.5);
+          }
+          this.hitTime = this.player.engine.time_;
+
           this.player.targetScale = Math.min(
             1,
             1 / Math.abs(body_.vel.y) / 8 + 0.7,
