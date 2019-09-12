@@ -9,8 +9,6 @@ import { MotionMode } from "../physics/player-physics";
 import { LEVELS } from "../levels";
 import { GRASS_MASK } from "../colisions-masks";
 
-const SCALE = 0.4;
-
 export class Renderer {
   ctx: CanvasRenderingContext2D;
 
@@ -220,12 +218,12 @@ export class Renderer {
   ) {
     const r = new Random(seed);
     const canvas = this.engine.renderer.activeLayer.canvas_;
-    const blur = 2 / this.engine.renderer.activeLayer.offsetScale;
 
     const grd = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
     grd.addColorStop(0, color);
     grd.addColorStop(1, "#111");
-    this.ctx.filter = `blur(${blur}px)`;
+    this.ctx.filter = `blur(${2 /
+      this.engine.renderer.activeLayer.offsetScale}px)`;
 
     this.ctx.fillStyle = grd;
     this.ctx.lineWidth = 0;
@@ -586,8 +584,8 @@ export class Renderer {
   }
 
   updateSize() {
-    this.engine.canvas_.width = window.outerWidth * SCALE;
-    this.engine.canvas_.height = window.outerHeight * SCALE;
+    this.engine.canvas_.width = window.outerWidth * 0.4;
+    this.engine.canvas_.height = window.outerHeight * 0.4;
 
     for (const layer of Layer.layers) {
       layer.updateSize();
