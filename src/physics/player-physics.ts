@@ -1,12 +1,11 @@
 import { PhysicsSystem } from "./physics";
 import { Player } from "../player";
 import { Vector2 } from "../vector";
-import { assets } from "../assets";
 import { Pickable } from "../level.interface";
 
 import "../ZzFX.micro";
 
-export declare var zzfx: any;
+export declare const zzfx: any;
 
 export const enum MotionMode {
   running,
@@ -46,16 +45,12 @@ export class PlayerPhysics {
 
   constructor(private physics: PhysicsSystem, private player: Player) {}
 
-  get body_() {
-    return this.player.body_;
-  }
-
   update_() {
     if (this.player.isDead) {
       return;
     }
 
-    const body_ = this.body_;
+    const body_ = this.player.body_;
 
     this.updateMode();
 
@@ -64,7 +59,7 @@ export class PlayerPhysics {
       this.player.engine.time_ - this.antigravityTime > 3500
     ) {
       this.gravity = 0.25;
-      this.body_.pos.y += 20;
+      this.player.body_.pos.y += 20;
       this.antigravityTime = 0;
     }
 
@@ -86,7 +81,7 @@ export class PlayerPhysics {
       }
       if (
         !this.player.isRunning ||
-        (this.body_.vel.x > 0 ? "r" : "l") !== this.direction_
+        (this.player.body_.vel.x > 0 ? "r" : "l") !== this.direction_
       ) {
         body_.vel.x *= 0.5;
       }
@@ -132,8 +127,7 @@ export class PlayerPhysics {
       Limit the speed to the diameter of circle.
       This way we avoid tunelling through terrain in high speeds.
     **/
-    const radius = body_.radius;
-    const speed = Math.min(body_.vel.length_(), radius);
+    const speed = Math.min(body_.vel.length_(), body_.radius);
     body_.vel = body_.vel.normalize_().mul(speed);
 
     if (this.mode_ !== MotionMode.climbing) {
@@ -202,9 +196,10 @@ export class PlayerPhysics {
       }
     }
 
-    for (const point of this.body_.contactPoints) {
-      const dy = (point.y - this.body_.pos.y) * (this.gravity > 0 ? 1 : -1);
-      const dx = point.x - this.body_.pos.x;
+    for (const point of this.player.body_.contactPoints) {
+      const dy =
+        (point.y - this.player.body_.pos.y) * (this.gravity > 0 ? 1 : -1);
+      const dx = point.x - this.player.body_.pos.x;
       if (dy > this.climbingThreshold) {
         this.mode_ = MotionMode.running;
         return;
@@ -237,7 +232,7 @@ export class PlayerPhysics {
 
   moveToDirection(direction: number) {
     if (this.mode_ === MotionMode.bubbling) {
-      this.body_.vel.rotate_(direction / 13);
+      this.player.body_.vel.rotate_(direction / 13);
       return;
     }
 
@@ -249,8 +244,8 @@ export class PlayerPhysics {
 
     const acc = direction * accScalar;
 
-    if (Math.abs(this.body_.vel.x + acc) < this.maxSpeed) {
-      this.body_.vel.x += acc;
+    if (Math.abs(this.player.body_.vel.x + acc) < this.maxSpeed) {
+      this.player.body_.vel.x += acc;
     }
 
     this.direction_ = direction < 0 ? "l" : "r";
@@ -267,13 +262,13 @@ export class PlayerPhysics {
         this.player.engine.time_ - this.fallingTime < 150)
     ) {
       if (this.player.engine.time_ - this.lastJumpTime > 151) {
-        this.body_.vel.y = 5;
+        this.player.body_.vel.y = 5;
         if (this.mode_ === MotionMode.climbing) {
-          this.body_.vel.x = -this.climbContact! / 3;
-          this.body_.vel.y = 5;
+          this.player.body_.vel.x = -this.climbContact! / 3;
+          this.player.body_.vel.y = 5;
         }
-        this.body_.vel.y *= this.gravity > 0 ? -1 : 1;
-        this.body_.contactPoints = [];
+        this.player.body_.vel.y *= this.gravity > 0 ? -1 : 1;
+        this.player.body_.contactPoints = [];
         this.lastJumpTime = this.player.engine.time_;
         this.dashed = false;
         zzfx(0.6, 1, 150, 0.15, 0.47, 4.2, 1.4, 1, 0.25);
@@ -286,7 +281,7 @@ export class PlayerPhysics {
       !this.dashed &&
       this.player.engine.time_ - this.lastJumpTime > 300
     ) {
-      this.body_.vel.y = 5 * (this.gravity > 0 ? -1 : 1);
+      this.player.body_.vel.y = 5 * (this.gravity > 0 ? -1 : 1);
       this.dashed = true;
       zzfx(0.6, 1, 200, 0.1, 0.47, 4.2, 1.4, 1, 0.15);
     }
@@ -303,9 +298,9 @@ export class PlayerPhysics {
     if (this.mode_ === MotionMode.bubbling) {
       this.leaveBubbling();
     } else {
-      this.body_.vel = new Vector2(0, -5);
-      this.body_.pos.x = bubble.pos.x;
-      this.body_.pos.y = bubble.pos.y;
+      this.player.body_.vel = new Vector2(0, -5);
+      this.player.body_.pos.x = bubble.pos.x;
+      this.player.body_.pos.y = bubble.pos.y;
     }
     this.mode_ = MotionMode.bubbling;
     this.bubble = bubble;
@@ -321,7 +316,9 @@ export class PlayerPhysics {
       count: 250,
       direction_: new Vector2(8, 0),
       lifetime: 80,
-      pos: this.body_.pos.copy().add_(this.body_.vel.copy().mul(9)),
+      pos: this.player.body_.pos
+        .copy()
+        .add_(this.player.body_.vel.copy().mul(9)),
     });
     const bubble = this.bubble!;
     this.bubble = null;

@@ -1,6 +1,6 @@
 import "./ZzFX.micro";
 
-export declare var zzfx: any;
+export declare const zzfx: any;
 
 let lastTime = 0;
 

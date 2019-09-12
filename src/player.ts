@@ -9,7 +9,7 @@ import { DynamicBody } from "./physics/physics";
 import "./ZzFX.micro";
 import { lerp } from "./utils";
 
-export declare var zzfx: any;
+export declare const zzfx: any;
 
 interface AgentAnimation {
   headOffset: number;
