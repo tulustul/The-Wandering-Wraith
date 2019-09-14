@@ -18,8 +18,9 @@ The game comes with a built-in editor available in development build only.
 
 Some non-obvious things about editor:
 
-- You can delete objects with "delete" key
-- when path point is select you can:
+- press "e" to enable it
+- you can delete objects with "delete" key
+- when path point is selected you can:
   - cut it using "c"
   - toggle between straight lines and bezier curves using "v"
 
