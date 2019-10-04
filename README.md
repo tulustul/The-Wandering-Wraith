@@ -4,6 +4,8 @@ A 2d platformer for [js13kGames](https://js13kgames.com/) 2019 edition challenge
 
 You can play it [here](https://tulustul.github.io/The-Wandering-Wraith/) or on the [contest page](https://js13kgames.com/entries/the-wandering-wraith)
 
+[Post mortem](https://medium.com/@mateusz.tomczyk/a-story-of-making-a-13-kb-game-in-30-days-the-wandering-wraith-post-mortem-9847c8992f49)
+
 ![Game screenshot](/screens/screen1.png)
 
 ## Controls
